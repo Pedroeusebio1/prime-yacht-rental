@@ -1,0 +1,12 @@
+assets/vehicles/
+assets/catalog/
+*.zip
+*.mov
+*.mp4
+*.webm
+*.m4v
+download-error.txt
+download-warning.txt
+node_modules/
+.DS_Store
+Thumbs.db

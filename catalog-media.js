@@ -1,0 +1,1 @@
+window.PRIME_MEDIA = {};
