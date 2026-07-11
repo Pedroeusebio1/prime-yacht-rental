@@ -185,13 +185,20 @@
   }
 
   function yachtIntro(yacht){
-    const extras = yacht.notes ? ` ${yacht.notes}` : '';
     const passengerLabel = yacht.passengers === 1 ? '1 pasajero' : `${yacht.passengers} pasajeros`;
-    return `${passengerLabel}. ${yacht.location}. ${yacht.rates}${extras}`;
+    return `${passengerLabel}. ${yacht.location}. ${quotePriceText(yacht)}`;
   }
 
-  function cardPriceText(){
-    return 'Precios desde $300 USD por hora';
+  function baseHourlyPrice(vehicle){
+    return vehicle && vehicle.category ? 250 : 300;
+  }
+
+  function cardPriceText(vehicle){
+    return `Precios desde $${baseHourlyPrice(vehicle)} USD por hora`;
+  }
+
+  function quotePriceText(vehicle){
+    return `Precios desde $${baseHourlyPrice(vehicle)} USD por hora. Para más info realizar su cotización.`;
   }
 
   function yachtImage(yacht){
@@ -342,9 +349,9 @@
             <span class="cat-kicker">${escapeHTML(yacht.size)} · ${escapeHTML(yacht.feet || '')}FT</span>
             <h3>${escapeHTML(yacht.name)}</h3>
             <span class="marina">${escapeHTML(yacht.location)}</span>
-            <span class="incl">${escapeHTML(cardPriceText())}</span>
+            <span class="incl">${escapeHTML(cardPriceText(yacht))}</span>
             <span class="cat-foot">
-              <span class="price">Desde $300<span>USD por hora</span></span>
+              <span class="price">Desde $${baseHourlyPrice(yacht)}<span>USD por hora</span></span>
               <span class="cat-actions">
                 <button class="book details-btn" type="button">Ver detalles</button>
                 ${photoLinkHTML(yacht, 'photo-link cat-photo-link')}
@@ -374,12 +381,12 @@
     modal.querySelector('[data-modal-title]').textContent = yacht.name;
     modal.querySelector('[data-modal-passengers]').textContent = yacht.passengers === 1 ? '1 pasajero' : `${yacht.passengers} pasajeros`;
     modal.querySelector('[data-modal-location]').textContent = yacht.location;
-    modal.querySelector('[data-modal-rates]').textContent = yacht.rates;
-    modal.querySelector('[data-modal-notes]').textContent = yacht.notes || 'Incluye el servicio base Prime para una experiencia privada y comoda.';
+    modal.querySelector('[data-modal-rates]').textContent = quotePriceText(yacht);
+    modal.querySelector('[data-modal-notes]').textContent = 'Para más info realizar su cotización.';
     modal.querySelector('[data-modal-summary]').textContent = yachtIntro(yacht);
     const description = modal.querySelector('[data-modal-description]');
     const photoLink = modal.querySelector('[data-modal-photo-link]');
-    if(description) description.textContent = yacht.description || yachtIntro(yacht);
+    if(description) description.textContent = quotePriceText(yacht);
     if(photoLink) {
       photoLink.href = isUsablePhotoLink(yacht) ? yacht.photoLink : '#';
       photoLink.textContent = 'Ver más fotos';
@@ -405,11 +412,11 @@
             <span class="tag">${adventure.category}</span>
             <h3>${adventure.name}</h3>
             <span class="meta">${adventure.location}</span>
-            <span class="adv-desc">${escapeHTML(cardPriceText())}</span>
+            <span class="adv-desc">${escapeHTML(cardPriceText(adventure))}</span>
             <span class="adv-prices">
               <span class="adv-price">
                 <span class="d">USD por hora</span>
-                <span class="v">Desde $300</span>
+                <span class="v">Desde $${baseHourlyPrice(adventure)}</span>
               </span>
               <span class="adv-link">Ver detalles</span>
             </span>
