@@ -401,12 +401,12 @@ window.PRIME_YACHTS = [
     "rates": "-$100 Mon–Thurs | 3H $600 | 4H $750 | 6H $1150",
     "price": "$600",
     "priceLabel": "3 horas",
-    "photoLink": "https://vcyacht.club/doublesugarphoto",
+    "photoLink": "",
     "image": "https://tse1.mm.bing.net/th?q=double%20sugar%20-%2042%20sea%20ray%20sundancer%20double%20sugar%20-%2042%20sea%20ray%20sundancer%20yacht%20miami%2042ft%20boat%20yacht%20miami%2024&w=900&h=650&c=7&rs=1&p=0&o=5&pid=1.7",
     "notes": "Gratuidad/tip segun nota del operador.",
-    "description": "Double Sugar  - 42' Sea Ray Sundancer\n-$100 Mon–Thurs\n3H  $600\n4H  $750\n6H  $1150\nBreezo Marine - 129 NW S River Dr, Miami, FL 33128\nMax 13 | 10% Gratuity\nvcyacht.club/doublesugarphoto",
+    "description": "Double Sugar  - 42' Sea Ray Sundancer\n-$100 Mon–Thurs\n3H  $600\n4H  $750\n6H  $1150\nBreezo Marine - 129 NW S River Dr, Miami, FL 33128\nMax 13 | 10% Gratuity",
     "mediaKey": "024-double-sugar-42-sea-ray-sundancer",
-    "photoLinkOk": true
+    "photoLinkOk": false
   },
   {
     "name": "42ft Marquis Sport Coupe",
@@ -605,12 +605,12 @@ window.PRIME_YACHTS = [
     "rates": "-$100 Mon–Thurs | 4H $1000 | 6H $1400",
     "price": "$1000",
     "priceLabel": "4 horas",
-    "photoLink": "https://vcyacht.club/jasminphoto",
+    "photoLink": "",
     "image": "https://tse1.mm.bing.net/th?q=jasmin%20-%2050%20cranchi%20jasmin%20-%2050%20cranchi%20yacht%20miami%2050ft%20boat%20yacht%20miami%2036&w=900&h=650&c=7&rs=1&p=0&o=5&pid=1.7",
     "notes": "Gratuidad/tip segun nota del operador.",
     "description": "Jasmin  - 50' Cranchi\n-$100 Mon–Thurs\n4H  $1000\n6H  $1400\n243 NW S River Dr, Miami, FL 33128\nMax 13 | 10% Gratuity",
     "mediaKey": "036-jasmin-50-cranchi",
-    "photoLinkOk": true
+    "photoLinkOk": false
   },
   {
     "name": "50FT Sea Ray",
@@ -792,12 +792,12 @@ window.PRIME_YACHTS = [
     "rates": "-$100 Mon–Thurs | 3H $1200 | 4H $1600 | 6H $2000 | 8H $2350",
     "price": "$1200",
     "priceLabel": "3 horas",
-    "photoLink": "https://vcyacht.club/everbluephoto",
+    "photoLink": "",
     "image": "https://tse1.mm.bing.net/th?q=everblue%20-%2058%20prestige%20550%20everblue%20-%2058%20prestige%20550%20luxury%20motor%20yacht%20miami%2058ft%20boat%20yacht%20miami%2051&w=900&h=650&c=7&rs=1&p=0&o=5&pid=1.7",
-    "notes": "10% de gratuidad. Deposito reembolsable de $300. Calendario: https://vcyacht.club/everbluecalendar",
-    "description": "EverBlue  - 58' Prestige 550\n-$100 Mon–Thurs\n3H  $1200\n4H  $1600\n6H  $2000\n8H  $2350\n2550 S Bayshore Dr, Miami, FL 33133, United States\nMax 13 | 10% Gratuity\nCalendario: https://vcyacht.club/everbluecalendar\nDeposito reembolsable: $300",
+    "notes": "10% de gratuidad. Depósito reembolsable de $300.",
+    "description": "EverBlue  - 58' Prestige 550\n-$100 Mon–Thurs\n3H  $1200\n4H  $1600\n6H  $2000\n8H  $2350\n2550 S Bayshore Dr, Miami, FL 33133, United States\nMax 13 | 10% Gratuity\nDepósito reembolsable: $300",
     "mediaKey": "051-everblue-58-prestige-550",
-    "photoLinkOk": true
+    "photoLinkOk": false
   },
   {
     "name": "60’ Absolute Fly",
