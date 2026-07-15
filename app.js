@@ -78,20 +78,8 @@
     return copy;
   }
 
-  const featuredYachts = [
-    "Double Sugar - 42' Sea Ray Sundancer",
-    "Jasmin - 50' Cranchi",
-    "EverBlue - 58' Prestige 550"
-  ];
   const yachts = Array.isArray(window.PRIME_YACHTS) && window.PRIME_YACHTS.length
-    ? [...window.PRIME_YACHTS].sort((a, b) => {
-        const aRank = featuredYachts.indexOf(a.name);
-        const bRank = featuredYachts.indexOf(b.name);
-        if(aRank === -1 && bRank === -1) return 0;
-        if(aRank === -1) return 1;
-        if(bRank === -1) return -1;
-        return aRank - bRank;
-      })
+    ? shuffled(window.PRIME_YACHTS)
     : [];
   const catalogMedia = window.PRIME_MEDIA || {};
 
