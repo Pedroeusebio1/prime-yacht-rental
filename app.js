@@ -214,6 +214,59 @@
     return compactText(vehicle.description || vehicle.rates || vehicle.notes || `Precios desde $${baseHourlyPrice(vehicle)} USD por hora`, 130);
   }
 
+  function uniqueRateOptions(yacht){
+    const options = String(yacht.rates || '')
+      .split('|')
+      .map((option) => option.replace(/\s+/g, ' ').trim())
+      .filter(Boolean)
+      .filter((option, index, items) => items.findIndex((item) => item.toLowerCase() === option.toLowerCase()) === index);
+
+    if(options.length > 1) options.shift();
+    return compactText(options.join(' · '), 145);
+  }
+
+  function meaningfulCardNote(yacht){
+    const note = cleanNotes(yacht.notes)
+      .replace(/Galería disponible en el botón “Ver más fotos”\.?/gi, '')
+      .replace(/Confirma la disponibilidad antes de reservar\.?/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return compactText(note, 105);
+  }
+
+  function yachtCardDetailsHTML(yacht){
+    const options = uniqueRateOptions(yacht);
+    const note = meaningfulCardNote(yacht);
+    if(!options && !note) return '';
+
+    return `<span class="cat-details">
+      ${options ? `<span class="cat-detail-row"><span class="cat-detail-label">Más opciones</span><span>${escapeHTML(options)}</span></span>` : ''}
+      ${note ? `<span class="cat-detail-row cat-detail-note"><span class="cat-detail-label">Importante</span><span>${escapeHTML(note)}</span></span>` : ''}
+    </span>`;
+  }
+
+  function modalExtraDescription(yacht){
+    const name = String(yacht.name || '').toLowerCase();
+    const location = String(yacht.location || '').toLowerCase();
+    const seen = new Set();
+    return String(yacht.description || '')
+      .split(/\r?\n/)
+      .map((line) => line.replace(/^[*•\-]+\s*/, '').trim())
+      .filter((line) => {
+        const normalized = line.toLowerCase();
+        if(!normalized || normalized === name || normalized === location) return false;
+        if(/photos?|pictures?|calendar|galer[ií]a|https?:|www\.|\.club\//i.test(line)) return false;
+        if(/(?:guest|people|pasajer|max|capacity)/i.test(line)) return false;
+        if(/(?:location|departure|pickup|pick up|marina).*:/i.test(line)) return false;
+        if(/(?:hours?|horas?|hrs?|\b\d+h\b).*\$|\$.*(?:hours?|horas?|hrs?|\b\d+h\b)/i.test(line)) return false;
+        if(/^(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekday|weekend|mon|tue|wed|thu|fri|sat|sun)/i.test(line)) return false;
+        if(seen.has(normalized)) return false;
+        seen.add(normalized);
+        return true;
+      })
+      .join(' · ');
+  }
+
   function quotePriceText(vehicle){
     return vehicle.rates || vehicle.description || `Precios desde $${baseHourlyPrice(vehicle)} USD por hora. Para más info realizar su cotización.`;
   }
@@ -384,7 +437,7 @@
             <span class="cat-kicker">${escapeHTML(yacht.size)} · ${escapeHTML(yacht.feet || '')}FT</span>
             <h3>${escapeHTML(yacht.name)}</h3>
             <span class="marina">${escapeHTML(yacht.location)}</span>
-            <span class="incl">${escapeHTML(cardPriceText(yacht))}</span>
+            ${yachtCardDetailsHTML(yacht)}
             <span class="cat-foot">
               <span class="price">${escapeHTML(yacht.price || `Desde $${baseHourlyPrice(yacht)}`)}<span>${escapeHTML(yacht.priceLabel || 'USD por hora')}</span></span>
               <span class="cat-actions">
@@ -420,7 +473,11 @@
     modal.querySelector('[data-modal-summary]').textContent = yachtIntro(yacht);
     const description = modal.querySelector('[data-modal-description]');
     const photoLink = modal.querySelector('[data-modal-photo-link]');
-    if(description) description.textContent = yacht.description || quotePriceText(yacht);
+    if(description) {
+      const extraDescription = modalExtraDescription(yacht);
+      description.textContent = extraDescription;
+      description.style.display = extraDescription ? 'block' : 'none';
+    }
     if(photoLink) {
       photoLink.href = isUsablePhotoLink(yacht) ? yacht.photoLink : '#';
       photoLink.textContent = 'Ver más fotos';
