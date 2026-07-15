@@ -59,6 +59,8 @@
 (function(){
   const catalogGrid = document.getElementById('catalogGrid');
   const filterBar = document.getElementById('filterBar');
+  const catalogSearch = document.getElementById('catalogSearch');
+  const catalogSearchBtn = document.getElementById('catalogSearchBtn');
   const loadMoreBtn = document.getElementById('loadMoreBtn');
   const adventuresGrid = document.getElementById('adventuresGrid');
   const statBoats = document.getElementById('statBoats');
@@ -76,7 +78,21 @@
     return copy;
   }
 
-  const yachts = Array.isArray(window.PRIME_YACHTS) && window.PRIME_YACHTS.length ? shuffled(window.PRIME_YACHTS) : [];
+  const featuredYachts = [
+    "Double Sugar - 42' Sea Ray Sundancer",
+    "Jasmin - 50' Cranchi",
+    "EverBlue - 58' Prestige 550"
+  ];
+  const yachts = Array.isArray(window.PRIME_YACHTS) && window.PRIME_YACHTS.length
+    ? [...window.PRIME_YACHTS].sort((a, b) => {
+        const aRank = featuredYachts.indexOf(a.name);
+        const bRank = featuredYachts.indexOf(b.name);
+        if(aRank === -1 && bRank === -1) return 0;
+        if(aRank === -1) return 1;
+        if(bRank === -1) return -1;
+        return aRank - bRank;
+      })
+    : [];
   const catalogMedia = window.PRIME_MEDIA || {};
 
   const filters = [
@@ -165,6 +181,7 @@
   ];
 
   let activeFilter = 'Todos';
+  let searchTerm = '';
   let visibleCount = 9;
 
   if(statBoats) statBoats.textContent = yachts.length;
@@ -184,9 +201,21 @@
     return text.length > maxLength ? `${text.slice(0, maxLength - 1).trim()}...` : text;
   }
 
+  function cleanNotes(value){
+    return String(value || '')
+      .replace(/Gratuidad\/tip segun nota del operador\.?/gi, 'Propina según las condiciones del operador.')
+      .replace(/Fotos disponibles en el boton Ver mas fotos\.?/gi, 'Galería disponible en el botón “Ver más fotos”.')
+      .replace(/Incluye capitan/gi, 'Incluye capitán')
+      .replace(/segun reserva/gi, 'según la reserva')
+      .replace(/catalogo/gi, 'catálogo')
+      .replace(/Confirmar disponibilidad antes de reservar\.?/gi, 'Confirma la disponibilidad antes de reservar.')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   function yachtIntro(yacht){
     const passengerLabel = yacht.passengers === 1 ? '1 pasajero' : `${yacht.passengers} pasajeros`;
-    return `${passengerLabel}. ${yacht.location}. ${quotePriceText(yacht)}`;
+    return `${passengerLabel}. ${yacht.location}. ${compactText(yacht.rates || yacht.description || yacht.notes || '', 120)}`;
   }
 
   function baseHourlyPrice(vehicle){
@@ -194,11 +223,11 @@
   }
 
   function cardPriceText(vehicle){
-    return `Precios desde $${baseHourlyPrice(vehicle)} USD por hora`;
+    return compactText(vehicle.description || vehicle.rates || vehicle.notes || `Precios desde $${baseHourlyPrice(vehicle)} USD por hora`, 130);
   }
 
   function quotePriceText(vehicle){
-    return `Precios desde $${baseHourlyPrice(vehicle)} USD por hora. Para más info realizar su cotización.`;
+    return vehicle.rates || vehicle.description || `Precios desde $${baseHourlyPrice(vehicle)} USD por hora. Para más info realizar su cotización.`;
   }
 
   function yachtImage(yacht){
@@ -284,8 +313,8 @@
 
   function isUsablePhotoLink(yacht){
     const url = String(yacht.photoLink || '');
-    if(!url || yacht.photoLinkOk === false) return false;
-    return !/bing\.com\/images|tse\d*\.mm\.bing\.net/i.test(url);
+    if(!/^https?:\/\//i.test(url)) return false;
+    return !/(?:bing\.com\/images|tse\d*\.mm\.bing\.net)/i.test(url);
   }
 
   function yachtMediaHTML(yacht, index){
@@ -304,7 +333,7 @@
 
   function photoLinkHTML(yacht, className = 'photo-link'){
     if(!isUsablePhotoLink(yacht)) return '';
-    return `<a class="${className}" href="${escapeHTML(yacht.photoLink)}" target="_blank" rel="noopener">Ver más fotos</a>`;
+    return `<a class="${className}" href="${escapeHTML(yacht.photoLink)}" target="_blank" rel="noopener noreferrer" aria-label="Ver más fotos de ${escapeHTML(yacht.name)}">Ver más fotos</a>`;
   }
 
   function adventureImage(adventure){
@@ -322,9 +351,27 @@
   }
 
   function getFilteredYachts(){
-    return activeFilter === 'Todos'
+    const sizeFiltered = activeFilter === 'Todos'
       ? yachts
       : yachts.filter((yacht) => yacht.size === activeFilter);
+
+    if(!searchTerm) return sizeFiltered;
+
+    return sizeFiltered.filter((yacht) => {
+      const searchable = [
+        yacht.name,
+        yacht.feet,
+        yacht.size,
+        yacht.sizeLabel,
+        yacht.location,
+        yacht.passengers,
+        yacht.rates
+      ].join(' ')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+      return searchable.includes(searchTerm);
+    });
   }
 
   function renderFilters(){
@@ -337,7 +384,7 @@
     const filteredYachts = getFilteredYachts();
     const visibleYachts = filteredYachts.slice(0, visibleCount);
 
-    catalogGrid.innerHTML = visibleYachts.map((yacht) => `
+    catalogGrid.innerHTML = visibleYachts.length ? visibleYachts.map((yacht) => `
       <article class="cat-card" data-yacht-index="${yachts.indexOf(yacht)}">
         <div class="cat-open">
           <span class="cat-media">
@@ -351,16 +398,15 @@
             <span class="marina">${escapeHTML(yacht.location)}</span>
             <span class="incl">${escapeHTML(cardPriceText(yacht))}</span>
             <span class="cat-foot">
-              <span class="price">Desde $${baseHourlyPrice(yacht)}<span>USD por hora</span></span>
+              <span class="price">${escapeHTML(yacht.price || `Desde $${baseHourlyPrice(yacht)}`)}<span>${escapeHTML(yacht.priceLabel || 'USD por hora')}</span></span>
               <span class="cat-actions">
-                <button class="book details-btn" type="button">Ver detalles</button>
-                ${photoLinkHTML(yacht, 'photo-link cat-photo-link')}
+                ${photoLinkHTML(yacht, 'cta-btn cat-photo-link')}
               </span>
             </span>
           </span>
         </div>
       </article>
-    `).join('');
+    `).join('') : `<div class="catalog-empty"><strong>No encontramos embarcaciones</strong><span>Prueba otro nombre, tamaño o ubicación.</span></div>`;
 
     loadMoreBtn.style.display = visibleCount >= filteredYachts.length ? 'none' : 'inline-flex';
     loadMoreBtn.textContent = `Ver Mas Embarcaciones (${filteredYachts.length - visibleYachts.length})`;
@@ -382,11 +428,11 @@
     modal.querySelector('[data-modal-passengers]').textContent = yacht.passengers === 1 ? '1 pasajero' : `${yacht.passengers} pasajeros`;
     modal.querySelector('[data-modal-location]').textContent = yacht.location;
     modal.querySelector('[data-modal-rates]').textContent = quotePriceText(yacht);
-    modal.querySelector('[data-modal-notes]').textContent = 'Para más info realizar su cotización.';
+    modal.querySelector('[data-modal-notes]').textContent = cleanNotes(yacht.notes) || 'Confirma disponibilidad y condiciones al solicitar la cotización.';
     modal.querySelector('[data-modal-summary]').textContent = yachtIntro(yacht);
     const description = modal.querySelector('[data-modal-description]');
     const photoLink = modal.querySelector('[data-modal-photo-link]');
-    if(description) description.textContent = quotePriceText(yacht);
+    if(description) description.textContent = yacht.description || quotePriceText(yacht);
     if(photoLink) {
       photoLink.href = isUsablePhotoLink(yacht) ? yacht.photoLink : '#';
       photoLink.textContent = 'Ver más fotos';
@@ -415,8 +461,8 @@
             <span class="adv-desc">${escapeHTML(cardPriceText(adventure))}</span>
             <span class="adv-prices">
               <span class="adv-price">
-                <span class="d">USD por hora</span>
-                <span class="v">Desde $${baseHourlyPrice(adventure)}</span>
+                <span class="d">${escapeHTML(adventure.priceLabel || 'por hora')}</span>
+                <span class="v">${escapeHTML(adventure.price || `Desde $${baseHourlyPrice(adventure)}`)}</span>
               </span>
               <span class="adv-link">Ver detalles</span>
             </span>
@@ -497,6 +543,34 @@
     }
     if(event.target.matches('[data-modal-close]') || event.target === modal) closeModal();
   });
+
+  function applyCatalogSearch(){
+    if(catalogSearch) {
+      searchTerm = catalogSearch.value
+        .trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+      visibleCount = 9;
+      if(searchTerm) {
+        activeFilter = 'Todos';
+        renderFilters();
+      }
+      renderCatalog();
+    }
+  }
+
+  if(catalogSearch && catalogSearchBtn) {
+    catalogSearchBtn.addEventListener('click', applyCatalogSearch);
+    catalogSearch.addEventListener('keydown', (event) => {
+      if(event.key === 'Enter') {
+        event.preventDefault();
+        applyCatalogSearch();
+      }
+    });
+    catalogSearch.addEventListener('input', applyCatalogSearch);
+    catalogSearch.addEventListener('search', applyCatalogSearch);
+  }
 
   document.addEventListener('keydown', (event) => {
     if(event.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
