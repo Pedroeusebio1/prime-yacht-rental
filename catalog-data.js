@@ -11,7 +11,7 @@ window.PRIME_YACHTS = [
     "priceLabel": "5 horas",
     "photoLink": "",
     "image": "./assets/covers/boca-chica-flybridge-40ft.jpg",
-    "notes": "Yate a motor tipo flybridge. Eslora aproximada y capacidad estimada; confirmar capacidad, disponibilidad y servicios incluidos antes de reservar.",
+    "notes": "Disfruta una experiencia privada navegando por las aguas cristalinas de Boca Chica a bordo de este cómodo yate flybridge, ideal para compartir con familiares y amigos.",
     "description": "YATE FLYBRIDGE BOCA CHICA 40FT\nUbicación: Boca Chica, República Dominicana\nTarifa: $750 USD por 5 horas\nCapacidad estimada: hasta 12 pasajeros\nLa marca, el modelo, la eslora y la capacidad exacta están pendientes de confirmación.",
     "mediaKey": "099-boca-chica-flybridge-40ft",
     "photoLinkOk": false
