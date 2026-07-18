@@ -1,5 +1,22 @@
 window.PRIME_YACHTS = [
   {
+    "name": "YATE FLYBRIDGE BOCA CHICA 40FT",
+    "feet": 40,
+    "size": "Mediano",
+    "sizeLabel": "40 a 58 pies",
+    "passengers": 12,
+    "location": "Boca Chica, República Dominicana",
+    "rates": "5 horas: $750 USD",
+    "price": "$750",
+    "priceLabel": "5 horas",
+    "photoLink": "",
+    "image": "./assets/covers/boca-chica-flybridge-40ft.jpg",
+    "notes": "Yate a motor tipo flybridge. Eslora aproximada y capacidad estimada; confirmar capacidad, disponibilidad y servicios incluidos antes de reservar.",
+    "description": "YATE FLYBRIDGE BOCA CHICA 40FT\nUbicación: Boca Chica, República Dominicana\nTarifa: $750 USD por 5 horas\nCapacidad estimada: hasta 12 pasajeros\nLa marca, el modelo, la eslora y la capacidad exacta están pendientes de confirmación.",
+    "mediaKey": "099-boca-chica-flybridge-40ft",
+    "photoLinkOk": false
+  },
+  {
     "name": "50FT SUNSEEKER MANHATTAN",
     "feet": 50,
     "size": "Mediano",
