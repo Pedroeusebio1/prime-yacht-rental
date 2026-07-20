@@ -160,14 +160,6 @@ nav.links a:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(185, 134, 42, 0.4);
 }
-.burger {
-  display: none;
-  background: none;
-  border: none;
-  color: var(--gold-deep);
-  font-size: 26px;
-  cursor: pointer;
-}
 .hero {
   position: relative;
   min-height: 96vh;
@@ -1157,9 +1149,6 @@ footer {
   .catalog-search-btn { width: 100%; }
   nav.links {
     display: none;
-  }
-  .burger {
-    display: block;
   }
   .loc-grid,
   .svc-grid,
