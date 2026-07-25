@@ -1232,3 +1232,7 @@ footer {
     font-size: 16px;
   }
 }
+
+body{
+  display: none;
+}
