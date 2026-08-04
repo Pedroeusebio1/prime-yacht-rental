@@ -133,29 +133,45 @@
   const adventuresGrid = document.getElementById('adventuresGrid');
   const statBoats = document.getElementById('statBoats');
   const modal = document.getElementById('yachtModal');
+  const editorAccess = document.getElementById('editorAccess');
+  const editorLoginModal = document.getElementById('editorLoginModal');
+  const editorLoginForm = document.getElementById('editorLoginForm');
+  const editorLoginFeedback = document.getElementById('editorLoginFeedback');
+  const fleetEditor = document.getElementById('fleetEditor');
+  const fleetEditorForm = document.getElementById('fleetEditorForm');
 
   if(!catalogGrid || !filterBar || !loadMoreBtn || !modal) return;
 
   const isEnglish = () => document.documentElement.lang === 'en';
   const ui = (es, en) => isEnglish() ? en : es;
-  function localizedLocation(value){
-    if(!isEnglish()) return value;
+  function englishLocation(value){
     return String(value || '')
       .replace(/Rep[uú]blica Dominicana/gi, 'Dominican Republic')
       .replace(/R[ií]o Miami/gi, 'Miami River')
       .replace(/y Biscayne Bay/gi, 'and Biscayne Bay')
       .replace(/Boca Chica, La Romana y Punta Cana/gi, 'Boca Chica, La Romana and Punta Cana');
   }
-  function localizedRate(value){
-    if(!isEnglish()) return value;
+  function localizedLocation(value){ return isEnglish() ? englishLocation(value) : value; }
+  function englishRate(value){
     return String(value || '')
       .replace(/(\d+)\s*horas?/gi, '$1 hours')
       .replace(/por hora/gi, 'per hour')
       .replace(/por tour/gi, 'per tour')
       .replace(/grupo privado/gi, 'private group')
       .replace(/seg[uú]n ruta/gi, 'based on route')
+      .replace(/Lun-Jue/gi, 'Mon–Thu')
+      .replace(/lunes a jueves/gi, 'Monday through Thursday')
+      .replace(/D[ií]as laborables/gi, 'Weekdays')
+      .replace(/Fin de semana/gi, 'Weekend')
+      .replace(/Vie\/Dom/gi, 'Fri/Sun')
+      .replace(/S[aá]b/gi, 'Sat')
+      .replace(/Dep[oó]sito requerido/gi, 'Required deposit')
+      .replace(/Tarifas de fin de semana disponibles en la ficha/gi, 'Weekend rates available in the listing')
+      .replace(/Precio desde/gi, 'Rates from')
+      .replace(/Tarifas sujetas a horario y disponibilidad/gi, 'Rates subject to schedule and availability')
       .replace(/Cotizar/gi, 'Request quote');
   }
+  function localizedRate(value){ return isEnglish() ? englishRate(value) : value; }
 
   const imageBase = 'https://loremflickr.com/900/650/';
   function shuffled(items){
@@ -167,9 +183,16 @@
     return copy;
   }
 
-  const yachts = Array.isArray(window.PRIME_YACHTS) && window.PRIME_YACHTS.length
-    ? shuffled(window.PRIME_YACHTS)
-    : [];
+  const editorStorageKey = 'prime-yacht-editor-v1';
+  function yachtStorageKey(yacht){ return yacht.mediaKey || yacht.name; }
+  function readEditorChanges(){
+    try { return JSON.parse(localStorage.getItem(editorStorageKey) || '{}'); } catch (_) { return {}; }
+  }
+  const savedEditorChanges = readEditorChanges();
+  const sourceYachts = Array.isArray(window.PRIME_YACHTS) ? window.PRIME_YACHTS.map((yacht) => ({ ...yacht })) : [];
+  const originalYachts = new Map(sourceYachts.map((yacht) => [yachtStorageKey(yacht), { ...yacht }]));
+  sourceYachts.forEach((yacht) => Object.assign(yacht, savedEditorChanges[yachtStorageKey(yacht)] || {}));
+  const yachts = sourceYachts.length ? shuffled(sourceYachts) : [];
   const catalogMedia = window.PRIME_MEDIA || {};
 
   const filters = [
@@ -290,9 +313,54 @@
       .trim();
   }
 
+  function localizedNote(value, forceEnglish = false){
+    const note = cleanNotes(value)
+      .replace(/Galería disponible en el botón “Ver más fotos”\.?/gi, '')
+      .replace(/Confirma la disponibilidad antes de reservar\.?/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if(!isEnglish() && !forceEnglish) return note;
+
+    const exact = {
+      'Vive una salida privada con estilo en Boca Chica, con amplias áreas exteriores, flybridge y espacios cómodos para disfrutar el mar Caribe en grupo.': 'Enjoy a stylish private cruise in Boca Chica, with spacious outdoor areas, a flybridge and comfortable spaces for sharing the Caribbean Sea with your group.',
+      'Una opción versátil para navegar, relajarse o compartir una aventura de pesca y playa, con cockpit abierto y flybridge para disfrutar las vistas.': 'A versatile option for cruising, relaxing or enjoying a fishing and beach adventure, with an open cockpit and flybridge for taking in the views.',
+      'Crucero deportivo ideal para parejas, familias o grupos pequeños que desean recorrer Boca Chica con comodidad y acceso fácil al agua.': 'A sporty cruiser ideal for couples, families or small groups who want to explore Boca Chica in comfort with easy access to the water.',
+      'Disfruta una experiencia privada navegando por las aguas cristalinas de Boca Chica a bordo de este cómodo yate flybridge, ideal para compartir con familiares y amigos.': 'Enjoy a private cruise through Boca Chica’s crystal-clear waters aboard this comfortable flybridge yacht, ideal for family and friends.'
+    };
+    if(exact[note]) return exact[note];
+
+    return note
+      .replace(/Propina según las condiciones del operador\.?/gi, 'Gratuity applies according to the operator’s terms.')
+      .replace(/Incluye capitán cuando se indica en el catálogo\.?/gi, 'Captain is included when stated in the listing.')
+      .replace(/Extras indicados en la ficha original disponibles según reserva\.?/gi, 'Extras shown in the original listing are available upon reservation.')
+      .replace(/Ficha actualizada desde el catálogo del cliente\.?/gi, 'Listing updated from the client catalog.')
+      .replace(/Confirmar disponibilidad antes de reservar\.?/gi, 'Confirm availability before booking.')
+      .replace(/Tarifas distintas para días laborables y fines de semana\.?/gi, 'Different weekday and weekend rates apply.')
+      .replace(/10% de gratuidad requerida\.?/gi, 'A 10% gratuity is required.')
+      .replace(/10% de gratuidad\.?/gi, 'A 10% gratuity applies.')
+      .replace(/Propina no incluida\.?/gi, 'Gratuity is not included.')
+      .replace(/Descuento de \$100 de lunes a jueves\.?/gi, 'Save $100 Monday through Thursday.')
+      .replace(/Depósito reembolsable de \$300\.?/gi, 'A refundable $300 deposit is required.')
+      .replace(/Calendario:\s*https?:\/\/\S+/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function yachtLocationText(yacht){
+    return isEnglish() ? (yacht.locationEn || localizedLocation(yacht.location)) : yacht.location;
+  }
+
+  function yachtRatesText(yacht){
+    return isEnglish() ? (yacht.ratesEn || localizedRate(yacht.rates)) : yacht.rates;
+  }
+
+  function yachtNotesText(yacht){
+    return isEnglish() ? (yacht.notesEn || localizedNote(yacht.notes)) : meaningfulCardNote(yacht);
+  }
+
   function yachtIntro(yacht){
     const passengerLabel = yacht.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${yacht.passengers} ${ui('pasajeros', 'passengers')}`;
-    if(isEnglish()) return `${passengerLabel}. ${localizedLocation(yacht.location)}. ${localizedRate(yacht.rates || '')}`;
+    if(isEnglish()) return `${passengerLabel}. ${yachtLocationText(yacht)}. ${yachtRatesText(yacht)}`;
     return `${passengerLabel}. ${yacht.location}. ${compactText(yacht.rates || yacht.description || yacht.notes || '', 120)}`;
   }
 
@@ -308,7 +376,7 @@
   }
 
   function uniqueRateOptions(yacht){
-    const options = String(yacht.rates || '')
+    const options = String(yachtRatesText(yacht) || '')
       .split('|')
       .map((option) => option.replace(/\s+/g, ' ').trim())
       .filter(Boolean)
@@ -329,12 +397,12 @@
 
   function yachtCardDetailsHTML(yacht){
     const options = uniqueRateOptions(yacht);
-    const note = meaningfulCardNote(yacht);
+    const note = yachtNotesText(yacht);
     if(!options && !note) return '';
 
     return `<span class="cat-details">
-      ${options ? `<span class="cat-detail-row"><span class="cat-detail-label">Más opciones</span><span>${escapeHTML(options)}</span></span>` : ''}
-      ${note ? `<span class="cat-detail-row cat-detail-note"><span class="cat-detail-label">Importante</span><span>${escapeHTML(note)}</span></span>` : ''}
+      ${options ? `<span class="cat-detail-row"><span class="cat-detail-label">${ui('Más opciones', 'More options')}</span><span>${escapeHTML(options)}</span></span>` : ''}
+      ${note ? `<span class="cat-detail-row cat-detail-note"><span class="cat-detail-label">${ui('Importante', 'Important')}</span><span>${escapeHTML(note)}</span></span>` : ''}
     </span>`;
   }
 
@@ -446,6 +514,7 @@
   }
 
   function isUsablePhotoLink(yacht){
+    if(yacht.photoLinkEnabled === false) return false;
     const url = String(yacht.photoLink || '');
     if(!/^https?:\/\//i.test(url)) return false;
     return !/(?:bing\.com\/images|tse\d*\.mm\.bing\.net)/i.test(url);
@@ -460,14 +529,14 @@
     return `
       <span class="cat-placeholder" aria-hidden="true">
         <span class="cat-placeholder-mark">${escapeHTML(yacht.feet || '')}'</span>
-        <span class="cat-placeholder-text">Fotos disponibles en el link del bote</span>
+        <span class="cat-placeholder-text">${ui('Fotos disponibles en el enlace del bote', 'Photos available through the boat link')}</span>
       </span>
     `;
   }
 
   function photoLinkHTML(yacht, className = 'photo-link'){
     if(!isUsablePhotoLink(yacht)) return '';
-    return `<a class="${className}" href="${escapeHTML(yacht.photoLink)}" target="_blank" rel="noopener noreferrer" aria-label="Ver más fotos de ${escapeHTML(yacht.name)}">Ver más fotos</a>`;
+    return `<a class="${className}" href="${escapeHTML(yacht.photoLink)}" target="_blank" rel="noopener noreferrer" aria-label="${ui('Ver más fotos de', 'View more photos of')} ${escapeHTML(yacht.name)}">${ui('Ver más fotos', 'View more photos')}</a>`;
   }
 
   function adventureImage(adventure){
@@ -498,8 +567,12 @@
         yacht.size,
         yacht.sizeLabel,
         yacht.location,
+        yacht.locationEn,
         yacht.passengers,
-        yacht.rates
+        yacht.rates,
+        yacht.ratesEn,
+        yacht.notes,
+        yacht.notesEn
       ].join(' ')
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
@@ -520,6 +593,7 @@
 
     catalogGrid.innerHTML = visibleYachts.length ? visibleYachts.map((yacht) => `
       <article class="cat-card" data-yacht-index="${yachts.indexOf(yacht)}">
+        <button class="card-edit-btn" type="button" data-edit-yacht="${yachts.indexOf(yacht)}"><span aria-hidden="true">✎</span> ${ui('Editar tarjeta', 'Edit card')}</button>
         <div class="cat-open">
           <span class="cat-media">
             ${yachtMediaHTML(yacht, yachts.indexOf(yacht))}
@@ -529,10 +603,10 @@
           <span class="cat-body">
             <span class="cat-kicker">${escapeHTML(yacht.size)} · ${escapeHTML(yacht.feet || '')}FT</span>
             <h3>${escapeHTML(yacht.name)}</h3>
-            <span class="marina">${escapeHTML(localizedLocation(yacht.location))}</span>
-            ${isEnglish() ? '' : yachtCardDetailsHTML(yacht)}
+            <span class="marina">${escapeHTML(yachtLocationText(yacht))}</span>
+            ${yachtCardDetailsHTML(yacht)}
             <span class="cat-foot">
-              <span class="price">${escapeHTML(yacht.price || `${ui('Desde', 'From')} $${baseHourlyPrice(yacht)}`)}<span>${escapeHTML(localizedRate(yacht.priceLabel || ui('USD por hora', 'USD per hour')))}</span></span>
+              <span class="price">${escapeHTML(yacht.price || `${ui('Desde', 'From')} $${baseHourlyPrice(yacht)}`)}<span>${escapeHTML(isEnglish() ? (yacht.priceLabelEn || localizedRate(yacht.priceLabel || 'USD per hour')) : (yacht.priceLabel || 'USD por hora'))}</span></span>
               <span class="cat-actions">
                 ${photoLinkHTML(yacht, 'cta-btn cat-photo-link')}
               </span>
@@ -560,14 +634,14 @@
     modal.querySelector('[data-modal-kicker]').textContent = isEnglish() ? `${yacht.feet || ''} ft | ${yacht.category || 'Yacht'}` : `${yacht.size} | ${yacht.sizeLabel}`;
     modal.querySelector('[data-modal-title]').textContent = yacht.name;
     modal.querySelector('[data-modal-passengers]').textContent = yacht.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${yacht.passengers} ${ui('pasajeros', 'passengers')}`;
-    modal.querySelector('[data-modal-location]').textContent = localizedLocation(yacht.location);
-    modal.querySelector('[data-modal-rates]').textContent = localizedRate(quotePriceText(yacht));
-    modal.querySelector('[data-modal-notes]').textContent = isEnglish() ? 'Captain and standard charter essentials included. Confirm availability and final conditions when requesting your quote.' : (cleanNotes(yacht.notes) || 'Confirma disponibilidad y condiciones al solicitar la cotización.');
+    modal.querySelector('[data-modal-location]').textContent = yachtLocationText(yacht);
+    modal.querySelector('[data-modal-rates]').textContent = yachtRatesText(yacht) || localizedRate(quotePriceText(yacht));
+    modal.querySelector('[data-modal-notes]').textContent = yachtNotesText(yacht) || ui('Confirma disponibilidad y condiciones al solicitar la cotización.', 'Confirm availability and final terms when requesting your quote.');
     modal.querySelector('[data-modal-summary]').textContent = yachtIntro(yacht);
     const description = modal.querySelector('[data-modal-description]');
     const photoLink = modal.querySelector('[data-modal-photo-link]');
     if(description) {
-      const extraDescription = isEnglish() ? '' : modalExtraDescription(yacht);
+      const extraDescription = isEnglish() ? (yacht.descriptionEn || '') : modalExtraDescription(yacht);
       description.textContent = extraDescription;
       description.style.display = extraDescription ? 'block' : 'none';
     }
@@ -635,6 +709,212 @@
     `;
   }
 
+  let editorAuthenticated = false;
+  let editingYachtIndex = -1;
+  try { editorAuthenticated = sessionStorage.getItem('prime-editor-session') === 'active'; } catch (_) {}
+
+  function editorField(name){
+    return fleetEditorForm ? fleetEditorForm.elements.namedItem(name) : null;
+  }
+
+  function updateEditorAccess(){
+    if(!editorAccess) return;
+    const active = document.body.classList.contains('fleet-editing');
+    editorAccess.classList.toggle('is-active', active);
+    editorAccess.setAttribute('aria-label', active ? ui('Salir del modo edición', 'Exit edit mode') : ui('Abrir modo edición', 'Open edit mode'));
+    const label = editorAccess.querySelector('.editor-access-label');
+    if(label) label.textContent = active ? ui('Editor activo', 'Editor active') : ui('Editar', 'Edit');
+  }
+
+  function setEditorMode(active){
+    document.body.classList.toggle('fleet-editing', Boolean(active));
+    updateEditorAccess();
+    renderCatalog();
+  }
+
+  function setEditorDialogState(element, open){
+    if(!element) return;
+    element.classList.toggle('is-open', open);
+    element.setAttribute('aria-hidden', String(!open));
+    const anyOpen = (editorLoginModal && editorLoginModal.classList.contains('is-open')) || (fleetEditor && fleetEditor.classList.contains('is-open'));
+    document.body.classList.toggle('editor-dialog-open', anyOpen);
+  }
+
+  function openEditorLogin(){
+    if(!editorLoginModal || !editorLoginForm) return;
+    editorLoginForm.reset();
+    if(editorLoginFeedback) editorLoginFeedback.textContent = '';
+    setEditorDialogState(editorLoginModal, true);
+    window.setTimeout(() => editorField('password'), 0);
+    const password = document.getElementById('editorPassword');
+    if(password) window.setTimeout(() => password.focus(), 40);
+  }
+
+  function updateEditorPreview(yacht){
+    if(!fleetEditorForm || !yacht) return;
+    const previewName = document.getElementById('fleetEditorPreviewName');
+    const previewMeta = document.getElementById('fleetEditorPreviewMeta');
+    const previewImage = document.getElementById('fleetEditorImage');
+    const name = editorField('name').value || yacht.name;
+    const feet = editorField('feet').value || yacht.feet || '';
+    const passengers = editorField('passengers').value || yacht.passengers || '';
+    if(previewName) previewName.textContent = name;
+    if(previewMeta) previewMeta.textContent = `${feet} FT · ${passengers} ${ui('pasajeros', 'passengers')}`;
+    if(previewImage) {
+      previewImage.src = editorField('image').value || imageFor(yacht, editingYachtIndex) || fallbackImage(yacht);
+      previewImage.alt = name;
+    }
+  }
+
+  function fillEditorForm(yacht){
+    if(!fleetEditorForm || !yacht) return;
+    const values = {
+      name: yacht.name || '', feet: yacht.feet || '', passengers: yacht.passengers || '',
+      price: yacht.price || '', image: yacht.image || '', location: yacht.location || '',
+      rates: yacht.rates || '', notes: yacht.notes || '', priceLabel: yacht.priceLabel || '',
+      locationEn: yacht.locationEn || englishLocation(yacht.location),
+      ratesEn: yacht.ratesEn || englishRate(yacht.rates),
+      notesEn: yacht.notesEn || localizedNote(yacht.notes, true),
+      priceLabelEn: yacht.priceLabelEn || englishRate(yacht.priceLabel || '')
+    };
+    Object.entries(values).forEach(([name, value]) => {
+      const field = editorField(name);
+      if(field) field.value = value;
+    });
+    editorField('photoLink').value = yacht.photoLink || '';
+    editorField('showPhotoLink').checked = yacht.photoLinkEnabled !== false && isUsablePhotoLink({ ...yacht, photoLinkEnabled: true });
+    const position = document.getElementById('fleetEditorPosition');
+    if(position) position.textContent = `${ui('Tarjeta', 'Card')} ${editingYachtIndex + 1} ${ui('de', 'of')} ${yachts.length}`;
+    const status = document.getElementById('editorSaveStatus');
+    if(status) status.textContent = '';
+    updateEditorPreview(yacht);
+    fleetEditorForm.scrollTop = 0;
+  }
+
+  function openFleetEditor(yacht){
+    if(!editorAuthenticated || !fleetEditor || !fleetEditorForm) return;
+    editingYachtIndex = yachts.indexOf(yacht);
+    if(editingYachtIndex < 0) return;
+    fillEditorForm(yacht);
+    setEditorDialogState(fleetEditor, true);
+  }
+
+  function closeFleetEditor(){
+    setEditorDialogState(fleetEditor, false);
+    editingYachtIndex = -1;
+  }
+
+  function saveEditorForm(showMessage = true){
+    if(!fleetEditorForm || editingYachtIndex < 0) return false;
+    if(!fleetEditorForm.checkValidity()) {
+      fleetEditorForm.reportValidity();
+      return false;
+    }
+    const yacht = yachts[editingYachtIndex];
+    const changes = {
+      name: editorField('name').value.trim(),
+      feet: Number(editorField('feet').value),
+      passengers: Number(editorField('passengers').value),
+      price: editorField('price').value.trim(),
+      image: editorField('image').value.trim(),
+      location: editorField('location').value.trim(),
+      rates: editorField('rates').value.trim(),
+      notes: editorField('notes').value.trim(),
+      priceLabel: editorField('priceLabel').value.trim(),
+      locationEn: editorField('locationEn').value.trim() || englishLocation(editorField('location').value),
+      ratesEn: editorField('ratesEn').value.trim() || englishRate(editorField('rates').value),
+      notesEn: editorField('notesEn').value.trim() || localizedNote(editorField('notes').value, true),
+      priceLabelEn: editorField('priceLabelEn').value.trim() || englishRate(editorField('priceLabel').value),
+      photoLink: editorField('photoLink').value.trim(),
+      photoLinkEnabled: editorField('showPhotoLink').checked
+    };
+    Object.assign(yacht, changes);
+    const allChanges = readEditorChanges();
+    allChanges[yachtStorageKey(yacht)] = changes;
+    try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
+    renderCatalog();
+    updateEditorPreview(yacht);
+    if(showMessage) {
+      const status = document.getElementById('editorSaveStatus');
+      if(status) status.textContent = ui('Cambios guardados', 'Changes saved');
+    }
+    return true;
+  }
+
+  function moveEditor(direction){
+    if(!saveEditorForm(false)) return;
+    editingYachtIndex = (editingYachtIndex + direction + yachts.length) % yachts.length;
+    fillEditorForm(yachts[editingYachtIndex]);
+  }
+
+  if(editorAccess) {
+    editorAccess.addEventListener('click', () => {
+      if(!editorAuthenticated) {
+        openEditorLogin();
+        return;
+      }
+      setEditorMode(!document.body.classList.contains('fleet-editing'));
+    });
+  }
+
+  if(editorLoginForm) {
+    editorLoginForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const password = document.getElementById('editorPassword');
+      if(password && password.value === '123456') {
+        editorAuthenticated = true;
+        try { sessionStorage.setItem('prime-editor-session', 'active'); } catch (_) {}
+        setEditorDialogState(editorLoginModal, false);
+        setEditorMode(true);
+      } else if(editorLoginFeedback) {
+        editorLoginFeedback.textContent = 'Clave incorrecta. Inténtalo de nuevo.';
+        if(password) { password.select(); password.focus(); }
+      }
+    });
+    editorLoginModal.addEventListener('click', (event) => {
+      if(event.target === editorLoginModal || event.target.closest('[data-editor-login-close]')) setEditorDialogState(editorLoginModal, false);
+    });
+  }
+
+  if(fleetEditorForm) {
+    fleetEditorForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      saveEditorForm(true);
+    });
+    fleetEditorForm.addEventListener('input', () => {
+      if(editingYachtIndex >= 0) updateEditorPreview(yachts[editingYachtIndex]);
+    });
+    fleetEditorForm.addEventListener('click', (event) => {
+      if(event.target.closest('[data-fleet-editor-close]')) closeFleetEditor();
+      if(event.target.closest('[data-editor-previous]')) moveEditor(-1);
+      if(event.target.closest('[data-editor-next]')) moveEditor(1);
+      if(event.target.closest('[data-editor-logout]')) {
+        closeFleetEditor();
+        editorAuthenticated = false;
+        try { sessionStorage.removeItem('prime-editor-session'); } catch (_) {}
+        setEditorMode(false);
+      }
+      if(event.target.closest('[data-editor-reset]') && editingYachtIndex >= 0) {
+        const yacht = yachts[editingYachtIndex];
+        if(!window.confirm(ui('¿Restaurar la información original de esta tarjeta?', 'Restore this card’s original information?'))) return;
+        const key = yachtStorageKey(yacht);
+        const original = originalYachts.get(key);
+        ['locationEn','ratesEn','notesEn','priceLabelEn','photoLinkEnabled'].forEach((field) => delete yacht[field]);
+        if(original) Object.assign(yacht, { ...original });
+        const allChanges = readEditorChanges();
+        delete allChanges[key];
+        try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
+        renderCatalog();
+        fillEditorForm(yacht);
+        const status = document.getElementById('editorSaveStatus');
+        if(status) status.textContent = ui('Tarjeta restaurada', 'Card restored');
+      }
+    });
+    fleetEditor.addEventListener('click', (event) => {
+      if(event.target === fleetEditor) closeFleetEditor();
+    });
+  }
+
   filterBar.addEventListener('click', (event) => {
     const button = event.target.closest('[data-filter]');
     if(!button) return;
@@ -646,6 +926,13 @@
   });
 
   catalogGrid.addEventListener('click', (event) => {
+    const editButton = event.target.closest('[data-edit-yacht]');
+    if(editButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      openFleetEditor(yachts[Number(editButton.dataset.editYacht)]);
+      return;
+    }
     if(event.target.closest('a')) return;
     const card = event.target.closest('[data-yacht-index]');
     if(!card) return;
@@ -711,17 +998,22 @@
   }
 
   document.addEventListener('keydown', (event) => {
-    if(event.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+    if(event.key !== 'Escape') return;
+    if(fleetEditor && fleetEditor.classList.contains('is-open')) closeFleetEditor();
+    else if(editorLoginModal && editorLoginModal.classList.contains('is-open')) setEditorDialogState(editorLoginModal, false);
+    else if(modal.classList.contains('is-open')) closeModal();
   });
 
   document.addEventListener('prime:languagechange', () => {
     renderFilters();
     renderCatalog();
     renderAdventures();
+    updateEditorAccess();
     if(modal.classList.contains('is-open')) closeModal();
   });
 
   renderFilters();
   renderCatalog();
   renderAdventures();
+  updateEditorAccess();
 })();
