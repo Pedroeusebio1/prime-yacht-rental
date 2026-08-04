@@ -134,6 +134,7 @@
   const statBoats = document.getElementById('statBoats');
   const modal = document.getElementById('yachtModal');
   const editorAccess = document.getElementById('editorAccess');
+  const editorExitMode = document.getElementById('editorExitMode');
   const editorLoginModal = document.getElementById('editorLoginModal');
   const editorLoginForm = document.getElementById('editorLoginForm');
   const editorLoginFeedback = document.getElementById('editorLoginFeedback');
@@ -721,9 +722,15 @@
     if(!editorAccess) return;
     const active = document.body.classList.contains('fleet-editing');
     editorAccess.classList.toggle('is-active', active);
-    editorAccess.setAttribute('aria-label', active ? ui('Salir del modo edición', 'Exit edit mode') : ui('Abrir modo edición', 'Open edit mode'));
+    editorAccess.setAttribute('aria-label', ui('Abrir modo edición', 'Open edit mode'));
     const label = editorAccess.querySelector('.editor-access-label');
-    if(label) label.textContent = active ? ui('Editor activo', 'Editor active') : ui('Editar', 'Edit');
+    if(label) label.textContent = active ? ui('Edición activa', 'Editing active') : ui('Administrar', 'Manage');
+    if(editorExitMode) {
+      const title = editorExitMode.querySelector('strong');
+      const subtitle = editorExitMode.querySelector('small');
+      if(title) title.textContent = ui('Finalizar edición', 'Finish editing');
+      if(subtitle) subtitle.textContent = ui('Guardar y cerrar sesión', 'Save and sign out');
+    }
   }
 
   function setEditorMode(active){
@@ -745,7 +752,6 @@
     editorLoginForm.reset();
     if(editorLoginFeedback) editorLoginFeedback.textContent = '';
     setEditorDialogState(editorLoginModal, true);
-    window.setTimeout(() => editorField('password'), 0);
     const password = document.getElementById('editorPassword');
     if(password) window.setTimeout(() => password.focus(), 40);
   }
@@ -804,6 +810,16 @@
     editingYachtIndex = -1;
   }
 
+  function finishEditingSession(){
+    if(fleetEditor && fleetEditor.classList.contains('is-open') && editingYachtIndex >= 0) {
+      if(!saveEditorForm(false)) return;
+    }
+    closeFleetEditor();
+    editorAuthenticated = false;
+    try { sessionStorage.removeItem('prime-editor-session'); } catch (_) {}
+    setEditorMode(false);
+  }
+
   function saveEditorForm(showMessage = true){
     if(!fleetEditorForm || editingYachtIndex < 0) return false;
     if(!fleetEditorForm.checkValidity()) {
@@ -853,9 +869,11 @@
         openEditorLogin();
         return;
       }
-      setEditorMode(!document.body.classList.contains('fleet-editing'));
+      setEditorMode(true);
     });
   }
+
+  if(editorExitMode) editorExitMode.addEventListener('click', finishEditingSession);
 
   if(editorLoginForm) {
     editorLoginForm.addEventListener('submit', (event) => {
@@ -889,10 +907,7 @@
       if(event.target.closest('[data-editor-previous]')) moveEditor(-1);
       if(event.target.closest('[data-editor-next]')) moveEditor(1);
       if(event.target.closest('[data-editor-logout]')) {
-        closeFleetEditor();
-        editorAuthenticated = false;
-        try { sessionStorage.removeItem('prime-editor-session'); } catch (_) {}
-        setEditorMode(false);
+        finishEditingSession();
       }
       if(event.target.closest('[data-editor-reset]') && editingYachtIndex >= 0) {
         const yacht = yachts[editingYachtIndex];
