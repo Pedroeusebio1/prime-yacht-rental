@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Marcellus&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="./assets/prime-logo.png">
-<link rel="stylesheet" href="styles.css?v=20260715-5">
+<link rel="stylesheet" href="styles.css?v=20260804-1">
 
 </head>
 <body>
@@ -21,11 +21,17 @@
     <nav class="links">
       <a href="#yacht-boats">Yacht &amp; Boats</a>
       <a href="#adventures">Jet Ski &amp; ATV</a>
-      <a href="#destinos">Destinos</a>
-      <a href="#ofertas">Ofertas</a>
-      <a href="#contacto">Contacto</a>
+      <a href="#destinos" data-i18n="nav.destinations">Destinos</a>
+      <a href="#ofertas" data-i18n="nav.deals">Ofertas</a>
+      <a href="#contacto" data-i18n="nav.contact">Contacto</a>
     </nav>
-    <a class="cta-btn" href="https://wa.me/18095011504" target="_blank" rel="noopener">Reservar Ahora</a>
+    <div class="nav-actions">
+      <div class="language-switcher" role="group" aria-label="Seleccionar idioma" data-i18n-aria="language.label">
+        <button type="button" class="language-btn active" data-language="es" aria-pressed="true">ES</button>
+        <button type="button" class="language-btn" data-language="en" aria-pressed="false">EN</button>
+      </div>
+      <a class="cta-btn" href="https://wa.me/18095011504" target="_blank" rel="noopener" data-i18n="nav.book">Reservar Ahora</a>
+    </div>
   </div>
 </header>
 
@@ -39,18 +45,18 @@
     <div class="hero-bg-slide" style="background-image:url('./assets/hero/hero-05.jpg')"></div>
   </div>
   <div class="wrap hero-content">
-    <div class="eyebrow">Miami, FL &amp; República Dominicana</div>
-    <h1>Vive el lujo del <em>mar</em>, sin límites de frontera</h1>
-    <p class="lead">Prime Yacht Rental te ofrece la flota más exclusiva de yates, botes, jet skis y ATVs en Miami y República Dominicana. Charters privados, capitán incluido y el servicio de cinco estrellas que tu ocasión merece.</p>
+    <div class="eyebrow" data-i18n="hero.eyebrow">Miami, FL &amp; República Dominicana</div>
+    <h1 data-i18n-html="hero.title">Vive el lujo del <em>mar</em>, sin límites de frontera</h1>
+    <p class="lead" data-i18n="hero.lead">Prime Yacht Rental te ofrece la flota más exclusiva de yates, botes, jet skis y ATVs en Miami y República Dominicana. Charters privados, capitán incluido y el servicio de cinco estrellas que tu ocasión merece.</p>
     <div class="hero-actions">
-      <a class="cta-btn" href="#yacht-boats">Ver Yacht &amp; Boats</a>
-      <a class="btn-ghost" href="https://wa.me/18095011504" target="_blank" rel="noopener">Cotización Personalizada</a>
+      <a class="cta-btn" href="#yacht-boats" data-i18n="hero.viewFleet">Ver Yacht &amp; Boats</a>
+      <a class="btn-ghost" href="https://wa.me/18095011504" target="_blank" rel="noopener" data-i18n="hero.quote">Cotización Personalizada</a>
     </div>
     <div class="stat-strip">
-      <div><div class="num" id="statBoats">0</div><div class="lbl">Embarcaciones</div></div>
-      <div><div class="num">2</div><div class="lbl">Países</div></div>
-      <div><div class="num">7</div><div class="lbl">Días a la semana</div></div>
-      <div><div class="num">130'</div><div class="lbl">Yate más grande</div></div>
+      <div><div class="num" id="statBoats">0</div><div class="lbl" data-i18n="stats.vessels">Embarcaciones</div></div>
+      <div><div class="num">2</div><div class="lbl" data-i18n="stats.countries">Países</div></div>
+      <div><div class="num">7</div><div class="lbl" data-i18n="stats.days">Días a la semana</div></div>
+      <div><div class="num">130'</div><div class="lbl" data-i18n="stats.largest">Yate más grande</div></div>
     </div>
   </div>
   <div class="hero-dots" id="heroDots"></div>
@@ -64,27 +70,27 @@
 <section class="locations" id="destinos">
   <div class="wrap">
     <div class="section-head">
-      <div class="eyebrow">Dos costas, una sola marca</div>
-      <h2>Navega en <span class="accent">Miami</span> y <span class="accent">República Dominicana</span></h2>
-      <p>Una sola reserva, dos destinos de clase mundial. Elige tu experiencia según dónde quieras vivirla.</p>
+      <div class="eyebrow" data-i18n="locations.eyebrow">Dos costas, una sola marca</div>
+      <h2 data-i18n-html="locations.title">Navega en <span class="accent">Miami</span> y <span class="accent">República Dominicana</span></h2>
+      <p data-i18n="locations.intro">Una sola reserva, dos destinos de clase mundial. Elige tu experiencia según dónde quieras vivirla.</p>
     </div>
     <div class="loc-grid">
       <div class="loc-card">
-        <span class="tag">Estados Unidos</span>
+        <span class="tag" data-i18n="locations.us">Estados Unidos</span>
         <h3>Miami, FL</h3>
-        <p>Nuestra flota insignia: más de 70 embarcaciones desde 26' hasta 120', además de Jet Skis y ATVs, saliendo de las marinas más exclusivas del Río Miami, Venetian, Miami Beach y Bill Bird Marina.</p>
+        <p data-i18n="locations.miami">Nuestra flota insignia: más de 70 embarcaciones desde 26' hasta 120', además de Jet Skis y ATVs, saliendo de las marinas más exclusivas del Río Miami, Venetian, Miami Beach y Bill Bird Marina.</p>
         <svg viewBox="0 0 100 100"><path d="M10 55 L90 30 L65 55 L90 62 Q50 68 10 55 Z" fill="#c99e3b"/></svg>
       </div>
       <div class="loc-card">
-        <span class="tag">República Dominicana</span>
+        <span class="tag" data-i18n="locations.dr">República Dominicana</span>
         <h3>Boca Chica &amp; La Romana</h3>
-        <p>Zarpa hacia Isla Catalina, Playa Palmilla e Isla Saona. El ambiente perfecto para fiestas privadas y escapadas en familia, a minutos de Santo Domingo.</p>
+        <p data-i18n="locations.boca">Zarpa hacia Isla Catalina, Playa Palmilla e Isla Saona. El ambiente perfecto para fiestas privadas y escapadas en familia, a minutos de Santo Domingo.</p>
         <svg viewBox="0 0 100 100"><path d="M10 55 L90 30 L65 55 L90 62 Q50 68 10 55 Z" fill="#c99e3b"/></svg>
       </div>
       <div class="loc-card">
-        <span class="tag">República Dominicana</span>
+        <span class="tag" data-i18n="locations.dr">República Dominicana</span>
         <h3>Punta Cana</h3>
-        <p>Navega hasta la piscina natural de Punta Cana en un yate privado. Aguas cristalinas, arena blanca y el servicio Prime en cada milla náutica.</p>
+        <p data-i18n="locations.punta">Navega hasta la piscina natural de Punta Cana en un yate privado. Aguas cristalinas, arena blanca y el servicio Prime en cada milla náutica.</p>
         <svg viewBox="0 0 100 100"><path d="M10 55 L90 30 L65 55 L90 62 Q50 68 10 55 Z" fill="#c99e3b"/></svg>
       </div>
     </div>
@@ -126,20 +132,20 @@
 <section class="catalog" id="yacht-boats">
   <div class="wrap">
     <div class="section-head">
-      <div class="eyebrow">La Flota Prime</div>
+      <div class="eyebrow" data-i18n="fleet.eyebrow">La Flota Prime</div>
       <h2 class="accent">Yacht &amp; <span class="accent">Boats</span></h2>
-      <p>Explora nuestra selección de yachts y boats disponibles en Miami. Cada renta incluye capitán, gasolina, hielo y agua — más los extras que verás en cada tarjeta.</p>
+      <p data-i18n="fleet.intro">Explora nuestra selección de yachts y boats disponibles en Miami. Cada renta incluye capitán, gasolina, hielo y agua — más los extras que verás en cada tarjeta.</p>
     </div>
     <div class="catalog-search">
-      <label class="sr-only" for="catalogSearch">Buscar embarcaciones</label>
+      <label class="sr-only" for="catalogSearch" data-i18n="fleet.searchLabel">Buscar embarcaciones</label>
       <span class="catalog-search-icon" aria-hidden="true">⌕</span>
-      <input id="catalogSearch" type="search" placeholder="Buscar por nombre, tamaño, ubicación o pasajeros…" autocomplete="off">
-      <button class="catalog-search-btn" id="catalogSearchBtn" type="button">Buscar</button>
+      <input id="catalogSearch" type="search" placeholder="Buscar por nombre, tamaño, ubicación o pasajeros…" data-i18n-placeholder="fleet.searchPlaceholder" autocomplete="off">
+      <button class="catalog-search-btn" id="catalogSearchBtn" type="button" data-i18n="fleet.search">Buscar</button>
     </div>
     <div class="filters" id="filterBar"></div>
     <div class="cat-grid" id="catalogGrid"></div>
     <div class="load-more-wrap">
-      <button class="btn-ghost" id="loadMoreBtn">Ver Más Embarcaciones</button>
+      <button class="btn-ghost" id="loadMoreBtn" data-i18n="fleet.more">Ver Más Embarcaciones</button>
     </div>
   </div>
 </section>
@@ -157,25 +163,25 @@
       <p class="modal-description" data-modal-description></p>
       <div class="modal-facts">
         <div>
-          <span>Capacidad</span>
+          <span data-i18n="modal.capacity">Capacidad</span>
           <strong data-modal-passengers></strong>
         </div>
         <div>
-          <span>Ubicación</span>
+          <span data-i18n="modal.location">Ubicación</span>
           <strong data-modal-location></strong>
         </div>
         <div>
-          <span>Tarifas</span>
+          <span data-i18n="modal.rates">Tarifas</span>
           <strong data-modal-rates></strong>
         </div>
         <div>
-          <span>Extras</span>
+          <span data-i18n="modal.extras">Extras</span>
           <strong data-modal-notes></strong>
         </div>
       </div>
       <div class="modal-actions">
-        <a class="cta-btn" href="#" target="_blank" rel="noopener noreferrer" data-modal-photo-link>Ver más fotos</a>
-        <a class="cta-btn" href="https://wa.me/18095011504" target="_blank" rel="noopener" data-modal-close>Solicitar Cotización</a>
+        <a class="cta-btn" href="#" target="_blank" rel="noopener noreferrer" data-modal-photo-link data-i18n="modal.photos">Ver más fotos</a>
+        <a class="cta-btn" href="https://wa.me/18095011504" target="_blank" rel="noopener" data-modal-close data-i18n="modal.request">Solicitar Cotización</a>
       </div>
     </div>
   </div>
@@ -185,8 +191,8 @@
 <section class="adventures" id="adventures">
   <div class="wrap">
     <div class="section-head">
-      <div class="eyebrow">Fuera del agua… y sobre ella</div>
-      <h2>Aventuras <span class="accent">Jet Ski &amp; ATV</span></h2>
+      <div class="eyebrow" data-i18n="adventures.eyebrow">Fuera del agua… y sobre ella</div>
+      <h2 data-i18n-html="adventures.title">Aventuras <span class="accent">Jet Ski &amp; ATV</span></h2>
     </div>
     <div class="adv-grid" id="adventuresGrid"></div>
   </div>
@@ -197,14 +203,14 @@
   <div class="wrap">
     <div class="section-head">
       <div class="eyebrow">Prime Deals</div>
-      <h2>Ofertas <span class="accent">Exclusivas</span></h2>
+      <h2 data-i18n-html="deals.title">Ofertas <span class="accent">Exclusivas</span></h2>
     </div>
     <div class="deals-grid">
-      <div class="deal-card"><div class="n">Early Bird</div><p>Madruga y recibe precio especial todos los días.</p></div>
-      <div class="deal-card"><div class="n">Entre Semana</div><p>Reserva 3 horas y la 4ta va por nuestra cuenta.</p></div>
-      <div class="deal-card"><div class="n">Fin de Semana</div><p>Reserva 4 horas y la 5ta va por nuestra cuenta.</p></div>
-      <div class="deal-card"><div class="n">Mimosa Sundays</div><p>Reserva 5 horas y solo pagas 4.</p></div>
-      <div class="deal-card"><div class="n">Combos Prime</div><p>Combina yacht, jet ski, ATV o UTV en una experiencia privada armada a tu medida.</p></div>
+      <div class="deal-card"><div class="n">Early Bird</div><p data-i18n="deals.early">Madruga y recibe precio especial todos los días.</p></div>
+      <div class="deal-card"><div class="n" data-i18n="deals.weekdayTitle">Entre Semana</div><p data-i18n="deals.weekday">Reserva 3 horas y la 4ta va por nuestra cuenta.</p></div>
+      <div class="deal-card"><div class="n" data-i18n="deals.weekendTitle">Fin de Semana</div><p data-i18n="deals.weekend">Reserva 4 horas y la 5ta va por nuestra cuenta.</p></div>
+      <div class="deal-card"><div class="n">Mimosa Sundays</div><p data-i18n="deals.sunday">Reserva 5 horas y solo pagas 4.</p></div>
+      <div class="deal-card"><div class="n">Combos Prime</div><p data-i18n="deals.combos">Combina yacht, jet ski, ATV o UTV en una experiencia privada armada a tu medida.</p></div>
     </div>
   </div>
 </section>
@@ -212,9 +218,9 @@
 <!-- ============ CTA BAND ============ -->
 <section class="cta-band">
   <div class="wrap">
-    <h2>¿Listo para zarpar con <span class="accent">Prime</span>?</h2>
-    <p>Escríbenos y arma tu experiencia ideal en Miami o República Dominicana. Respuesta rápida, sin compromiso.</p>
-    <a class="cta-btn" href="https://wa.me/18095011504" target="_blank" rel="noopener">Solicitar Cotización</a>
+    <h2 data-i18n-html="cta.title">¿Listo para zarpar con <span class="accent">Prime</span>?</h2>
+    <p data-i18n="cta.text">Escríbenos y arma tu experiencia ideal en Miami o República Dominicana. Respuesta rápida, sin compromiso.</p>
+    <a class="cta-btn" href="https://wa.me/18095011504" target="_blank" rel="noopener" data-i18n="modal.request">Solicitar Cotización</a>
   </div>
 </section>
 
@@ -226,20 +232,20 @@
         <div class="brand">
           <img class="brand-logo" src="./assets/prime-logo.png" alt="Prime Yacht Rental">
         </div>
-        <p>Alquiler de yates, botes, jet skis y ATVs en Miami, FL y República Dominicana (Boca Chica, La Romana y Punta Cana). Vive la experiencia Prime.</p>
+        <p data-i18n="footer.about">Alquiler de yates, botes, jet skis y ATVs en Miami, FL y República Dominicana (Boca Chica, La Romana y Punta Cana). Vive la experiencia Prime.</p>
       </div>
       <div class="foot-col">
-        <h4>Navegación</h4>
+        <h4 data-i18n="footer.navigation">Navegación</h4>
         <a href="#yacht-boats">Yacht &amp; Boats</a>
         <a href="#adventures">Jet Ski &amp; ATV</a>
-        <a href="#destinos">Destinos</a>
-        <a href="#ofertas">Ofertas</a>
+        <a href="#destinos" data-i18n="nav.destinations">Destinos</a>
+        <a href="#ofertas" data-i18n="nav.deals">Ofertas</a>
       </div>
       <div class="foot-col">
         <h4>Miami, FL</h4>
         <p>+1 (786) 943-1998</p>
         <p>info@primeyachtrental.com</p>
-        <p>Abierto los 7 días</p>
+        <p data-i18n="footer.open">Abierto los 7 días</p>
       </div>
       <div class="foot-col">
         <h4>Rep. Dominicana</h4>
@@ -249,7 +255,7 @@
       </div>
     </div>
     <div class="foot-bottom">
-      <p>© 2026 Prime Yacht Rental. Todos los derechos reservados.</p>
+      <p data-i18n="footer.rights">© 2026 Prime Yacht Rental. Todos los derechos reservados.</p>
       <div class="socials">
         <a href="https://www.instagram.com/prime_yacht_rental?igsh=MXRoMHV4Njk0Mnc5Nw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="#9c7a24"><path d="M12 2.2c3.2 0 3.6 0 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.25.07 1.62.07 4.81s-.01 3.56-.07 4.81c-.15 3.23-1.66 4.77-4.92 4.92-1.25.06-1.62.07-4.85.07s-3.6 0-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92C2.16 15.56 2.15 15.19 2.15 12s.01-3.56.07-4.81C2.37 3.96 3.88 2.42 7.15 2.27 8.4 2.21 8.77 2.2 12 2.2zm0 3.15a6.65 6.65 0 100 13.3 6.65 6.65 0 000-13.3zm0 11a4.35 4.35 0 110-8.7 4.35 4.35 0 010 8.7zm6.9-11.25a1.55 1.55 0 11-3.1 0 1.55 1.55 0 013.1 0z"/></svg></a>
       </div>
@@ -261,8 +267,8 @@
   <svg viewBox="0 0 32 32"><path d="M16 3C9 3 3 9 3 16c0 2.4.7 4.7 1.9 6.7L3 29l6.5-1.8A13 13 0 0016 29c7 0 13-6 13-13S23 3 16 3zm0 23.6c-2.1 0-4.1-.6-5.8-1.6l-.4-.3-3.9 1 1-3.8-.3-.4A10.6 10.6 0 015.4 16c0-5.9 4.8-10.6 10.6-10.6S26.6 10.1 26.6 16 21.9 26.6 16 26.6zm5.8-7.9c-.3-.1-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.7 8.7 0 01-4.3-3.8c-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.5s-.7-1.7-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4a2.6 2.6 0 00-.8 1.9c0 1.1.8 2.2.9 2.4.1.2 1.6 2.6 4 3.6 1.4.6 2 .7 2.7.6.4-.1 1.2-.5 1.4-1s.2-.9.1-1c-.1-.2-.3-.2-.6-.4z"/></svg>
 </a>
 
-<script src="./catalog-data.js?v=20260715-5"></script>
-<script src="./catalog-media.js?v=20260715-5"></script>
-<script src="./app.js?v=20260715-5"></script>
+<script src="./catalog-data.js?v=20260804-1"></script>
+<script src="./catalog-media.js?v=20260804-1"></script>
+<script src="./app.js?v=20260804-1"></script>
 </body>
 </html>

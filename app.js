@@ -1,5 +1,73 @@
 
 (function(){
+  const translations = {
+    es: {},
+    en: {
+      'language.label': 'Select language',
+      'nav.destinations': 'Destinations', 'nav.deals': 'Deals', 'nav.contact': 'Contact', 'nav.book': 'Book Now',
+      'hero.eyebrow': 'Miami, FL & Dominican Republic',
+      'hero.title': 'Experience luxury on the <em>sea</em>, without borders',
+      'hero.lead': 'Prime Yacht Rental offers an exclusive fleet of yachts, boats, jet skis and ATVs in Miami and the Dominican Republic. Private charters, captain included, and five-star service for every occasion.',
+      'hero.viewFleet': 'View Yachts & Boats', 'hero.quote': 'Personalized Quote',
+      'stats.vessels': 'Vessels', 'stats.countries': 'Countries', 'stats.days': 'Days a week', 'stats.largest': 'Largest yacht',
+      'locations.eyebrow': 'Two coasts, one exceptional brand',
+      'locations.title': 'Set sail in <span class="accent">Miami</span> and the <span class="accent">Dominican Republic</span>',
+      'locations.intro': 'One simple booking, two world-class destinations. Choose where you want to enjoy your Prime experience.',
+      'locations.us': 'United States', 'locations.dr': 'Dominican Republic',
+      'locations.miami': "Our flagship fleet: more than 70 vessels from 26' to 120', plus jet skis and ATVs, departing from the finest marinas along the Miami River, Venetian Islands, Miami Beach and Bill Bird Marina.",
+      'locations.boca': 'Set sail for Catalina Island, Palmilla Beach and Saona Island. Perfect for private parties and family getaways, just minutes from Santo Domingo.',
+      'locations.punta': "Cruise to Punta Cana's natural pool aboard a private yacht. Crystal-clear water, white sand and Prime service at every nautical mile.",
+      'fleet.eyebrow': 'The Prime Fleet',
+      'fleet.intro': 'Explore our selection of yachts and boats available in Miami and the Dominican Republic. Each rental includes a captain, fuel, ice and water, plus the extras shown on each listing.',
+      'fleet.searchLabel': 'Search vessels', 'fleet.searchPlaceholder': 'Search by name, size, location or passengers…', 'fleet.search': 'Search', 'fleet.more': 'View More Vessels',
+      'modal.capacity': 'Capacity', 'modal.location': 'Location', 'modal.rates': 'Rates', 'modal.extras': 'Extras', 'modal.photos': 'View more photos', 'modal.request': 'Request a Quote',
+      'adventures.eyebrow': 'Off the water… and on it', 'adventures.title': '<span class="accent">Jet Ski & ATV</span> Adventures',
+      'deals.title': '<span class="accent">Exclusive</span> Deals', 'deals.early': 'Start early and enjoy a special rate every day.',
+      'deals.weekdayTitle': 'Weekdays', 'deals.weekday': 'Book 3 hours and enjoy the 4th on us.', 'deals.weekendTitle': 'Weekends', 'deals.weekend': 'Book 4 hours and enjoy the 5th on us.',
+      'deals.sunday': 'Book 5 hours and pay for only 4.', 'deals.combos': 'Combine a yacht, jet ski, ATV or UTV in a private experience tailored to you.',
+      'cta.title': 'Ready to set sail with <span class="accent">Prime</span>?', 'cta.text': 'Message us to create your ideal experience in Miami or the Dominican Republic. Fast response, no obligation.',
+      'footer.about': 'Yacht, boat, jet ski and ATV rentals in Miami, FL and the Dominican Republic (Boca Chica, La Romana and Punta Cana). Live the Prime experience.',
+      'footer.navigation': 'Navigation', 'footer.open': 'Open 7 days a week', 'footer.rights': '© 2026 Prime Yacht Rental. All rights reserved.'
+    }
+  };
+
+  const spanish = new Map();
+  document.querySelectorAll('[data-i18n], [data-i18n-html], [data-i18n-placeholder], [data-i18n-aria]').forEach((el) => {
+    const key = el.dataset.i18n || el.dataset.i18nHtml || el.dataset.i18nPlaceholder || el.dataset.i18nAria;
+    spanish.set(key, el.dataset.i18nHtml ? el.innerHTML : (el.dataset.i18nPlaceholder ? el.placeholder : (el.dataset.i18nAria ? el.getAttribute('aria-label') : el.textContent)));
+  });
+
+  function translate(key, fallback = '') {
+    const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
+    return lang === 'en' ? (translations.en[key] || fallback) : (spanish.get(key) || fallback);
+  }
+  function applyLanguage(language, announce = true) {
+    const lang = language === 'en' ? 'en' : 'es';
+    document.documentElement.lang = lang;
+    document.title = lang === 'en' ? 'Prime Yacht Rental — Miami & Dominican Republic' : 'Prime Yacht Rental — Miami & República Dominicana';
+    document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = translate(el.dataset.i18n, el.textContent); });
+    document.querySelectorAll('[data-i18n-html]').forEach((el) => { el.innerHTML = translate(el.dataset.i18nHtml, el.innerHTML); });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => { el.placeholder = translate(el.dataset.i18nPlaceholder, el.placeholder); });
+    document.querySelectorAll('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', translate(el.dataset.i18nAria, el.getAttribute('aria-label'))); });
+    document.querySelectorAll('[data-language]').forEach((button) => {
+      const active = button.dataset.language === lang;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    try { localStorage.setItem('prime-language', lang); } catch (_) {}
+    if(announce) document.dispatchEvent(new CustomEvent('prime:languagechange', { detail: { language: lang } }));
+  }
+  window.PrimeI18n = { translate, applyLanguage, get language(){ return document.documentElement.lang; } };
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-language]');
+    if(button) applyLanguage(button.dataset.language);
+  });
+  let saved = 'es';
+  try { saved = localStorage.getItem('prime-language') || (navigator.language.toLowerCase().startsWith('en') ? 'en' : 'es'); } catch (_) {}
+  applyLanguage(saved, false);
+})();
+
+(function(){
   const slides = document.querySelectorAll('#heroBgTrack .hero-bg-slide');
   const dotsWrap = document.getElementById('heroDots');
   if(!slides.length || !dotsWrap) return;
@@ -67,6 +135,27 @@
   const modal = document.getElementById('yachtModal');
 
   if(!catalogGrid || !filterBar || !loadMoreBtn || !modal) return;
+
+  const isEnglish = () => document.documentElement.lang === 'en';
+  const ui = (es, en) => isEnglish() ? en : es;
+  function localizedLocation(value){
+    if(!isEnglish()) return value;
+    return String(value || '')
+      .replace(/Rep[uú]blica Dominicana/gi, 'Dominican Republic')
+      .replace(/R[ií]o Miami/gi, 'Miami River')
+      .replace(/y Biscayne Bay/gi, 'and Biscayne Bay')
+      .replace(/Boca Chica, La Romana y Punta Cana/gi, 'Boca Chica, La Romana and Punta Cana');
+  }
+  function localizedRate(value){
+    if(!isEnglish()) return value;
+    return String(value || '')
+      .replace(/(\d+)\s*horas?/gi, '$1 hours')
+      .replace(/por hora/gi, 'per hour')
+      .replace(/por tour/gi, 'per tour')
+      .replace(/grupo privado/gi, 'private group')
+      .replace(/seg[uú]n ruta/gi, 'based on route')
+      .replace(/Cotizar/gi, 'Request quote');
+  }
 
   const imageBase = 'https://loremflickr.com/900/650/';
   function shuffled(items){
@@ -202,7 +291,8 @@
   }
 
   function yachtIntro(yacht){
-    const passengerLabel = yacht.passengers === 1 ? '1 pasajero' : `${yacht.passengers} pasajeros`;
+    const passengerLabel = yacht.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${yacht.passengers} ${ui('pasajeros', 'passengers')}`;
+    if(isEnglish()) return `${passengerLabel}. ${localizedLocation(yacht.location)}. ${localizedRate(yacht.rates || '')}`;
     return `${passengerLabel}. ${yacht.location}. ${compactText(yacht.rates || yacht.description || yacht.notes || '', 120)}`;
   }
 
@@ -211,6 +301,9 @@
   }
 
   function cardPriceText(vehicle){
+    if(isEnglish()) return vehicle.category
+      ? `A private ${vehicle.category} experience tailored to your group, route and schedule.`
+      : localizedRate(vehicle.rates || `Rates from $${baseHourlyPrice(vehicle)} USD per hour`);
     return compactText(vehicle.description || vehicle.rates || vehicle.notes || `Precios desde $${baseHourlyPrice(vehicle)} USD por hora`, 130);
   }
 
@@ -417,7 +510,7 @@
 
   function renderFilters(){
     filterBar.innerHTML = filters.map((filter) => (
-      `<button class="filter-btn${filter.key === activeFilter ? ' active' : ''}" type="button" data-filter="${filter.key}">${filter.label}</button>`
+      `<button class="filter-btn${filter.key === activeFilter ? ' active' : ''}" type="button" data-filter="${filter.key}">${filter.key === 'Todos' ? ui('Todos', 'All') : filter.label.replace('pies', ui('pies', 'ft'))}</button>`
     )).join('');
   }
 
@@ -430,16 +523,16 @@
         <div class="cat-open">
           <span class="cat-media">
             ${yachtMediaHTML(yacht, yachts.indexOf(yacht))}
-            <span class="cat-badge">${escapeHTML(yacht.sizeLabel)}</span>
-            <span class="cat-pax">${escapeHTML(yacht.passengers)} pasajeros</span>
+            <span class="cat-badge">${escapeHTML(isEnglish() ? `${yacht.feet || ''} ft` : yacht.sizeLabel)}</span>
+            <span class="cat-pax">${escapeHTML(yacht.passengers)} ${ui('pasajeros', 'passengers')}</span>
           </span>
           <span class="cat-body">
             <span class="cat-kicker">${escapeHTML(yacht.size)} · ${escapeHTML(yacht.feet || '')}FT</span>
             <h3>${escapeHTML(yacht.name)}</h3>
-            <span class="marina">${escapeHTML(yacht.location)}</span>
-            ${yachtCardDetailsHTML(yacht)}
+            <span class="marina">${escapeHTML(localizedLocation(yacht.location))}</span>
+            ${isEnglish() ? '' : yachtCardDetailsHTML(yacht)}
             <span class="cat-foot">
-              <span class="price">${escapeHTML(yacht.price || `Desde $${baseHourlyPrice(yacht)}`)}<span>${escapeHTML(yacht.priceLabel || 'USD por hora')}</span></span>
+              <span class="price">${escapeHTML(yacht.price || `${ui('Desde', 'From')} $${baseHourlyPrice(yacht)}`)}<span>${escapeHTML(localizedRate(yacht.priceLabel || ui('USD por hora', 'USD per hour')))}</span></span>
               <span class="cat-actions">
                 ${photoLinkHTML(yacht, 'cta-btn cat-photo-link')}
               </span>
@@ -447,10 +540,10 @@
           </span>
         </div>
       </article>
-    `).join('') : `<div class="catalog-empty"><strong>No encontramos embarcaciones</strong><span>Prueba otro nombre, tamaño o ubicación.</span></div>`;
+    `).join('') : `<div class="catalog-empty"><strong>${ui('No encontramos embarcaciones', 'No vessels found')}</strong><span>${ui('Prueba otro nombre, tamaño o ubicación.', 'Try another name, size or location.')}</span></div>`;
 
     loadMoreBtn.style.display = visibleCount >= filteredYachts.length ? 'none' : 'inline-flex';
-    loadMoreBtn.textContent = `Ver Mas Embarcaciones (${filteredYachts.length - visibleYachts.length})`;
+    loadMoreBtn.textContent = `${ui('Ver Más Embarcaciones', 'View More Vessels')} (${filteredYachts.length - visibleYachts.length})`;
   }
 
   function openModal(yacht){
@@ -464,23 +557,23 @@
     modalMedia.innerHTML = image
       ? `<img class="modal-active-media" src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" onerror="this.style.display='none'">`
       : '';
-    modal.querySelector('[data-modal-kicker]').textContent = `${yacht.size} | ${yacht.sizeLabel}`;
+    modal.querySelector('[data-modal-kicker]').textContent = isEnglish() ? `${yacht.feet || ''} ft | ${yacht.category || 'Yacht'}` : `${yacht.size} | ${yacht.sizeLabel}`;
     modal.querySelector('[data-modal-title]').textContent = yacht.name;
-    modal.querySelector('[data-modal-passengers]').textContent = yacht.passengers === 1 ? '1 pasajero' : `${yacht.passengers} pasajeros`;
-    modal.querySelector('[data-modal-location]').textContent = yacht.location;
-    modal.querySelector('[data-modal-rates]').textContent = quotePriceText(yacht);
-    modal.querySelector('[data-modal-notes]').textContent = cleanNotes(yacht.notes) || 'Confirma disponibilidad y condiciones al solicitar la cotización.';
+    modal.querySelector('[data-modal-passengers]').textContent = yacht.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${yacht.passengers} ${ui('pasajeros', 'passengers')}`;
+    modal.querySelector('[data-modal-location]').textContent = localizedLocation(yacht.location);
+    modal.querySelector('[data-modal-rates]').textContent = localizedRate(quotePriceText(yacht));
+    modal.querySelector('[data-modal-notes]').textContent = isEnglish() ? 'Captain and standard charter essentials included. Confirm availability and final conditions when requesting your quote.' : (cleanNotes(yacht.notes) || 'Confirma disponibilidad y condiciones al solicitar la cotización.');
     modal.querySelector('[data-modal-summary]').textContent = yachtIntro(yacht);
     const description = modal.querySelector('[data-modal-description]');
     const photoLink = modal.querySelector('[data-modal-photo-link]');
     if(description) {
-      const extraDescription = modalExtraDescription(yacht);
+      const extraDescription = isEnglish() ? '' : modalExtraDescription(yacht);
       description.textContent = extraDescription;
       description.style.display = extraDescription ? 'block' : 'none';
     }
     if(photoLink) {
       photoLink.href = isUsablePhotoLink(yacht) ? yacht.photoLink : '#';
-      photoLink.textContent = 'Ver más fotos';
+      photoLink.textContent = ui('Ver más fotos', 'View more photos');
       photoLink.style.display = isUsablePhotoLink(yacht) ? 'inline-flex' : 'none';
     }
     modal.classList.add('is-open');
@@ -493,23 +586,23 @@
 
     adventuresGrid.innerHTML = adventures.map((adventure) => `
       <article class="adv-card" data-adventure-index="${adventures.indexOf(adventure)}">
-        <button class="adv-open" type="button" aria-label="Ver detalles de ${adventure.name}">
+        <button class="adv-open" type="button" aria-label="${ui('Ver detalles de', 'View details for')} ${adventure.name}">
           <span class="adv-media" style="background-image:url('${imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure)}')">
             <img src="${escapeHTML(imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure))}" alt="${escapeHTML(adventure.name)}" loading="lazy" onerror="this.style.display='none'">
             <span class="cat-badge">${adventure.sizeLabel}</span>
-            <span class="cat-pax">${adventure.passengers === 1 ? '1 pasajero' : `${adventure.passengers} pasajeros`}</span>
+            <span class="cat-pax">${adventure.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${adventure.passengers} ${ui('pasajeros', 'passengers')}`}</span>
           </span>
           <span class="adv-body">
             <span class="tag">${adventure.category}</span>
             <h3>${adventure.name}</h3>
-            <span class="meta">${adventure.location}</span>
+            <span class="meta">${localizedLocation(adventure.location)}</span>
             <span class="adv-desc">${escapeHTML(cardPriceText(adventure))}</span>
             <span class="adv-prices">
               <span class="adv-price">
-                <span class="d">${escapeHTML(adventure.priceLabel || 'por hora')}</span>
-                <span class="v">${escapeHTML(adventure.price || `Desde $${baseHourlyPrice(adventure)}`)}</span>
+                <span class="d">${escapeHTML(localizedRate(adventure.priceLabel || ui('por hora', 'per hour')))}</span>
+                <span class="v">${escapeHTML(localizedRate(adventure.price || `${ui('Desde', 'From')} $${baseHourlyPrice(adventure)}`))}</span>
               </span>
-              <span class="adv-link">Ver detalles</span>
+              <span class="adv-link">${ui('Ver detalles', 'View details')}</span>
             </span>
           </span>
         </button>
@@ -619,6 +712,13 @@
 
   document.addEventListener('keydown', (event) => {
     if(event.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+  });
+
+  document.addEventListener('prime:languagechange', () => {
+    renderFilters();
+    renderCatalog();
+    renderAdventures();
+    if(modal.classList.contains('is-open')) closeModal();
   });
 
   renderFilters();

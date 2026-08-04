@@ -139,6 +139,35 @@ nav.links a:hover {
   opacity: 1;
   color: var(--gold-deep);
 }
+.nav-actions,
+.language-switcher {
+  display: flex;
+  align-items: center;
+}
+.nav-actions { gap: 12px; }
+.language-switcher {
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+}
+.language-btn {
+  min-width: 34px;
+  min-height: 30px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: 700 11px/1 Manrope, sans-serif;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.language-btn.active {
+  background: var(--gold-deep);
+  color: #fff;
+}
+.language-btn:focus-visible { outline: 2px solid var(--gold-deep); outline-offset: 2px; }
 .cta-btn {
   display: inline-flex;
   align-items: center;
@@ -1150,6 +1179,10 @@ footer {
   nav.links {
     display: none;
   }
+  .nav { padding-inline: 16px; }
+  .brand-logo { width: 120px; }
+  .nav-actions { gap: 8px; }
+  .nav-actions > .cta-btn { display: none; }
   .loc-grid,
   .svc-grid,
   .cat-grid,
@@ -1234,5 +1267,4 @@ footer {
 }
 
 body{
-  
 }
