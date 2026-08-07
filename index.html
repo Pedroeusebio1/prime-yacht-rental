@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Marcellus&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="./assets/prime-logo.png">
-<link rel="stylesheet" href="styles.css?v=20260807-1">
+<link rel="stylesheet" href="styles.css?v=20260807-2">
 
 </head>
 <body>
@@ -170,9 +170,9 @@
           <span data-i18n="modal.location">Ubicación</span>
           <strong data-modal-location></strong>
         </div>
-        <div>
+        <div class="modal-rates-fact">
           <span data-i18n="modal.rates">Tarifas</span>
-          <strong data-modal-rates></strong>
+          <div data-modal-rates></div>
         </div>
         <div>
           <span data-i18n="modal.extras">Extras</span>
@@ -324,17 +324,27 @@
       <div class="fleet-editor-language">
         <div class="fleet-editor-section-title"><span>Español</span><small>Contenido de la tarjeta</small></div>
         <label>Ubicación<input name="location" type="text" required></label>
-        <label>Tarifas<textarea name="rates" rows="3" required></textarea></label>
+        <label class="legacy-rates-field">Tarifas<textarea name="rates" rows="3" required></textarea></label>
         <label>Descripción<textarea name="notes" rows="4"></textarea></label>
         <label>Etiqueta del precio<input name="priceLabel" type="text" placeholder="4 horas"></label>
       </div>
       <div class="fleet-editor-language is-english">
         <div class="fleet-editor-section-title"><span>English</span><small>Card content</small></div>
         <label>Location<input name="locationEn" type="text" required></label>
-        <label>Rates<textarea name="ratesEn" rows="3" required></textarea></label>
+        <label class="legacy-rates-field">Rates<textarea name="ratesEn" rows="3" required></textarea></label>
         <label>Description<textarea name="notesEn" rows="4"></textarea></label>
         <label>Price label<input name="priceLabelEn" type="text" placeholder="4 hours"></label>
       </div>
+    </div>
+
+    <div class="fleet-editor-section pricing-editor-section">
+      <div class="fleet-editor-section-title">
+        <span>Tarifario</span>
+        <small>El menor valor se muestra como precio principal</small>
+      </div>
+      <div class="pricing-editor-head" aria-hidden="true"><span>Etiqueta (ES)</span><span>Label (EN)</span><span>Precio</span><span></span></div>
+      <div class="pricing-editor-rows" id="pricingEditorRows"></div>
+      <button type="button" class="pricing-add-row" data-pricing-add>+ Agregar tarifa</button>
     </div>
 
     <div class="fleet-editor-section editor-link-section">
@@ -361,6 +371,6 @@
 
 <script src="./catalog-data.js?v=20260807-1"></script>
 <script src="./catalog-media.js?v=20260804-1"></script>
-<script src="./app.js?v=20260807-2"></script>
+<script src="./app.js?v=20260807-4"></script>
 </body>
 </html>

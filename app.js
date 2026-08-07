@@ -226,6 +226,7 @@
       priceLabel: 'por hora',
       notes: 'Máximo 2 horas por reservación. El paquete deluxe incluye videos y fotografías.',
       notesEn: 'Maximum 2 hours per booking. The deluxe package includes videos and photos.',
+      mediaKey: 'adventure-001-jet-ski-spark',
       image: './assets/catalog-fallbacks/jetski.png',
       imageTags: 'jet-ski,miami,water',
       fallback: './assets/hero/hero-02.gif'
@@ -243,6 +244,7 @@
       priceLabel: 'por hora',
       notes: 'Máximo 2 horas por reservación. El paquete deluxe incluye videos y fotografías.',
       notesEn: 'Maximum 2 hours per booking. The deluxe package includes videos and photos.',
+      mediaKey: 'adventure-002-jet-ski-premium',
       image: './assets/catalog-fallbacks/jetski.png',
       imageTags: 'luxury-jet-ski,miami,water',
       fallback: './assets/hero/hero-03.gif'
@@ -260,6 +262,7 @@
       priceLabel: '1 hora',
       notes: 'Experiencia en ATV disponible en Miami por reservación.',
       notesEn: 'ATV experience available in Miami by reservation.',
+      mediaKey: 'adventure-003-atv-honda-rancher',
       imageTags: 'atv,beach,adventure',
       fallback: './assets/hero/hero-04.gif'
     },
@@ -276,6 +279,7 @@
       priceLabel: '1 hora',
       notes: 'Experiencia terrestre disponible en Miami por reservación.',
       notesEn: 'Land adventure available in Miami by reservation.',
+      mediaKey: 'adventure-004-utv-honda-pioneer',
       image: './assets/adventures/utv-honda-pioneer.png',
       imageTags: 'utv,miami,offroad,adventure',
       fallback: './assets/hero/hero-05.jpg'
@@ -293,6 +297,7 @@
       priceLabel: '1 hora · por ATV',
       notes: 'Experiencia para grupos disponible en Miami. El precio se calcula por cada ATV reservado.',
       notesEn: 'Group experience available in Miami. Pricing is calculated per reserved ATV.',
+      mediaKey: 'adventure-005-atv-group-experience',
       image: 'https://resmark-production.s3.amazonaws.com/images/QeygN9/aa998b9b8f6e73b603e3a243d805461f5c0229db/original',
       imageTags: 'atv-tour,miami,adventure',
       fallback: './assets/hero/hero-03.gif'
@@ -310,10 +315,16 @@
       priceLabel: '1 hora',
       notes: 'El precio final depende del modelo y la disponibilidad.',
       notesEn: 'Final price depends on the model and availability.',
+      mediaKey: 'adventure-006-jet-car-miami',
       imageTags: 'jet-car,miami,water',
       fallback: './assets/hero/hero-03.gif'
     }
   ];
+  const originalAdventures = new Map(adventures.map((adventure) => [yachtStorageKey(adventure), { ...adventure }]));
+  adventures.forEach((adventure) => Object.assign(adventure, savedEditorChanges[yachtStorageKey(adventure)] || {}));
+  for(let index = adventures.length - 1; index >= 0; index -= 1) {
+    if(deletedYachtKeys.has(yachtStorageKey(adventures[index]))) adventures.splice(index, 1);
+  }
 
   let activeFilter = 'Todos';
   let searchTerm = '';
@@ -441,14 +452,31 @@
     </span>`;
   }
 
+  function parsePriceRows(text){
+    return String(text || '').split('|').map((option) => {
+      const amount = option.match(/\$\s*[\d,.]+(?:\s*[–-]\s*\$?\s*[\d,.]+)?/);
+      if(!amount) return null;
+      return {
+        label: option.replace(amount[0], '').replace(/[:·\s]+$/, '').trim() || ui('Tarifa', 'Rate'),
+        value: amount[0].replace(/\s*-\s*/, ' – ')
+      };
+    }).filter(Boolean);
+  }
+
+  function vehiclePriceRows(yacht){
+    return Array.isArray(yacht.priceTable) && yacht.priceTable.length
+      ? yacht.priceTable.map((row) => ({ ...row }))
+      : parsePriceRows(yachtRatesText(yacht));
+  }
+
   function priceTableHTML(yacht, modalView = false){
-    const rows = Array.isArray(yacht.priceTable) ? yacht.priceTable : [];
+    const rows = vehiclePriceRows(yacht);
     if(!rows.length) return '';
     const visibleRows = modalView ? rows : rows.slice(0, 4);
     const more = rows.length - visibleRows.length;
     return `<span class="price-table${modalView ? ' price-table-modal' : ''}">
       <span class="price-table-heading"><span>${ui('Tabla de precios', 'Price table')}</span>${rows.some((row) => row.estimated) ? `<em>${ui('Estimado', 'Estimated')}</em>` : ''}</span>
-      ${visibleRows.map((row) => `<span class="price-table-row"><span>${escapeHTML(isEnglish() ? localizedRate(row.label) : row.label)}</span><strong>${escapeHTML(row.value)}</strong></span>`).join('')}
+      ${visibleRows.map((row) => `<span class="price-table-row"><span>${escapeHTML(isEnglish() ? (row.labelEn || localizedRate(row.label)) : row.label)}</span><strong>${escapeHTML(row.value)}</strong></span>`).join('')}
       ${more > 0 ? `<span class="price-table-more">+${more} ${ui('tarifas en detalles', 'rates in details')}</span>` : ''}
     </span>`;
   }
@@ -708,6 +736,7 @@
 
     adventuresGrid.innerHTML = adventures.map((adventure) => `
       <article class="adv-card" data-adventure-index="${adventures.indexOf(adventure)}">
+        <button class="card-edit-btn" type="button" data-edit-adventure="${adventures.indexOf(adventure)}"><span aria-hidden="true">✎</span> ${ui('Editar tarjeta', 'Edit card')}</button>
         <button class="adv-open" type="button" aria-label="${ui('Ver detalles de', 'View details for')} ${adventure.name}">
           <span class="adv-media" style="background-image:url('${imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure)}')">
             <img src="${escapeHTML(imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure))}" alt="${escapeHTML(adventure.name)}" loading="lazy" onerror="this.style.display='none'">
@@ -718,7 +747,7 @@
             <span class="tag">${adventure.category}</span>
             <h3>${adventure.name}</h3>
             <span class="meta">${localizedLocation(adventure.location)}</span>
-            <span class="adv-desc">${escapeHTML(cardPriceText(adventure))}</span>
+            ${priceTableHTML(adventure)}
             <span class="adv-prices">
               <span class="adv-price">
                 <span class="d">${escapeHTML(localizedRate(adventure.priceLabel || ui('por hora', 'per hour')))}</span>
@@ -759,10 +788,83 @@
 
   let editorAuthenticated = false;
   let editingYachtIndex = -1;
+  let editingVehicles = yachts;
   try { editorAuthenticated = sessionStorage.getItem('prime-editor-session') === 'active'; } catch (_) {}
 
   function editorField(name){
     return fleetEditorForm ? fleetEditorForm.elements.namedItem(name) : null;
+  }
+
+  function editorPriceRows(yacht){
+    const rows = Array.isArray(yacht.priceTable) && yacht.priceTable.length
+      ? yacht.priceTable
+      : parsePriceRows(yacht.rates);
+    if(rows.length) return rows.map((row) => ({ ...row, labelEn: row.labelEn || englishRate(row.label || '') }));
+    return [{ label: 'Tarifa base', labelEn: 'Base rate', value: yacht.price || '' }];
+  }
+
+  function pricingRowHTML(row = {}){
+    return `<div class="pricing-editor-row" data-pricing-row${row.estimated ? ' data-estimated="true"' : ''}>
+      <input type="text" data-rate-label value="${escapeHTML(row.label || '')}" placeholder="${ui('Ej. 4 horas', 'E.g. 4 hours')}" aria-label="${ui('Duración o condición', 'Duration or condition')}" required>
+      <input type="text" data-rate-label-en value="${escapeHTML(row.labelEn || englishRate(row.label || ''))}" placeholder="E.g. 4 hours" aria-label="English rate label" required>
+      <input type="text" data-rate-value value="${escapeHTML(row.value || '')}" placeholder="$650" aria-label="${ui('Precio o rango', 'Price or range')}" required>
+      <button class="pricing-remove-row" type="button" data-pricing-remove aria-label="${ui('Eliminar tarifa', 'Remove rate')}">×</button>
+    </div>`;
+  }
+
+  function renderPricingEditor(yacht){
+    const container = document.getElementById('pricingEditorRows');
+    if(!container) return;
+    container.innerHTML = editorPriceRows(yacht).map(pricingRowHTML).join('');
+  }
+
+  function normalizeRateValue(value){
+    const clean = String(value || '').trim().replace(/\s*-\s*/g, ' – ');
+    if(!clean || clean.includes('$')) return clean;
+    const range = clean.match(/^([\d,.]+)\s*[–-]\s*([\d,.]+)$/);
+    if(range) return `$${range[1]} – $${range[2]}`;
+    return /^[\d,.]+$/.test(clean) ? `$${clean}` : clean;
+  }
+
+  function readPricingEditorRows(){
+    const container = document.getElementById('pricingEditorRows');
+    if(!container) return [];
+    return [...container.querySelectorAll('[data-pricing-row]')].map((row) => ({
+      label: row.querySelector('[data-rate-label]').value.trim(),
+      labelEn: row.querySelector('[data-rate-label-en]').value.trim(),
+      value: normalizeRateValue(row.querySelector('[data-rate-value]').value),
+      ...(row.dataset.estimated === 'true' ? { estimated: true } : {})
+    })).filter((row) => row.label || row.value);
+  }
+
+  function rateValueNumber(value){
+    const compact = String(value || '');
+    const thousands = compact.match(/\$?\s*(\d+(?:\.\d+)?)\s*k\b/i);
+    if(thousands) return Math.round(Number(thousands[1]) * 1000);
+    const match = compact.match(/\$?\s*([\d,.]+)/);
+    if(!match) return null;
+    return Number(match[1].replace(/,/g, ''));
+  }
+
+  function formattedPrice(value){
+    return `$${Math.round(value).toLocaleString('en-US')}`;
+  }
+
+  function syncPricingEditorFields(){
+    const rows = readPricingEditorRows();
+    if(!rows.length) return rows;
+    const rates = rows.map((row) => `${row.label}: ${row.value}`).join(' | ');
+    const ratesField = editorField('rates');
+    const ratesEnField = editorField('ratesEn');
+    if(ratesField) ratesField.value = rates;
+    if(ratesEnField) ratesEnField.value = rows.map((row) => `${row.labelEn || englishRate(row.label)}: ${row.value}`).join(' | ');
+    const amounts = rows.map((row) => rateValueNumber(row.value)).filter(Number.isFinite);
+    if(amounts.length) {
+      editorField('price').value = formattedPrice(Math.min(...amounts));
+      editorField('priceLabel').value = rows.some((row) => row.estimated) ? 'desde · tarifa estimada' : 'precio desde';
+      editorField('priceLabelEn').value = rows.some((row) => row.estimated) ? 'from · estimated rate' : 'rates from';
+    }
+    return rows;
   }
 
   function updateEditorAccess(){
@@ -784,6 +886,7 @@
     document.body.classList.toggle('fleet-editing', Boolean(active));
     updateEditorAccess();
     renderCatalog();
+    renderAdventures();
   }
 
   function setEditorDialogState(element, open){
@@ -812,7 +915,9 @@
     const feet = editorField('feet').value || yacht.feet || '';
     const passengers = editorField('passengers').value || yacht.passengers || '';
     if(previewName) previewName.textContent = name;
-    if(previewMeta) previewMeta.textContent = `${feet} FT · ${passengers} ${ui('pasajeros', 'passengers')}`;
+    if(previewMeta) previewMeta.textContent = yacht.category
+      ? `${yacht.category} · ${passengers} ${ui('pasajeros', 'passengers')}`
+      : `${feet} FT · ${passengers} ${ui('pasajeros', 'passengers')}`;
     if(previewImage) {
       previewImage.src = editorField('image').value || imageFor(yacht, editingYachtIndex) || fallbackImage(yacht);
       previewImage.alt = name;
@@ -834,19 +939,28 @@
       const field = editorField(name);
       if(field) field.value = value;
     });
+    const feetField = editorField('feet');
+    if(feetField) {
+      feetField.disabled = Boolean(yacht.category);
+      feetField.required = !yacht.category;
+    }
     editorField('photoLink').value = yacht.photoLink || '';
     editorField('showPhotoLink').checked = yacht.photoLinkEnabled !== false && isUsablePhotoLink({ ...yacht, photoLinkEnabled: true });
     const position = document.getElementById('fleetEditorPosition');
-    if(position) position.textContent = `${ui('Tarjeta', 'Card')} ${editingYachtIndex + 1} ${ui('de', 'of')} ${yachts.length}`;
+    const title = document.getElementById('fleetEditorTitle');
+    if(title) title.textContent = yacht.category ? ui('Editar aventura', 'Edit adventure') : ui('Editar embarcación', 'Edit vessel');
+    if(position) position.textContent = `${ui('Tarjeta', 'Card')} ${editingYachtIndex + 1} ${ui('de', 'of')} ${editingVehicles.length}`;
+    renderPricingEditor(yacht);
     const status = document.getElementById('editorSaveStatus');
     if(status) status.textContent = '';
     updateEditorPreview(yacht);
     fleetEditorForm.scrollTop = 0;
   }
 
-  function openFleetEditor(yacht){
+  function openFleetEditor(yacht, collection = yachts){
     if(!editorAuthenticated || !fleetEditor || !fleetEditorForm) return;
-    editingYachtIndex = yachts.indexOf(yacht);
+    editingVehicles = collection;
+    editingYachtIndex = editingVehicles.indexOf(yacht);
     if(editingYachtIndex < 0) return;
     fillEditorForm(yacht);
     setEditorDialogState(fleetEditor, true);
@@ -855,6 +969,7 @@
   function closeFleetEditor(){
     setEditorDialogState(fleetEditor, false);
     editingYachtIndex = -1;
+    editingVehicles = yachts;
   }
 
   function finishEditingSession(){
@@ -869,14 +984,15 @@
 
   function saveEditorForm(showMessage = true){
     if(!fleetEditorForm || editingYachtIndex < 0) return false;
+    const priceTable = syncPricingEditorFields();
     if(!fleetEditorForm.checkValidity()) {
       fleetEditorForm.reportValidity();
       return false;
     }
-    const yacht = yachts[editingYachtIndex];
+    const yacht = editingVehicles[editingYachtIndex];
     const changes = {
       name: editorField('name').value.trim(),
-      feet: Number(editorField('feet').value),
+      feet: yacht.category ? (yacht.feet || 0) : Number(editorField('feet').value),
       passengers: Number(editorField('passengers').value),
       price: editorField('price').value.trim(),
       image: editorField('image').value.trim(),
@@ -888,6 +1004,7 @@
       ratesEn: editorField('ratesEn').value.trim() || englishRate(editorField('rates').value),
       notesEn: editorField('notesEn').value.trim() || localizedNote(editorField('notes').value, true),
       priceLabelEn: editorField('priceLabelEn').value.trim() || englishRate(editorField('priceLabel').value),
+      priceTable,
       photoLink: editorField('photoLink').value.trim(),
       photoLinkEnabled: editorField('showPhotoLink').checked
     };
@@ -896,6 +1013,7 @@
     allChanges[yachtStorageKey(yacht)] = changes;
     try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
     renderCatalog();
+    renderAdventures();
     updateEditorPreview(yacht);
     if(showMessage) {
       const status = document.getElementById('editorSaveStatus');
@@ -905,15 +1023,15 @@
   }
 
   function moveEditor(direction){
-    if(!yachts.length) return;
+    if(!editingVehicles.length) return;
     if(!saveEditorForm(false)) return;
-    editingYachtIndex = (editingYachtIndex + direction + yachts.length) % yachts.length;
-    fillEditorForm(yachts[editingYachtIndex]);
+    editingYachtIndex = (editingYachtIndex + direction + editingVehicles.length) % editingVehicles.length;
+    fillEditorForm(editingVehicles[editingYachtIndex]);
   }
 
   function deleteEditorYacht(){
-    if(editingYachtIndex < 0 || !yachts[editingYachtIndex]) return;
-    const yacht = yachts[editingYachtIndex];
+    if(editingYachtIndex < 0 || !editingVehicles[editingYachtIndex]) return;
+    const yacht = editingVehicles[editingYachtIndex];
     const confirmed = window.confirm(ui(
       `¿Eliminar “${yacht.name}” del catálogo? Esta acción ocultará la tarjeta en este dispositivo.`,
       `Delete “${yacht.name}” from the catalog? This will hide the card on this device.`
@@ -927,17 +1045,18 @@
     delete allChanges[key];
     try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
 
-    yachts.splice(editingYachtIndex, 1);
-    if(statBoats) statBoats.textContent = yachts.length;
+    editingVehicles.splice(editingYachtIndex, 1);
+    if(editingVehicles === yachts && statBoats) statBoats.textContent = yachts.length;
     visibleCount = Math.min(Math.max(visibleCount, 9), Math.max(yachts.length, 9));
     renderCatalog();
+    renderAdventures();
 
-    if(!yachts.length) {
+    if(!editingVehicles.length) {
       closeFleetEditor();
       return;
     }
-    editingYachtIndex = Math.min(editingYachtIndex, yachts.length - 1);
-    fillEditorForm(yachts[editingYachtIndex]);
+    editingYachtIndex = Math.min(editingYachtIndex, editingVehicles.length - 1);
+    fillEditorForm(editingVehicles[editingYachtIndex]);
     const status = document.getElementById('editorSaveStatus');
     if(status) status.textContent = ui('Tarjeta eliminada', 'Card deleted');
   }
@@ -979,9 +1098,31 @@
       saveEditorForm(true);
     });
     fleetEditorForm.addEventListener('input', () => {
-      if(editingYachtIndex >= 0) updateEditorPreview(yachts[editingYachtIndex]);
+      if(editingYachtIndex >= 0) {
+        syncPricingEditorFields();
+        updateEditorPreview(editingVehicles[editingYachtIndex]);
+      }
     });
     fleetEditorForm.addEventListener('click', (event) => {
+      if(event.target.closest('[data-pricing-add]')) {
+        const container = document.getElementById('pricingEditorRows');
+        if(container) {
+          container.insertAdjacentHTML('beforeend', pricingRowHTML({ label: '', value: '' }));
+          const newRow = container.lastElementChild;
+          if(newRow) newRow.querySelector('[data-rate-label]').focus();
+        }
+      }
+      const removeRate = event.target.closest('[data-pricing-remove]');
+      if(removeRate) {
+        const rows = document.querySelectorAll('#pricingEditorRows [data-pricing-row]');
+        if(rows.length > 1) removeRate.closest('[data-pricing-row]').remove();
+        else {
+          const row = removeRate.closest('[data-pricing-row]');
+          row.querySelector('[data-rate-label]').value = '';
+          row.querySelector('[data-rate-value]').value = '';
+        }
+        syncPricingEditorFields();
+      }
       if(event.target.closest('[data-fleet-editor-close]')) closeFleetEditor();
       if(event.target.closest('[data-editor-previous]')) moveEditor(-1);
       if(event.target.closest('[data-editor-next]')) moveEditor(1);
@@ -990,16 +1131,18 @@
         finishEditingSession();
       }
       if(event.target.closest('[data-editor-reset]') && editingYachtIndex >= 0) {
-        const yacht = yachts[editingYachtIndex];
+        const yacht = editingVehicles[editingYachtIndex];
         if(!window.confirm(ui('¿Restaurar la información original de esta tarjeta?', 'Restore this card’s original information?'))) return;
         const key = yachtStorageKey(yacht);
-        const original = originalYachts.get(key);
+        const original = (editingVehicles === adventures ? originalAdventures : originalYachts).get(key);
         ['locationEn','ratesEn','notesEn','priceLabelEn','photoLinkEnabled'].forEach((field) => delete yacht[field]);
+        delete yacht.priceTable;
         if(original) Object.assign(yacht, { ...original });
         const allChanges = readEditorChanges();
         delete allChanges[key];
         try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
         renderCatalog();
+        renderAdventures();
         fillEditorForm(yacht);
         const status = document.getElementById('editorSaveStatus');
         if(status) status.textContent = ui('Tarjeta restaurada', 'Card restored');
@@ -1037,6 +1180,13 @@
 
   if(adventuresGrid) {
     adventuresGrid.addEventListener('click', (event) => {
+      const editButton = event.target.closest('[data-edit-adventure]');
+      if(editButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        openFleetEditor(adventures[Number(editButton.dataset.editAdventure)], adventures);
+        return;
+      }
       const card = event.target.closest('[data-adventure-index]');
       if(!card) return;
 

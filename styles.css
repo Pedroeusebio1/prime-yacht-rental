@@ -842,12 +842,12 @@ footer {
   gap: 12px;
   margin: 28px 0 30px;
 }
-.modal-facts div {
+.modal-facts > div {
   background: var(--paper-2);
   border: 1px solid var(--line);
   padding: 16px 18px;
 }
-.modal-facts span {
+.modal-facts > div > span {
   color: var(--ink-faint);
   display: block;
   font-size: 10.5px;
@@ -856,7 +856,7 @@ footer {
   margin-bottom: 7px;
   text-transform: uppercase;
 }
-.modal-facts strong {
+.modal-facts > div > strong {
   color: var(--ink);
   display: block;
   font-size: 14px;
@@ -1141,6 +1141,16 @@ footer {
   height: 28px;
   fill: #fffdf8;
 }
+.modal-facts [data-modal-rates] {
+  display: block;
+  min-width: 0;
+}
+.modal-facts .modal-rates-fact {
+  background: transparent;
+  border: 0;
+  padding: 4px 0 0;
+}
+.adv-body .price-table { margin-top: 14px; width: 100%; }
 .price-table {
   background: linear-gradient(145deg, rgba(255, 252, 243, 0.98), rgba(246, 235, 207, 0.68));
   border: 1px solid rgba(185, 134, 42, 0.28);
@@ -1193,7 +1203,15 @@ footer {
   text-align: center;
   text-transform: uppercase;
 }
-.price-table-modal { margin-top: 7px; width: min(100%, 430px); }
+.price-table-modal {
+  background: #fffdf8;
+  border-color: rgba(185, 134, 42, 0.22);
+  border-radius: 8px;
+  box-shadow: none;
+  margin-top: 7px;
+  width: 100%;
+}
+.price-table-modal .price-table-heading { display: none; }
 .price-table-modal .price-table-row { font-size: 13px; padding: 10px 13px; }
 .price-table-modal .price-table-row strong { font-size: 16px; }
 
@@ -1377,6 +1395,57 @@ body.fleet-editing .editor-exit-mode { display: inline-flex; }
 .fleet-editor-language.is-english { border-left: 1px solid var(--line); background: #f8faf9; }
 .fleet-editor-language .fleet-editor-section-title { margin-bottom: 0; }
 .editor-link-section { display: grid; gap: 14px; }
+.pricing-editor-section { display: grid; gap: 12px; }
+.legacy-rates-field { display: none !important; }
+.pricing-editor-section .fleet-editor-section-title { margin-bottom: 2px; }
+.pricing-editor-head,
+.pricing-editor-row {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(120px, .75fr) 38px;
+}
+.pricing-editor-head {
+  color: var(--ink-faint);
+  font: 800 9px/1.2 Manrope, sans-serif;
+  letter-spacing: .11em;
+  padding: 0 4px;
+  text-transform: uppercase;
+}
+.pricing-editor-rows { display: grid; gap: 9px; }
+.pricing-editor-row {
+  background: #fbf8f0;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 9px;
+}
+.pricing-editor-row input { min-width: 0; }
+.pricing-remove-row {
+  align-items: center;
+  background: transparent;
+  border: 1px solid rgba(168, 58, 50, .24);
+  border-radius: 7px;
+  color: #a83a32;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 19px;
+  height: 38px;
+  justify-content: center;
+  width: 38px;
+}
+.pricing-remove-row:hover { background: #a83a32; border-color: #a83a32; color: #fff; }
+.pricing-add-row {
+  background: transparent;
+  border: 1px dashed rgba(185, 134, 42, .55);
+  border-radius: 8px;
+  color: var(--gold-deep);
+  cursor: pointer;
+  font: 800 10px/1 Manrope, sans-serif;
+  letter-spacing: .06em;
+  padding: 12px;
+  text-transform: uppercase;
+}
+.pricing-add-row:hover { background: rgba(185, 134, 42, .07); }
 .editor-link-toggle { grid-template-columns: auto 1fr !important; align-items: center; cursor: pointer; }
 .editor-link-toggle input { width: 18px; height: 18px; accent-color: var(--gold-deep); }
 .fleet-editor-actions {
@@ -1482,6 +1551,11 @@ body.fleet-editing .cat-card { outline: 1px dashed rgba(201, 158, 59, .5); outli
   .fleet-editor-section { margin-inline: 18px; padding: 16px; }
   .editor-field-grid-3, .editor-field-grid-2, .bilingual-editor-fields { grid-template-columns: 1fr; }
   .fleet-editor-language.is-english { border-left: 0; border-top: 1px solid var(--line); }
+  .pricing-editor-head { display: none; }
+  .pricing-editor-row { grid-template-columns: 1fr 38px; }
+  .pricing-editor-row input[data-rate-label-en],
+  .pricing-editor-row input[data-rate-value] { grid-column: 1; }
+  .pricing-remove-row { grid-column: 2; grid-row: 1 / span 3; }
   .fleet-editor-actions { flex-wrap: wrap; padding: 14px 18px; }
   .editor-destructive-actions { width: 100%; justify-content: space-between; }
   .editor-save-status { order: -1; width: 100%; }
