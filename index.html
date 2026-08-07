@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Marcellus&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="./assets/prime-logo.png">
-<link rel="stylesheet" href="styles.css?v=20260807-2">
+<link rel="stylesheet" href="styles.css?v=20260807-3">
 
 </head>
 <body>
@@ -298,7 +298,7 @@
     </div>
 
     <div class="fleet-editor-preview">
-      <img id="fleetEditorImage" src="" alt="">
+      <div class="editor-preview-media" id="fleetEditorImageFrame"><img id="fleetEditorImage" src="" alt=""></div>
       <div><span>Vista previa</span><strong id="fleetEditorPreviewName"></strong><small id="fleetEditorPreviewMeta"></small></div>
     </div>
 
@@ -318,6 +318,36 @@
         <label>Precio principal<input name="price" type="text" placeholder="$1,500"></label>
         <label>Imagen de portada<input name="image" type="text" placeholder="https://... o ./assets/..."></label>
       </div>
+    </div>
+
+    <div class="fleet-editor-section image-display-editor">
+      <div class="fleet-editor-section-title"><span>Presentación de la foto</span><small>Vista de la tarjeta y detalles</small></div>
+      <div class="editor-field-grid editor-field-grid-3">
+        <label>Ajuste
+          <select name="imageFit">
+            <option value="cover">Cubrir el contenedor</option>
+            <option value="contain">Mostrar foto completa</option>
+          </select>
+        </label>
+        <label>Punto de enfoque
+          <select name="imagePosition">
+            <option value="center center">Centro</option>
+            <option value="center top">Parte superior</option>
+            <option value="center bottom">Parte inferior</option>
+            <option value="left center">Lado izquierdo</option>
+            <option value="right center">Lado derecho</option>
+          </select>
+        </label>
+        <label>Fondo
+          <select name="imageBackground">
+            <option value="blur">Foto difuminada</option>
+            <option value="cream">Crema</option>
+            <option value="dark">Oscuro</option>
+            <option value="white">Blanco</option>
+          </select>
+        </label>
+      </div>
+      <p class="image-display-hint">“Cubrir” llena todo el espacio; “Mostrar completa” evita recortes y utiliza el fondo seleccionado.</p>
     </div>
 
     <div class="fleet-editor-section bilingual-editor-fields">
@@ -371,6 +401,6 @@
 
 <script src="./catalog-data.js?v=20260807-1"></script>
 <script src="./catalog-media.js?v=20260804-1"></script>
-<script src="./app.js?v=20260807-4"></script>
+<script src="./app.js?v=20260807-5"></script>
 </body>
 </html>

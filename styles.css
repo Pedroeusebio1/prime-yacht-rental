@@ -803,6 +803,8 @@ footer {
   background-position: center;
   background-size: cover;
   min-height: 100%;
+  overflow: hidden;
+  position: relative;
 }
 .modal-media img {
   height: 100%;
@@ -935,6 +937,8 @@ footer {
 .adv-card:hover .adv-media img {
   transform: scale(1.04);
 }
+.cat-card:hover .cat-media.media-fit-contain > img,
+.adv-card:hover .adv-media.media-fit-contain > img { transform: scale(1.015); }
 .adv-body {
   display: flex;
   flex: 1;
@@ -1141,6 +1145,32 @@ footer {
   height: 28px;
   fill: #fffdf8;
 }
+.media-bg-cream { background: linear-gradient(155deg, #f7eecf, #fffdf8 70%); }
+.media-bg-dark { background: linear-gradient(145deg, #172824, #29423c); }
+.media-bg-white { background: #fff; }
+.media-bg-blur { background: #e9e2d2; isolation: isolate; }
+.media-bg-blur::before {
+  background-image: var(--media-image);
+  background-position: var(--media-position, center center);
+  background-repeat: no-repeat;
+  background-size: cover;
+  content: "";
+  filter: blur(16px) saturate(.85);
+  inset: -18px;
+  opacity: .52;
+  position: absolute;
+  transform: scale(1.08);
+  z-index: 0;
+}
+.media-bg-blur > img,
+.media-bg-blur > video { position: relative; z-index: 1; }
+.cat-media .cat-badge,
+.cat-media .cat-pax,
+.adv-media .cat-badge,
+.adv-media .cat-pax { z-index: 2; }
+.media-fit-contain > img { transform: none; }
+.cat-card:hover .media-fit-contain > img,
+.adv-card:hover .media-fit-contain > img { transform: scale(1.015); }
 .modal-facts [data-modal-rates] {
   display: block;
   min-width: 0;
@@ -1314,6 +1344,7 @@ body.fleet-editing .editor-exit-mode { display: inline-flex; }
 .editor-password-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
 .editor-password-row input,
 .fleet-editor-card input,
+.fleet-editor-card select,
 .fleet-editor-card textarea {
   width: 100%;
   border: 1px solid #ddd8ca;
@@ -1328,6 +1359,7 @@ body.fleet-editing .editor-exit-mode { display: inline-flex; }
 .fleet-editor-card textarea { resize: vertical; min-height: 86px; }
 .editor-password-row input:focus,
 .fleet-editor-card input:focus,
+.fleet-editor-card select:focus,
 .fleet-editor-card textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201, 158, 59, .13); }
 .editor-close {
   position: absolute;
@@ -1375,7 +1407,8 @@ body.fleet-editing .editor-exit-mode { display: inline-flex; }
   border-radius: 12px;
   background: #fff;
 }
-.fleet-editor-preview img { width: 128px; height: 82px; border-radius: 8px; object-fit: cover; background: var(--cream); }
+.editor-preview-media { width: 128px; height: 82px; border-radius: 8px; overflow: hidden; position: relative; background: var(--cream); }
+.fleet-editor-preview img { width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 1; }
 .fleet-editor-preview div { display: grid; gap: 5px; }
 .fleet-editor-preview span { color: var(--gold-deep); font-size: 9px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
 .fleet-editor-preview strong { color: var(--ink); font-family: "Cormorant Garamond", serif; font-size: 23px; }
@@ -1390,6 +1423,7 @@ body.fleet-editing .editor-exit-mode { display: inline-flex; }
 .editor-field-grid + .editor-field-grid { margin-top: 14px; }
 .editor-field-grid-3 { grid-template-columns: 1.5fr .7fr .7fr; }
 .editor-field-grid-2 { grid-template-columns: 1fr 1fr; }
+.image-display-hint { color: var(--muted); font-size: 11px; line-height: 1.55; margin: 14px 0 0; }
 .bilingual-editor-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0; overflow: hidden; }
 .fleet-editor-language { display: grid; gap: 14px; padding: 20px; }
 .fleet-editor-language.is-english { border-left: 1px solid var(--line); background: #f8faf9; }
@@ -1546,7 +1580,8 @@ body.fleet-editing .cat-card { outline: 1px dashed rgba(201, 158, 59, .5); outli
   .fleet-editor-card { width: 100%; }
   .fleet-editor-head { padding-left: 20px; }
   .fleet-editor-preview { margin-inline: 18px; grid-template-columns: 92px 1fr; }
-  .fleet-editor-preview img { width: 92px; height: 72px; }
+  .editor-preview-media { width: 92px; height: 72px; }
+  .fleet-editor-preview img { width: 100%; height: 100%; }
   .fleet-editor-nav { padding-inline: 18px; }
   .fleet-editor-section { margin-inline: 18px; padding: 16px; }
   .editor-field-grid-3, .editor-field-grid-2, .bilingual-editor-fields { grid-template-columns: 1fr; }

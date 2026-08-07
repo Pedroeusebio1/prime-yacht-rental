@@ -574,14 +574,36 @@
     return vehicle.category ? adventureImage(vehicle) : yachtImage(vehicle);
   }
 
-  function mediaElementHTML(item, alt, className = ''){
+  const validImageFits = new Set(['cover', 'contain']);
+  const validImagePositions = new Set(['center center', 'center top', 'center bottom', 'left center', 'right center']);
+  const validImageBackgrounds = new Set(['blur', 'cream', 'dark', 'white']);
+  function vehicleImageFit(vehicle){ return validImageFits.has(vehicle.imageFit) ? vehicle.imageFit : 'cover'; }
+  function vehicleImagePosition(vehicle){ return validImagePositions.has(vehicle.imagePosition) ? vehicle.imagePosition : 'center center'; }
+  function vehicleImageBackground(vehicle){ return validImageBackgrounds.has(vehicle.imageBackground) ? vehicle.imageBackground : 'blur'; }
+  function mediaContainerClass(vehicle){ return `media-fit-${vehicleImageFit(vehicle)} media-bg-${vehicleImageBackground(vehicle)}`; }
+  function mediaImageStyle(vehicle){ return `object-fit:${vehicleImageFit(vehicle)};object-position:${vehicleImagePosition(vehicle)};` }
+  function mediaContainerStyle(vehicle, image){
+    if(!image) return '';
+    return `--media-image:url("${String(image).replace(/["\\]/g, '\\$&')}");--media-position:${vehicleImagePosition(vehicle)};`;
+  }
+
+  function applyMediaPresentation(container, image, vehicle){
+    if(!container) return;
+    [...validImageBackgrounds].forEach((value) => container.classList.remove(`media-bg-${value}`));
+    [...validImageFits].forEach((value) => container.classList.remove(`media-fit-${value}`));
+    container.classList.add(`media-bg-${vehicleImageBackground(vehicle)}`, `media-fit-${vehicleImageFit(vehicle)}`);
+    container.style.setProperty('--media-image', image ? `url("${String(image).replace(/["\\]/g, '\\$&')}")` : 'none');
+    container.style.setProperty('--media-position', vehicleImagePosition(vehicle));
+  }
+
+  function mediaElementHTML(item, alt, className = '', vehicle = {}){
     const media = normalizeMedia(item);
     const classAttr = className ? ` class="${escapeHTML(className)}"` : '';
     if(media.type === 'video') {
       const poster = media.poster ? ` poster="${escapeHTML(media.poster)}"` : '';
       return `<video${classAttr} src="${escapeHTML(media.src)}"${poster} muted playsinline controls preload="metadata"></video>`;
     }
-    return `<img${classAttr} src="${escapeHTML(media.src)}" alt="${escapeHTML(alt)}" loading="lazy" onerror="this.style.display='none'">`;
+    return `<img${classAttr} src="${escapeHTML(media.src)}" alt="${escapeHTML(alt)}" loading="lazy" style="${escapeHTML(mediaImageStyle(vehicle))}" onerror="this.style.display='none'">`;
   }
 
   function hasDirectImage(url){
@@ -598,7 +620,7 @@
   function yachtMediaHTML(yacht, index){
     const image = imageFor(yacht, index);
     if(image) {
-      return `<img src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" loading="lazy" onerror="this.style.display='none'">`;
+      return `<img src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(yacht))}" onerror="this.style.display='none'">`;
     }
 
     return `
@@ -670,7 +692,7 @@
       <article class="cat-card" data-yacht-index="${yachts.indexOf(yacht)}">
         <button class="card-edit-btn" type="button" data-edit-yacht="${yachts.indexOf(yacht)}"><span aria-hidden="true">✎</span> ${ui('Editar tarjeta', 'Edit card')}</button>
         <div class="cat-open">
-          <span class="cat-media">
+          <span class="cat-media ${mediaContainerClass(yacht)}" style="${escapeHTML(mediaContainerStyle(yacht, imageFor(yacht, yachts.indexOf(yacht))))}">
             ${yachtMediaHTML(yacht, yachts.indexOf(yacht))}
             <span class="cat-badge">${escapeHTML(isEnglish() ? `${yacht.feet || ''} ft` : yacht.sizeLabel)}</span>
             <span class="cat-pax">${escapeHTML(yacht.passengers)} ${ui('pasajeros', 'passengers')}</span>
@@ -700,11 +722,13 @@
     const collection = yacht.category ? adventures : yachts;
     const prefix = yacht.category ? 'adventure-' : '';
     const image = imageFor(yacht, collection.indexOf(yacht), prefix);
-    modalMedia.style.backgroundImage = image ? `url('${image}')` : '';
+    modalMedia._displayVehicle = yacht;
+    modalMedia.style.backgroundImage = '';
+    applyMediaPresentation(modalMedia, image, yacht);
     modalMedia.classList.toggle('no-photo', !image);
     modalMedia.dataset.placeholder = `${yacht.feet || ''}' ${yacht.name}`;
     modalMedia.innerHTML = image
-      ? `<img class="modal-active-media" src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" onerror="this.style.display='none'">`
+      ? `<img class="modal-active-media" src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" style="${escapeHTML(mediaImageStyle(yacht))}" onerror="this.style.display='none'">`
       : '';
     modal.querySelector('[data-modal-kicker]').textContent = isEnglish() ? `${yacht.feet || ''} ft | ${yacht.category || 'Yacht'}` : `${yacht.size} | ${yacht.sizeLabel}`;
     modal.querySelector('[data-modal-title]').textContent = yacht.name;
@@ -738,8 +762,8 @@
       <article class="adv-card" data-adventure-index="${adventures.indexOf(adventure)}">
         <button class="card-edit-btn" type="button" data-edit-adventure="${adventures.indexOf(adventure)}"><span aria-hidden="true">✎</span> ${ui('Editar tarjeta', 'Edit card')}</button>
         <button class="adv-open" type="button" aria-label="${ui('Ver detalles de', 'View details for')} ${adventure.name}">
-          <span class="adv-media" style="background-image:url('${imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure)}')">
-            <img src="${escapeHTML(imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure))}" alt="${escapeHTML(adventure.name)}" loading="lazy" onerror="this.style.display='none'">
+          <span class="adv-media ${mediaContainerClass(adventure)}" style="${escapeHTML(mediaContainerStyle(adventure, imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure)))}">
+            <img src="${escapeHTML(imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure))}" alt="${escapeHTML(adventure.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(adventure))}" onerror="this.style.display='none'">
             <span class="cat-badge">${adventure.sizeLabel}</span>
             <span class="cat-pax">${adventure.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${adventure.passengers} ${ui('pasajeros', 'passengers')}`}</span>
           </span>
@@ -774,10 +798,11 @@
     const index = (nextIndex + gallery.length) % gallery.length;
     const item = gallery[index];
     modalMedia.dataset.galleryIndex = String(index);
-    modalMedia.style.backgroundImage = item.type === 'image' ? `url('${item.src}')` : '';
+    modalMedia.style.backgroundImage = '';
+    applyMediaPresentation(modalMedia, item.type === 'image' ? item.src : item.poster, modalMedia._displayVehicle || {});
     modalMedia.classList.remove('no-photo');
     modalMedia.innerHTML = `
-      ${mediaElementHTML(item, modalMedia._galleryTitle || 'Galeria', 'modal-active-media')}
+      ${mediaElementHTML(item, modalMedia._galleryTitle || 'Galeria', 'modal-active-media', modalMedia._displayVehicle || {})}
       ${gallery.length > 1 ? `
         <button class="gallery-nav gallery-prev" type="button" data-gallery-prev aria-label="Medio anterior">‹</button>
         <button class="gallery-nav gallery-next" type="button" data-gallery-next aria-label="Medio siguiente">›</button>
@@ -911,6 +936,7 @@
     const previewName = document.getElementById('fleetEditorPreviewName');
     const previewMeta = document.getElementById('fleetEditorPreviewMeta');
     const previewImage = document.getElementById('fleetEditorImage');
+    const previewFrame = document.getElementById('fleetEditorImageFrame');
     const name = editorField('name').value || yacht.name;
     const feet = editorField('feet').value || yacht.feet || '';
     const passengers = editorField('passengers').value || yacht.passengers || '';
@@ -921,6 +947,15 @@
     if(previewImage) {
       previewImage.src = editorField('image').value || imageFor(yacht, editingYachtIndex) || fallbackImage(yacht);
       previewImage.alt = name;
+      const draft = {
+        ...yacht,
+        imageFit: editorField('imageFit').value,
+        imagePosition: editorField('imagePosition').value,
+        imageBackground: editorField('imageBackground').value
+      };
+      previewImage.style.objectFit = vehicleImageFit(draft);
+      previewImage.style.objectPosition = vehicleImagePosition(draft);
+      applyMediaPresentation(previewFrame, previewImage.src, draft);
     }
   }
 
@@ -928,8 +963,9 @@
     if(!fleetEditorForm || !yacht) return;
     const values = {
       name: yacht.name || '', feet: yacht.feet || '', passengers: yacht.passengers || '',
-      price: yacht.price || '', image: yacht.image || '', location: yacht.location || '',
+      price: yacht.price || '', image: yacht.coverImage || yacht.image || '', location: yacht.location || '',
       rates: yacht.rates || '', notes: yacht.notes || '', priceLabel: yacht.priceLabel || '',
+      imageFit: vehicleImageFit(yacht), imagePosition: vehicleImagePosition(yacht), imageBackground: vehicleImageBackground(yacht),
       locationEn: yacht.locationEn || englishLocation(yacht.location),
       ratesEn: yacht.ratesEn || englishRate(yacht.rates),
       notesEn: yacht.notesEn || localizedNote(yacht.notes, true),
@@ -996,6 +1032,10 @@
       passengers: Number(editorField('passengers').value),
       price: editorField('price').value.trim(),
       image: editorField('image').value.trim(),
+      coverImage: editorField('image').value.trim(),
+      imageFit: editorField('imageFit').value,
+      imagePosition: editorField('imagePosition').value,
+      imageBackground: editorField('imageBackground').value,
       location: editorField('location').value.trim(),
       rates: editorField('rates').value.trim(),
       notes: editorField('notes').value.trim(),
@@ -1136,7 +1176,7 @@
         const key = yachtStorageKey(yacht);
         const original = (editingVehicles === adventures ? originalAdventures : originalYachts).get(key);
         ['locationEn','ratesEn','notesEn','priceLabelEn','photoLinkEnabled'].forEach((field) => delete yacht[field]);
-        delete yacht.priceTable;
+        ['priceTable', 'coverImage', 'imageFit', 'imagePosition', 'imageBackground'].forEach((field) => delete yacht[field]);
         if(original) Object.assign(yacht, { ...original });
         const allChanges = readEditorChanges();
         delete allChanges[key];
