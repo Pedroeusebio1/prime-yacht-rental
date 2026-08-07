@@ -185,15 +185,23 @@
   }
 
   const editorStorageKey = 'prime-yacht-editor-v1';
+  const editorDeletedStorageKey = 'prime-yacht-deleted-v1';
   function yachtStorageKey(yacht){ return yacht.mediaKey || yacht.name; }
   function readEditorChanges(){
     try { return JSON.parse(localStorage.getItem(editorStorageKey) || '{}'); } catch (_) { return {}; }
   }
+  function readDeletedYachts(){
+    try {
+      const deleted = JSON.parse(localStorage.getItem(editorDeletedStorageKey) || '[]');
+      return Array.isArray(deleted) ? deleted : [];
+    } catch (_) { return []; }
+  }
   const savedEditorChanges = readEditorChanges();
+  const deletedYachtKeys = new Set(readDeletedYachts());
   const sourceYachts = Array.isArray(window.PRIME_YACHTS) ? window.PRIME_YACHTS.map((yacht) => ({ ...yacht })) : [];
   const originalYachts = new Map(sourceYachts.map((yacht) => [yachtStorageKey(yacht), { ...yacht }]));
   sourceYachts.forEach((yacht) => Object.assign(yacht, savedEditorChanges[yachtStorageKey(yacht)] || {}));
-  const yachts = sourceYachts.length ? shuffled(sourceYachts) : [];
+  const yachts = sourceYachts.length ? shuffled(sourceYachts.filter((yacht) => !deletedYachtKeys.has(yachtStorageKey(yacht)))) : [];
   const catalogMedia = window.PRIME_MEDIA || {};
 
   const filters = [
@@ -397,13 +405,25 @@
   }
 
   function yachtCardDetailsHTML(yacht){
-    const options = uniqueRateOptions(yacht);
+    const table = priceTableHTML(yacht, false);
     const note = yachtNotesText(yacht);
-    if(!options && !note) return '';
+    if(!table && !note) return '';
 
     return `<span class="cat-details">
-      ${options ? `<span class="cat-detail-row"><span class="cat-detail-label">${ui('Más opciones', 'More options')}</span><span>${escapeHTML(options)}</span></span>` : ''}
+      ${table}
       ${note ? `<span class="cat-detail-row cat-detail-note"><span class="cat-detail-label">${ui('Importante', 'Important')}</span><span>${escapeHTML(note)}</span></span>` : ''}
+    </span>`;
+  }
+
+  function priceTableHTML(yacht, modalView = false){
+    const rows = Array.isArray(yacht.priceTable) ? yacht.priceTable : [];
+    if(!rows.length) return '';
+    const visibleRows = modalView ? rows : rows.slice(0, 4);
+    const more = rows.length - visibleRows.length;
+    return `<span class="price-table${modalView ? ' price-table-modal' : ''}">
+      <span class="price-table-heading"><span>${ui('Tabla de precios', 'Price table')}</span>${rows.some((row) => row.estimated) ? `<em>${ui('Estimado', 'Estimated')}</em>` : ''}</span>
+      ${visibleRows.map((row) => `<span class="price-table-row"><span>${escapeHTML(isEnglish() ? localizedRate(row.label) : row.label)}</span><strong>${escapeHTML(row.value)}</strong></span>`).join('')}
+      ${more > 0 ? `<span class="price-table-more">+${more} ${ui('tarifas en detalles', 'rates in details')}</span>` : ''}
     </span>`;
   }
 
@@ -636,7 +656,8 @@
     modal.querySelector('[data-modal-title]').textContent = yacht.name;
     modal.querySelector('[data-modal-passengers]').textContent = yacht.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${yacht.passengers} ${ui('pasajeros', 'passengers')}`;
     modal.querySelector('[data-modal-location]').textContent = yachtLocationText(yacht);
-    modal.querySelector('[data-modal-rates]').textContent = yachtRatesText(yacht) || localizedRate(quotePriceText(yacht));
+    const modalRates = modal.querySelector('[data-modal-rates]');
+    modalRates.innerHTML = priceTableHTML(yacht, true) || escapeHTML(yachtRatesText(yacht) || localizedRate(quotePriceText(yacht)));
     modal.querySelector('[data-modal-notes]').textContent = yachtNotesText(yacht) || ui('Confirma disponibilidad y condiciones al solicitar la cotización.', 'Confirm availability and final terms when requesting your quote.');
     modal.querySelector('[data-modal-summary]').textContent = yachtIntro(yacht);
     const description = modal.querySelector('[data-modal-description]');
@@ -858,9 +879,41 @@
   }
 
   function moveEditor(direction){
+    if(!yachts.length) return;
     if(!saveEditorForm(false)) return;
     editingYachtIndex = (editingYachtIndex + direction + yachts.length) % yachts.length;
     fillEditorForm(yachts[editingYachtIndex]);
+  }
+
+  function deleteEditorYacht(){
+    if(editingYachtIndex < 0 || !yachts[editingYachtIndex]) return;
+    const yacht = yachts[editingYachtIndex];
+    const confirmed = window.confirm(ui(
+      `¿Eliminar “${yacht.name}” del catálogo? Esta acción ocultará la tarjeta en este dispositivo.`,
+      `Delete “${yacht.name}” from the catalog? This will hide the card on this device.`
+    ));
+    if(!confirmed) return;
+
+    const key = yachtStorageKey(yacht);
+    deletedYachtKeys.add(key);
+    try { localStorage.setItem(editorDeletedStorageKey, JSON.stringify([...deletedYachtKeys])); } catch (_) {}
+    const allChanges = readEditorChanges();
+    delete allChanges[key];
+    try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
+
+    yachts.splice(editingYachtIndex, 1);
+    if(statBoats) statBoats.textContent = yachts.length;
+    visibleCount = Math.min(Math.max(visibleCount, 9), Math.max(yachts.length, 9));
+    renderCatalog();
+
+    if(!yachts.length) {
+      closeFleetEditor();
+      return;
+    }
+    editingYachtIndex = Math.min(editingYachtIndex, yachts.length - 1);
+    fillEditorForm(yachts[editingYachtIndex]);
+    const status = document.getElementById('editorSaveStatus');
+    if(status) status.textContent = ui('Tarjeta eliminada', 'Card deleted');
   }
 
   if(editorAccess) {
@@ -906,6 +959,7 @@
       if(event.target.closest('[data-fleet-editor-close]')) closeFleetEditor();
       if(event.target.closest('[data-editor-previous]')) moveEditor(-1);
       if(event.target.closest('[data-editor-next]')) moveEditor(1);
+      if(event.target.closest('[data-editor-delete]')) deleteEditorYacht();
       if(event.target.closest('[data-editor-logout]')) {
         finishEditingSession();
       }

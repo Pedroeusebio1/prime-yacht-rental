@@ -1141,6 +1141,61 @@ footer {
   height: 28px;
   fill: #fffdf8;
 }
+.price-table {
+  background: linear-gradient(145deg, rgba(255, 252, 243, 0.98), rgba(246, 235, 207, 0.68));
+  border: 1px solid rgba(185, 134, 42, 0.28);
+  border-radius: 10px;
+  box-shadow: 0 8px 22px rgba(71, 49, 13, 0.06);
+  display: grid;
+  overflow: hidden;
+}
+.price-table-heading,
+.price-table-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+.price-table-heading {
+  background: linear-gradient(90deg, #243b37, #35534c);
+  color: #fff8e8;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  padding: 9px 12px;
+  text-transform: uppercase;
+}
+.price-table-heading em {
+  background: rgba(255, 255, 255, 0.13);
+  border-radius: 99px;
+  color: #f6d995;
+  font-size: 8px;
+  font-style: normal;
+  padding: 3px 7px;
+}
+.price-table-row {
+  color: var(--ink-soft);
+  font-size: 11.5px;
+  padding: 8px 12px;
+}
+.price-table-row + .price-table-row { border-top: 1px solid rgba(185, 134, 42, 0.16); }
+.price-table-row strong {
+  color: var(--gold-deep);
+  font-family: "Marcellus", serif;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.price-table-more {
+  border-top: 1px solid rgba(185, 134, 42, 0.16);
+  color: var(--ink-faint);
+  font-size: 9.5px;
+  padding: 7px 12px;
+  text-align: center;
+  text-transform: uppercase;
+}
+.price-table-modal { margin-top: 7px; width: min(100%, 430px); }
+.price-table-modal .price-table-row { font-size: 13px; padding: 10px 13px; }
+.price-table-modal .price-table-row strong { font-size: 16px; }
 
 /* Fleet editor */
 .footer-editor-access {
@@ -1338,7 +1393,22 @@ body.fleet-editing .editor-exit-mode { display: inline-flex; }
   background: rgba(255, 253, 248, .95);
   backdrop-filter: blur(10px);
 }
-.editor-danger { margin-right: auto; border: 0; background: transparent; color: #a83a32; font: 700 11px Manrope, sans-serif; cursor: pointer; }
+.editor-destructive-actions { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+.editor-danger { border: 0; background: transparent; color: #7b645f; font: 700 11px Manrope, sans-serif; cursor: pointer; }
+.editor-delete {
+  align-items: center;
+  background: #fff4f2;
+  border: 1px solid rgba(168, 58, 50, .35);
+  border-radius: 4px;
+  color: #a83a32;
+  cursor: pointer;
+  display: inline-flex;
+  font: 800 11px/1 Manrope, sans-serif;
+  gap: 6px;
+  padding: 11px 13px;
+}
+.editor-delete:hover { background: #a83a32; border-color: #a83a32; color: #fff; }
+.editor-delete span { font-size: 16px; line-height: .7; }
 .editor-save-status { color: #26735e; font-size: 11px; font-weight: 700; }
 .editor-finish-button {
   border: 1px solid #183b36;
@@ -1413,6 +1483,7 @@ body.fleet-editing .cat-card { outline: 1px dashed rgba(201, 158, 59, .5); outli
   .editor-field-grid-3, .editor-field-grid-2, .bilingual-editor-fields { grid-template-columns: 1fr; }
   .fleet-editor-language.is-english { border-left: 0; border-top: 1px solid var(--line); }
   .fleet-editor-actions { flex-wrap: wrap; padding: 14px 18px; }
+  .editor-destructive-actions { width: 100%; justify-content: space-between; }
   .editor-save-status { order: -1; width: 100%; }
   .catalog-search {
     align-items: stretch;
