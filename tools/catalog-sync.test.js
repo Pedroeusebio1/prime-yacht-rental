@@ -23,6 +23,9 @@ async function run(){
     imageFit: 'contain',
     imagePosition: 'right center',
     imageBackground: 'dark',
+    detailImageFit: 'contain',
+    detailImagePosition: 'center top',
+    detailImageBackground: 'cream',
     unknown: 'ignored',
     __proto__: { polluted: true },
     priceTable: [
@@ -41,6 +44,9 @@ async function run(){
   assert.equal(sanitized.imageFit, 'contain');
   assert.equal(sanitized.imagePosition, 'right center');
   assert.equal(sanitized.imageBackground, 'dark');
+  assert.equal(sanitized.detailImageFit, 'contain');
+  assert.equal(sanitized.detailImagePosition, 'center top');
+  assert.equal(sanitized.detailImageBackground, 'cream');
   assert.equal(Object.prototype.hasOwnProperty.call(sanitized, 'unknown'), false);
   assert.equal({}.polluted, undefined);
   assert.deepEqual(sanitized.priceTable, [{ label: '4 horas', labelEn: '4 hours', value: '$650' }]);

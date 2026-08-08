@@ -120,6 +120,9 @@
     if(validImageFits.has(source.imageFit)) clean.imageFit = source.imageFit;
     if(validImagePositions.has(source.imagePosition)) clean.imagePosition = source.imagePosition;
     if(validImageBackgrounds.has(source.imageBackground)) clean.imageBackground = source.imageBackground;
+    if(validImageFits.has(source.detailImageFit)) clean.detailImageFit = source.detailImageFit;
+    if(validImagePositions.has(source.detailImagePosition)) clean.detailImagePosition = source.detailImagePosition;
+    if(validImageBackgrounds.has(source.detailImageBackground)) clean.detailImageBackground = source.detailImageBackground;
     if(Object.prototype.hasOwnProperty.call(source, 'priceTable')) {
       clean.priceTable = sanitizePriceTable(source.priceTable);
       const amounts = clean.priceTable.map((row) => priceAmount(row.value)).filter(Number.isFinite);

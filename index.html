@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Marcellus&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="./assets/prime-logo.png">
-<link rel="stylesheet" href="styles.css?v=20260808-1">
+<link rel="stylesheet" href="styles.css?v=20260808-2">
 
 </head>
 <body>
@@ -326,33 +326,73 @@
     </div>
 
     <div class="fleet-editor-section image-display-editor">
-      <div class="fleet-editor-section-title"><span>Presentación de la foto</span><small>Vista de la tarjeta y detalles</small></div>
-      <div class="editor-field-grid editor-field-grid-3">
-        <label>Ajuste
-          <select name="imageFit">
-            <option value="cover">Cubrir el contenedor</option>
-            <option value="contain">Mostrar foto completa</option>
-          </select>
-        </label>
-        <label>Punto de enfoque
-          <select name="imagePosition">
-            <option value="center center">Centro</option>
-            <option value="center top">Parte superior</option>
-            <option value="center bottom">Parte inferior</option>
-            <option value="left center">Lado izquierdo</option>
-            <option value="right center">Lado derecho</option>
-          </select>
-        </label>
-        <label>Fondo
-          <select name="imageBackground">
-            <option value="blur">Foto difuminada</option>
-            <option value="cream">Crema</option>
-            <option value="dark">Oscuro</option>
-            <option value="white">Blanco</option>
-          </select>
-        </label>
+      <div class="fleet-editor-section-title"><span>Presentación de la foto</span><small>Configura cada vista por separado</small></div>
+      <div class="image-display-groups">
+        <div class="image-display-group">
+          <div class="image-display-group-head">
+            <strong>Miniatura de la tarjeta</strong>
+            <small>Controla cómo se ve la foto en el catálogo.</small>
+          </div>
+          <div class="editor-field-grid image-display-fields">
+            <label>Ajuste
+              <select name="imageFit">
+                <option value="cover">Cubrir el contenedor</option>
+                <option value="contain">Mostrar foto completa</option>
+              </select>
+            </label>
+            <label>Punto de enfoque
+              <select name="imagePosition">
+                <option value="center center">Centro</option>
+                <option value="center top">Parte superior</option>
+                <option value="center bottom">Parte inferior</option>
+                <option value="left center">Lado izquierdo</option>
+                <option value="right center">Lado derecho</option>
+              </select>
+            </label>
+            <label>Fondo
+              <select name="imageBackground">
+                <option value="blur">Foto difuminada</option>
+                <option value="cream">Crema</option>
+                <option value="dark">Oscuro</option>
+                <option value="white">Blanco</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="image-display-group is-detail-view">
+          <div class="image-display-group-head">
+            <strong>Foto al abrir la tarjeta</strong>
+            <small>Usa “Mostrar foto completa” para evitar recortes.</small>
+          </div>
+          <div class="editor-field-grid image-display-fields">
+            <label>Ajuste
+              <select name="detailImageFit">
+                <option value="contain">Mostrar foto completa</option>
+                <option value="cover">Cubrir el contenedor</option>
+              </select>
+            </label>
+            <label>Punto de enfoque
+              <select name="detailImagePosition">
+                <option value="center center">Centro</option>
+                <option value="center top">Parte superior</option>
+                <option value="center bottom">Parte inferior</option>
+                <option value="left center">Lado izquierdo</option>
+                <option value="right center">Lado derecho</option>
+              </select>
+            </label>
+            <label>Fondo
+              <select name="detailImageBackground">
+                <option value="blur">Foto difuminada</option>
+                <option value="cream">Crema</option>
+                <option value="dark">Oscuro</option>
+                <option value="white">Blanco</option>
+              </select>
+            </label>
+          </div>
+        </div>
       </div>
-      <p class="image-display-hint">“Cubrir” llena todo el espacio; “Mostrar completa” evita recortes y utiliza el fondo seleccionado.</p>
+      <p class="image-display-hint">La miniatura y la foto grande se guardan de forma independiente para cada tarjeta.</p>
     </div>
 
     <div class="fleet-editor-section bilingual-editor-fields">
@@ -406,7 +446,7 @@
 
 <script src="./catalog-data.js?v=20260807-1"></script>
 <script src="./catalog-media.js?v=20260804-1"></script>
-<script src="./catalog-sync.js?v=20260808-1"></script>
-<script src="./app.js?v=20260808-1"></script>
+<script src="./catalog-sync.js?v=20260808-2"></script>
+<script src="./app.js?v=20260808-2"></script>
 </body>
 </html>

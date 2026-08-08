@@ -751,33 +751,46 @@
   const validImageFits = new Set(['cover', 'contain']);
   const validImagePositions = new Set(['center center', 'center top', 'center bottom', 'left center', 'right center']);
   const validImageBackgrounds = new Set(['blur', 'cream', 'dark', 'white']);
-  function vehicleImageFit(vehicle){ return validImageFits.has(vehicle.imageFit) ? vehicle.imageFit : 'cover'; }
-  function vehicleImagePosition(vehicle){ return validImagePositions.has(vehicle.imagePosition) ? vehicle.imagePosition : 'center center'; }
-  function vehicleImageBackground(vehicle){ return validImageBackgrounds.has(vehicle.imageBackground) ? vehicle.imageBackground : 'blur'; }
-  function mediaContainerClass(vehicle){ return `media-fit-${vehicleImageFit(vehicle)} media-bg-${vehicleImageBackground(vehicle)}`; }
-  function mediaImageStyle(vehicle){ return `object-fit:${vehicleImageFit(vehicle)};object-position:${vehicleImagePosition(vehicle)};` }
-  function mediaContainerStyle(vehicle, image){
+  function vehicleImageFit(vehicle, view = 'card'){
+    const value = view === 'detail' ? vehicle.detailImageFit : vehicle.imageFit;
+    return validImageFits.has(value) ? value : (view === 'detail' ? 'contain' : 'cover');
+  }
+  function vehicleImagePosition(vehicle, view = 'card'){
+    const value = view === 'detail' ? vehicle.detailImagePosition : vehicle.imagePosition;
+    if(validImagePositions.has(value)) return value;
+    if(view === 'detail' && validImagePositions.has(vehicle.imagePosition)) return vehicle.imagePosition;
+    return 'center center';
+  }
+  function vehicleImageBackground(vehicle, view = 'card'){
+    const value = view === 'detail' ? vehicle.detailImageBackground : vehicle.imageBackground;
+    if(validImageBackgrounds.has(value)) return value;
+    if(view === 'detail' && validImageBackgrounds.has(vehicle.imageBackground)) return vehicle.imageBackground;
+    return 'blur';
+  }
+  function mediaContainerClass(vehicle, view = 'card'){ return `media-fit-${vehicleImageFit(vehicle, view)} media-bg-${vehicleImageBackground(vehicle, view)}`; }
+  function mediaImageStyle(vehicle, view = 'card'){ return `object-fit:${vehicleImageFit(vehicle, view)};object-position:${vehicleImagePosition(vehicle, view)};` }
+  function mediaContainerStyle(vehicle, image, view = 'card'){
     if(!image) return '';
-    return `--media-image:url("${String(image).replace(/["\\]/g, '\\$&')}");--media-position:${vehicleImagePosition(vehicle)};`;
+    return `--media-image:url("${String(image).replace(/["\\]/g, '\\$&')}");--media-position:${vehicleImagePosition(vehicle, view)};`;
   }
 
-  function applyMediaPresentation(container, image, vehicle){
+  function applyMediaPresentation(container, image, vehicle, view = 'card'){
     if(!container) return;
     [...validImageBackgrounds].forEach((value) => container.classList.remove(`media-bg-${value}`));
     [...validImageFits].forEach((value) => container.classList.remove(`media-fit-${value}`));
-    container.classList.add(`media-bg-${vehicleImageBackground(vehicle)}`, `media-fit-${vehicleImageFit(vehicle)}`);
+    container.classList.add(`media-bg-${vehicleImageBackground(vehicle, view)}`, `media-fit-${vehicleImageFit(vehicle, view)}`);
     container.style.setProperty('--media-image', image ? `url("${String(image).replace(/["\\]/g, '\\$&')}")` : 'none');
-    container.style.setProperty('--media-position', vehicleImagePosition(vehicle));
+    container.style.setProperty('--media-position', vehicleImagePosition(vehicle, view));
   }
 
-  function mediaElementHTML(item, alt, className = '', vehicle = {}){
+  function mediaElementHTML(item, alt, className = '', vehicle = {}, view = 'card'){
     const media = normalizeMedia(item);
     const classAttr = className ? ` class="${escapeHTML(className)}"` : '';
     if(media.type === 'video') {
       const poster = media.poster ? ` poster="${escapeHTML(media.poster)}"` : '';
       return `<video${classAttr} src="${escapeHTML(media.src)}"${poster} muted playsinline controls preload="metadata"></video>`;
     }
-    return `<img${classAttr} data-hide-on-error src="${escapeHTML(media.src)}" alt="${escapeHTML(alt)}" loading="lazy" style="${escapeHTML(mediaImageStyle(vehicle))}">`;
+    return `<img${classAttr} data-hide-on-error src="${escapeHTML(media.src)}" alt="${escapeHTML(alt)}" loading="lazy" style="${escapeHTML(mediaImageStyle(vehicle, view))}">`;
   }
 
   function hasDirectImage(url){
@@ -898,11 +911,11 @@
     const image = imageFor(yacht, collection.indexOf(yacht), prefix);
     modalMedia._displayVehicle = yacht;
     modalMedia.style.backgroundImage = '';
-    applyMediaPresentation(modalMedia, image, yacht);
+    applyMediaPresentation(modalMedia, image, yacht, 'detail');
     modalMedia.classList.toggle('no-photo', !image);
     modalMedia.dataset.placeholder = `${yacht.feet || ''}' ${yacht.name}`;
     modalMedia.innerHTML = image
-      ? `<img class="modal-active-media" data-hide-on-error src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" style="${escapeHTML(mediaImageStyle(yacht))}">`
+      ? `<img class="modal-active-media" data-hide-on-error src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" style="${escapeHTML(mediaImageStyle(yacht, 'detail'))}">`
       : '';
     modal.querySelector('[data-modal-kicker]').textContent = isEnglish() ? `${yacht.feet || ''} ft | ${yacht.category || 'Yacht'}` : `${yacht.size} | ${yacht.sizeLabel}`;
     modal.querySelector('[data-modal-title]').textContent = yacht.name;
@@ -975,10 +988,10 @@
     const item = gallery[index];
     modalMedia.dataset.galleryIndex = String(index);
     modalMedia.style.backgroundImage = '';
-    applyMediaPresentation(modalMedia, item.type === 'image' ? item.src : item.poster, modalMedia._displayVehicle || {});
+    applyMediaPresentation(modalMedia, item.type === 'image' ? item.src : item.poster, modalMedia._displayVehicle || {}, 'detail');
     modalMedia.classList.remove('no-photo');
     modalMedia.innerHTML = `
-      ${mediaElementHTML(item, modalMedia._galleryTitle || 'Galeria', 'modal-active-media', modalMedia._displayVehicle || {})}
+      ${mediaElementHTML(item, modalMedia._galleryTitle || 'Galeria', 'modal-active-media', modalMedia._displayVehicle || {}, 'detail')}
       ${gallery.length > 1 ? `
         <button class="gallery-nav gallery-prev" type="button" data-gallery-prev aria-label="Medio anterior">‹</button>
         <button class="gallery-nav gallery-next" type="button" data-gallery-next aria-label="Medio siguiente">›</button>
@@ -1233,6 +1246,7 @@
       price: yacht.price || '', image: yacht.coverImage || yacht.image || '', location: yacht.location || '',
       rates: yacht.rates || '', notes: yacht.notes || '', priceLabel: yacht.priceLabel || '',
       imageFit: vehicleImageFit(yacht), imagePosition: vehicleImagePosition(yacht), imageBackground: vehicleImageBackground(yacht),
+      detailImageFit: vehicleImageFit(yacht, 'detail'), detailImagePosition: vehicleImagePosition(yacht, 'detail'), detailImageBackground: vehicleImageBackground(yacht, 'detail'),
       locationEn: yacht.locationEn || englishLocation(yacht.location),
       ratesEn: yacht.ratesEn || englishRate(yacht.rates),
       notesEn: yacht.notesEn || localizedNote(yacht.notes, true),
@@ -1314,6 +1328,9 @@
       imageFit: editorField('imageFit').value,
       imagePosition: editorField('imagePosition').value,
       imageBackground: editorField('imageBackground').value,
+      detailImageFit: editorField('detailImageFit').value,
+      detailImagePosition: editorField('detailImagePosition').value,
+      detailImageBackground: editorField('detailImageBackground').value,
       location: editorField('location').value.trim(),
       rates: editorField('rates').value.trim(),
       notes: editorField('notes').value.trim(),
