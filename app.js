@@ -124,7 +124,7 @@
   });
 })();
 
-(async function(){
+(function(){
   const catalogGrid = document.getElementById('catalogGrid');
   const filterBar = document.getElementById('filterBar');
   const catalogSearch = document.getElementById('catalogSearch');
@@ -186,254 +186,18 @@
 
   const editorStorageKey = 'prime-yacht-editor-v1';
   const editorDeletedStorageKey = 'prime-yacht-deleted-v1';
-  const editorSyncStorageKey = 'prime-yacht-catalog-sync-v2';
-  const catalogSync = window.PrimeCatalogSync;
-  if(!catalogSync) throw new Error('Catalog sync module is unavailable');
-  const githubSyncConfig = {
-    owner: 'Pedroeusebio1',
-    repo: 'prime-yacht-rental',
-    branch: 'main',
-    path: 'catalog-overrides.json',
-    apiVersion: '2022-11-28'
-  };
-  const githubRawStateUrl = `https://raw.githubusercontent.com/${githubSyncConfig.owner}/${githubSyncConfig.repo}/${githubSyncConfig.branch}/${githubSyncConfig.path}`;
-  const allowedImageFits = new Set(['cover', 'contain']);
-  const allowedImagePositions = new Set(['center center', 'center top', 'center bottom', 'left center', 'right center']);
-  const allowedImageBackgrounds = new Set(['blur', 'cream', 'dark', 'white']);
-  const editableOverrideFields = [
-    'name', 'feet', 'passengers', 'price', 'image', 'coverImage', 'imageFit', 'imagePosition', 'imageBackground',
-    'location', 'rates', 'notes', 'priceLabel', 'locationEn', 'ratesEn', 'notesEn', 'priceLabelEn',
-    'priceTable', 'photoLink', 'photoLinkEnabled'
-  ];
   function yachtStorageKey(yacht){ return yacht.mediaKey || yacht.name; }
-  function readLegacyEditorChanges(){
+  function readEditorChanges(){
     try { return JSON.parse(localStorage.getItem(editorStorageKey) || '{}'); } catch (_) { return {}; }
   }
-  function readLegacyDeletedYachts(){
+  function readDeletedYachts(){
     try {
       const deleted = JSON.parse(localStorage.getItem(editorDeletedStorageKey) || '[]');
       return Array.isArray(deleted) ? deleted : [];
     } catch (_) { return []; }
   }
-
-  function safeString(value, maxLength){
-    return String(value == null ? '' : value).replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, maxLength);
-  }
-
-  function safeMultilineString(value, maxLength){
-    return String(value == null ? '' : value)
-      .replace(/\r\n?/g, '\n')
-      .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, ' ')
-      .trim()
-      .slice(0, maxLength);
-  }
-
-  function safeMediaUrl(value){
-    const raw = safeString(value, 2048);
-    if(!raw) return '';
-    const hasScheme = /^[a-z][a-z\d+.-]*:/i.test(raw) || raw.startsWith('//');
-    if(!hasScheme) return raw;
-    try {
-      const parsed = new URL(raw, window.location.href);
-      if(parsed.protocol !== 'https:' || parsed.username || parsed.password) return '';
-      return raw;
-    } catch (_) {
-      return '';
-    }
-  }
-
-  function safePhotoUrl(value){
-    const raw = safeString(value, 2048);
-    if(!raw) return '';
-    try {
-      const parsed = new URL(raw);
-      return parsed.protocol === 'https:' && !parsed.username && !parsed.password ? raw : '';
-    } catch (_) {
-      return '';
-    }
-  }
-
-  function sanitizeOverrideChanges(raw){
-    if(!catalogSync.isPlainObject(raw)) return {};
-    const clean = {};
-    const stringLimits = { name: 140, price: 50, location: 260, priceLabel: 180, locationEn: 260, priceLabelEn: 180 };
-    Object.entries(stringLimits).forEach(([key, limit]) => {
-      if(Object.prototype.hasOwnProperty.call(raw, key)) clean[key] = safeString(raw[key], limit);
-    });
-    const multilineLimits = { rates: 2400, notes: 4000, ratesEn: 2400, notesEn: 4000 };
-    Object.entries(multilineLimits).forEach(([key, limit]) => {
-      if(Object.prototype.hasOwnProperty.call(raw, key)) clean[key] = safeMultilineString(raw[key], limit);
-    });
-    if(Object.prototype.hasOwnProperty.call(raw, 'image')) clean.image = safeMediaUrl(raw.image);
-    if(Object.prototype.hasOwnProperty.call(raw, 'coverImage')) clean.coverImage = safeMediaUrl(raw.coverImage);
-    if(Object.prototype.hasOwnProperty.call(raw, 'photoLink')) clean.photoLink = safePhotoUrl(raw.photoLink);
-    if(typeof raw.photoLinkEnabled === 'boolean') clean.photoLinkEnabled = raw.photoLinkEnabled;
-
-    const feet = Number(raw.feet);
-    const passengers = Number(raw.passengers);
-    if(Number.isFinite(feet) && feet >= 0 && feet <= 300) clean.feet = feet;
-    if(Number.isFinite(passengers) && passengers >= 1 && passengers <= 100) clean.passengers = Math.round(passengers);
-    if(allowedImageFits.has(raw.imageFit)) clean.imageFit = raw.imageFit;
-    if(allowedImagePositions.has(raw.imagePosition)) clean.imagePosition = raw.imagePosition;
-    if(allowedImageBackgrounds.has(raw.imageBackground)) clean.imageBackground = raw.imageBackground;
-
-    if(Array.isArray(raw.priceTable)) {
-      clean.priceTable = raw.priceTable.slice(0, 24).map((row) => ({
-        label: safeString(row && row.label, 120),
-        labelEn: safeString(row && row.labelEn, 120),
-        value: safeString(row && row.value, 80),
-        ...(row && row.estimated === true ? { estimated: true } : {})
-      })).filter((row) => row.label || row.value);
-    }
-    return clean;
-  }
-
-  function makeDeviceId(){
-    if(window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
-    return `device-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  }
-
-  function normalizePending(raw){
-    const pending = {};
-    if(!catalogSync.isPlainObject(raw)) return pending;
-    Object.entries(raw).forEach(([key, operation]) => {
-      if(!key || ['__proto__', 'prototype', 'constructor'].includes(key) || !catalogSync.isPlainObject(operation)) return;
-      const generation = Number.isInteger(operation.generation) && operation.generation > 0 ? operation.generation : 1;
-      const mutationId = safeString(operation.mutationId, 180);
-      if(!mutationId) return;
-      pending[key] = {
-        generation,
-        mutationId,
-        baseVersion: Number.isInteger(operation.baseVersion) && operation.baseVersion >= 0 ? operation.baseVersion : 0,
-        updatedAt: safeString(operation.updatedAt, 60) || null,
-        ...(operation.source === 'legacy' ? { source: 'legacy' } : {}),
-        deleted: operation.deleted === true,
-        changes: operation.deleted === true ? {} : sanitizeOverrideChanges(operation.changes)
-      };
-    });
-    return pending;
-  }
-
-  function readStoredSyncState(){
-    try {
-      const raw = JSON.parse(localStorage.getItem(editorSyncStorageKey) || 'null');
-      if(!catalogSync.isPlainObject(raw) || Number(raw.schemaVersion) !== 2) return null;
-      const normalizedRemote = catalogSync.normalizeSharedState({
-        schemaVersion: 2,
-        revision: raw.lastRemoteRevision,
-        updatedAt: raw.lastRemoteUpdatedAt,
-        records: raw.remoteRecords
-      }, sanitizeOverrideChanges);
-      if(!normalizedRemote) return null;
-      return {
-        schemaVersion: 2,
-        deviceId: safeString(raw.deviceId, 100) || makeDeviceId(),
-        nextGeneration: Number.isInteger(raw.nextGeneration) && raw.nextGeneration >= 0 ? raw.nextGeneration : 0,
-        lastRemoteRevision: normalizedRemote.revision,
-        lastRemoteUpdatedAt: normalizedRemote.updatedAt,
-        remoteRecords: normalizedRemote.records,
-        pending: normalizePending(raw.pending)
-      };
-    } catch (_) {
-      return null;
-    }
-  }
-
-  function createSyncStateFromLegacy(){
-    const deviceId = makeDeviceId();
-    const changes = readLegacyEditorChanges();
-    const deleted = new Set(readLegacyDeletedYachts().filter((key) => typeof key === 'string'));
-    const pending = {};
-    let generation = 0;
-    const keys = new Set([
-      ...Object.keys(catalogSync.isPlainObject(changes) ? changes : {}),
-      ...deleted
-    ]);
-    keys.forEach((key) => {
-      if(!key || ['__proto__', 'prototype', 'constructor'].includes(key)) return;
-      generation += 1;
-      const isDeleted = deleted.has(key);
-      pending[key] = {
-        generation,
-        mutationId: `${deviceId}:${generation}`,
-        baseVersion: 0,
-        updatedAt: new Date().toISOString(),
-        source: 'legacy',
-        deleted: isDeleted,
-        changes: isDeleted ? {} : sanitizeOverrideChanges(changes[key])
-      };
-    });
-    return {
-      schemaVersion: 2,
-      deviceId,
-      nextGeneration: generation,
-      lastRemoteRevision: 0,
-      lastRemoteUpdatedAt: null,
-      remoteRecords: {},
-      pending
-    };
-  }
-
-  let catalogSyncState = readStoredSyncState() || createSyncStateFromLegacy();
-
-  function effectiveEditorRecords(){
-    const visiblePending = {};
-    Object.entries(catalogSyncState.pending).forEach(([key, operation]) => {
-      if(operation.source === 'legacy' && catalogSyncState.remoteRecords[key]) return;
-      visiblePending[key] = operation;
-    });
-    return catalogSync.overlayPending(catalogSyncState.remoteRecords, visiblePending);
-  }
-
-  function persistCatalogSyncState(){
-    const overrides = catalogSync.deriveOverrides(effectiveEditorRecords());
-    try {
-      localStorage.setItem(editorSyncStorageKey, JSON.stringify(catalogSyncState));
-      localStorage.setItem(editorStorageKey, JSON.stringify(overrides.changes));
-      localStorage.setItem(editorDeletedStorageKey, JSON.stringify(overrides.deleted));
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function hasPendingEditorChanges(){ return Object.keys(catalogSyncState.pending).length > 0; }
-  let allowInternalReload = false;
-  function reloadCatalogPage(){
-    allowInternalReload = true;
-    window.location.reload();
-  }
-
-  async function readSharedEditorState(){
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 5000);
-    try {
-      const response = await fetch(`${githubRawStateUrl}?v=${Date.now()}`, { cache: 'no-store', signal: controller.signal });
-      if(!response.ok) throw new Error(`GitHub state ${response.status}`);
-      return catalogSync.normalizeSharedState(await response.json(), sanitizeOverrideChanges);
-    } catch (_) {
-      return null;
-    } finally {
-      window.clearTimeout(timeout);
-    }
-  }
-
-  const initialSharedStatePromise = readSharedEditorState();
-  const sharedEditorState = await Promise.race([
-    initialSharedStatePromise,
-    new Promise((resolve) => window.setTimeout(() => resolve(null), 300))
-  ]);
-  if(sharedEditorState && sharedEditorState.revision >= catalogSyncState.lastRemoteRevision) {
-    catalogSyncState.remoteRecords = sharedEditorState.records;
-    catalogSyncState.lastRemoteRevision = sharedEditorState.revision;
-    catalogSyncState.lastRemoteUpdatedAt = sharedEditorState.updatedAt;
-  }
-  persistCatalogSyncState();
-  let loadedSharedRevision = catalogSyncState.lastRemoteRevision;
-  const effectiveOverrides = catalogSync.deriveOverrides(effectiveEditorRecords());
-  const savedEditorChanges = effectiveOverrides.changes;
-  const savedDeletedYachts = effectiveOverrides.deleted;
-  const deletedYachtKeys = new Set(savedDeletedYachts);
+  const savedEditorChanges = readEditorChanges();
+  const deletedYachtKeys = new Set(readDeletedYachts());
   const sourceYachts = Array.isArray(window.PRIME_YACHTS) ? window.PRIME_YACHTS.map((yacht) => ({ ...yacht })) : [];
   const originalYachts = new Map(sourceYachts.map((yacht) => [yachtStorageKey(yacht), { ...yacht }]));
   sourceYachts.forEach((yacht) => Object.assign(yacht, savedEditorChanges[yachtStorageKey(yacht)] || {}));
@@ -577,11 +341,6 @@
       "'": '&#39;'
     }[char]));
   }
-
-  document.addEventListener('error', (event) => {
-    const target = event.target;
-    if(target && target.matches && target.matches('img[data-hide-on-error]')) target.style.display = 'none';
-  }, true);
 
   function compactText(value, maxLength = 180){
     const text = String(value || '').replace(/\s+/g, ' ').trim();
@@ -749,7 +508,7 @@
   }
 
   function yachtImage(yacht){
-    if(hasDirectImage(yacht.image)) return safeMediaUrl(yacht.image);
+    if(hasDirectImage(yacht.image)) return yacht.image;
 
     const index = yachts.indexOf(yacht) + 1;
     const tags = {
@@ -785,15 +544,14 @@
 
   function normalizeMedia(item){
     if(typeof item === 'string') {
-      const src = safeMediaUrl(item);
-      return { type: isVideoMedia(src) ? 'video' : 'image', src };
+      return { type: isVideoMedia(item) ? 'video' : 'image', src: item };
     }
 
-    const src = safeMediaUrl(item && item.src ? item.src : '');
+    const src = item && item.src ? item.src : '';
     return {
       type: item && item.type ? item.type : (isVideoMedia(src) ? 'video' : 'image'),
       src,
-      poster: safeMediaUrl(item && item.poster ? item.poster : '')
+      poster: item && item.poster ? item.poster : ''
     };
   }
 
@@ -809,17 +567,19 @@
   }
 
   function imageFor(vehicle, index, prefix = ''){
-    const coverImage = safeMediaUrl(vehicle.coverImage);
-    if(coverImage) return coverImage;
+    if(vehicle.coverImage) return vehicle.coverImage;
     const gallery = galleryFor(vehicle, index, prefix);
     const localImage = gallery.find((item) => normalizeMedia(item).type === 'image');
     if(localImage) return normalizeMedia(localImage).src;
     return vehicle.category ? adventureImage(vehicle) : yachtImage(vehicle);
   }
 
-  function vehicleImageFit(vehicle){ return allowedImageFits.has(vehicle.imageFit) ? vehicle.imageFit : 'cover'; }
-  function vehicleImagePosition(vehicle){ return allowedImagePositions.has(vehicle.imagePosition) ? vehicle.imagePosition : 'center center'; }
-  function vehicleImageBackground(vehicle){ return allowedImageBackgrounds.has(vehicle.imageBackground) ? vehicle.imageBackground : 'blur'; }
+  const validImageFits = new Set(['cover', 'contain']);
+  const validImagePositions = new Set(['center center', 'center top', 'center bottom', 'left center', 'right center']);
+  const validImageBackgrounds = new Set(['blur', 'cream', 'dark', 'white']);
+  function vehicleImageFit(vehicle){ return validImageFits.has(vehicle.imageFit) ? vehicle.imageFit : 'cover'; }
+  function vehicleImagePosition(vehicle){ return validImagePositions.has(vehicle.imagePosition) ? vehicle.imagePosition : 'center center'; }
+  function vehicleImageBackground(vehicle){ return validImageBackgrounds.has(vehicle.imageBackground) ? vehicle.imageBackground : 'blur'; }
   function mediaContainerClass(vehicle){ return `media-fit-${vehicleImageFit(vehicle)} media-bg-${vehicleImageBackground(vehicle)}`; }
   function mediaImageStyle(vehicle){ return `object-fit:${vehicleImageFit(vehicle)};object-position:${vehicleImagePosition(vehicle)};` }
   function mediaContainerStyle(vehicle, image){
@@ -829,8 +589,8 @@
 
   function applyMediaPresentation(container, image, vehicle){
     if(!container) return;
-    [...allowedImageBackgrounds].forEach((value) => container.classList.remove(`media-bg-${value}`));
-    [...allowedImageFits].forEach((value) => container.classList.remove(`media-fit-${value}`));
+    [...validImageBackgrounds].forEach((value) => container.classList.remove(`media-bg-${value}`));
+    [...validImageFits].forEach((value) => container.classList.remove(`media-fit-${value}`));
     container.classList.add(`media-bg-${vehicleImageBackground(vehicle)}`, `media-fit-${vehicleImageFit(vehicle)}`);
     container.style.setProperty('--media-image', image ? `url("${String(image).replace(/["\\]/g, '\\$&')}")` : 'none');
     container.style.setProperty('--media-position', vehicleImagePosition(vehicle));
@@ -843,25 +603,24 @@
       const poster = media.poster ? ` poster="${escapeHTML(media.poster)}"` : '';
       return `<video${classAttr} src="${escapeHTML(media.src)}"${poster} muted playsinline controls preload="metadata"></video>`;
     }
-    return `<img${classAttr} src="${escapeHTML(media.src)}" alt="${escapeHTML(alt)}" loading="lazy" style="${escapeHTML(mediaImageStyle(vehicle))}" data-hide-on-error>`;
+    return `<img${classAttr} src="${escapeHTML(media.src)}" alt="${escapeHTML(alt)}" loading="lazy" style="${escapeHTML(mediaImageStyle(vehicle))}" onerror="this.style.display='none'">`;
   }
 
   function hasDirectImage(url){
-    const safeUrl = safeMediaUrl(url);
-    return Boolean(safeUrl && (/^https?:\/\//i.test(safeUrl) || /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(safeUrl)));
+    return Boolean(url && (/^https?:\/\//i.test(url) || /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(url)));
   }
 
   function isUsablePhotoLink(yacht){
     if(yacht.photoLinkEnabled === false) return false;
-    const url = safePhotoUrl(yacht.photoLink);
-    if(!url) return false;
+    const url = String(yacht.photoLink || '');
+    if(!/^https?:\/\//i.test(url)) return false;
     return !/(?:bing\.com\/images|tse\d*\.mm\.bing\.net)/i.test(url);
   }
 
   function yachtMediaHTML(yacht, index){
     const image = imageFor(yacht, index);
     if(image) {
-      return `<img src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(yacht))}" data-hide-on-error>`;
+      return `<img src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(yacht))}" onerror="this.style.display='none'">`;
     }
 
     return `
@@ -878,15 +637,13 @@
   }
 
   function adventureImage(adventure){
-    const directImage = safeMediaUrl(adventure.image);
-    if(directImage) return directImage;
+    if(adventure.image) return adventure.image;
     const index = adventures.indexOf(adventure) + 101;
     return `${imageBase}${adventure.imageTags}?lock=${index}`;
   }
 
   function fallbackImage(yacht){
-    const fallback = safeMediaUrl(yacht.fallback);
-    if(fallback) return fallback;
+    if(yacht.fallback) return yacht.fallback;
 
     const index = yachts.indexOf(yacht) % 5 + 1;
     const extension = index === 5 ? 'jpg' : 'gif';
@@ -965,22 +722,14 @@
     const collection = yacht.category ? adventures : yachts;
     const prefix = yacht.category ? 'adventure-' : '';
     const image = imageFor(yacht, collection.indexOf(yacht), prefix);
-    const gallery = galleryFor(yacht, collection.indexOf(yacht), prefix).map(normalizeMedia).filter((item) => item.src);
-    const leadMedia = image ? normalizeMedia(image) : null;
-    const modalGallery = leadMedia && leadMedia.src
-      ? [leadMedia, ...gallery.filter((item) => item.src !== leadMedia.src)]
-      : gallery;
     modalMedia._displayVehicle = yacht;
-    modalMedia._gallery = modalGallery;
-    modalMedia._galleryTitle = yacht.name;
     modalMedia.style.backgroundImage = '';
-    modalMedia.classList.toggle('no-photo', !modalGallery.length);
+    applyMediaPresentation(modalMedia, image, yacht);
+    modalMedia.classList.toggle('no-photo', !image);
     modalMedia.dataset.placeholder = `${yacht.feet || ''}' ${yacht.name}`;
-    if(modalGallery.length) renderModalGalleryItem(modalMedia, 0);
-    else {
-      applyMediaPresentation(modalMedia, '', yacht);
-      modalMedia.innerHTML = '';
-    }
+    modalMedia.innerHTML = image
+      ? `<img class="modal-active-media" src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" style="${escapeHTML(mediaImageStyle(yacht))}" onerror="this.style.display='none'">`
+      : '';
     modal.querySelector('[data-modal-kicker]').textContent = isEnglish() ? `${yacht.feet || ''} ft | ${yacht.category || 'Yacht'}` : `${yacht.size} | ${yacht.sizeLabel}`;
     modal.querySelector('[data-modal-title]').textContent = yacht.name;
     modal.querySelector('[data-modal-passengers]').textContent = yacht.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${yacht.passengers} ${ui('pasajeros', 'passengers')}`;
@@ -1012,16 +761,16 @@
     adventuresGrid.innerHTML = adventures.map((adventure) => `
       <article class="adv-card" data-adventure-index="${adventures.indexOf(adventure)}">
         <button class="card-edit-btn" type="button" data-edit-adventure="${adventures.indexOf(adventure)}"><span aria-hidden="true">✎</span> ${ui('Editar tarjeta', 'Edit card')}</button>
-        <button class="adv-open" type="button" aria-label="${escapeHTML(`${ui('Ver detalles de', 'View details for')} ${adventure.name}`)}">
+        <button class="adv-open" type="button" aria-label="${ui('Ver detalles de', 'View details for')} ${adventure.name}">
           <span class="adv-media ${mediaContainerClass(adventure)}" style="${escapeHTML(mediaContainerStyle(adventure, imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure)))}">
-            <img src="${escapeHTML(imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure))}" alt="${escapeHTML(adventure.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(adventure))}" data-hide-on-error>
-            <span class="cat-badge">${escapeHTML(adventure.sizeLabel)}</span>
-            <span class="cat-pax">${escapeHTML(adventure.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${adventure.passengers} ${ui('pasajeros', 'passengers')}`)}</span>
+            <img src="${escapeHTML(imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure))}" alt="${escapeHTML(adventure.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(adventure))}" onerror="this.style.display='none'">
+            <span class="cat-badge">${adventure.sizeLabel}</span>
+            <span class="cat-pax">${adventure.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${adventure.passengers} ${ui('pasajeros', 'passengers')}`}</span>
           </span>
           <span class="adv-body">
-            <span class="tag">${escapeHTML(adventure.category)}</span>
-            <h3>${escapeHTML(adventure.name)}</h3>
-            <span class="meta">${escapeHTML(localizedLocation(adventure.location))}</span>
+            <span class="tag">${adventure.category}</span>
+            <h3>${adventure.name}</h3>
+            <span class="meta">${localizedLocation(adventure.location)}</span>
             ${priceTableHTML(adventure)}
             <span class="adv-prices">
               <span class="adv-price">
@@ -1063,10 +812,9 @@
   }
 
   let editorAuthenticated = false;
-  let githubSessionToken = '';
-  let pricingEditorDirty = false;
   let editingYachtIndex = -1;
   let editingVehicles = yachts;
+  try { editorAuthenticated = sessionStorage.getItem('prime-editor-session') === 'active'; } catch (_) {}
 
   function editorField(name){
     return fleetEditorForm ? fleetEditorForm.elements.namedItem(name) : null;
@@ -1081,11 +829,10 @@
   }
 
   function pricingRowHTML(row = {}){
-    return `<div class="pricing-editor-row" data-pricing-row>
+    return `<div class="pricing-editor-row" data-pricing-row${row.estimated ? ' data-estimated="true"' : ''}>
       <input type="text" data-rate-label value="${escapeHTML(row.label || '')}" placeholder="${ui('Ej. 4 horas', 'E.g. 4 hours')}" aria-label="${ui('Duración o condición', 'Duration or condition')}" required>
       <input type="text" data-rate-label-en value="${escapeHTML(row.labelEn || englishRate(row.label || ''))}" placeholder="E.g. 4 hours" aria-label="English rate label" required>
       <input type="text" data-rate-value value="${escapeHTML(row.value || '')}" placeholder="$650" aria-label="${ui('Precio o rango', 'Price or range')}" required>
-      <label class="pricing-estimated-toggle"><input type="checkbox" data-rate-estimated${row.estimated ? ' checked' : ''}><span>${ui('Estimado', 'Estimated')}</span></label>
       <button class="pricing-remove-row" type="button" data-pricing-remove aria-label="${ui('Eliminar tarifa', 'Remove rate')}">×</button>
     </div>`;
   }
@@ -1094,7 +841,6 @@
     const container = document.getElementById('pricingEditorRows');
     if(!container) return;
     container.innerHTML = editorPriceRows(yacht).map(pricingRowHTML).join('');
-    pricingEditorDirty = false;
   }
 
   function normalizeRateValue(value){
@@ -1112,7 +858,7 @@
       label: row.querySelector('[data-rate-label]').value.trim(),
       labelEn: row.querySelector('[data-rate-label-en]').value.trim(),
       value: normalizeRateValue(row.querySelector('[data-rate-value]').value),
-      ...(row.querySelector('[data-rate-estimated]').checked ? { estimated: true } : {})
+      ...(row.dataset.estimated === 'true' ? { estimated: true } : {})
     })).filter((row) => row.label || row.value);
   }
 
@@ -1138,235 +884,13 @@
     if(ratesField) ratesField.value = rates;
     if(ratesEnField) ratesEnField.value = rows.map((row) => `${row.labelEn || englishRate(row.label)}: ${row.value}`).join(' | ');
     const amounts = rows.map((row) => rateValueNumber(row.value)).filter(Number.isFinite);
-    if(amounts.length) editorField('price').value = formattedPrice(Math.min(...amounts));
+    if(amounts.length) {
+      editorField('price').value = formattedPrice(Math.min(...amounts));
+      editorField('priceLabel').value = rows.some((row) => row.estimated) ? 'desde · tarifa estimada' : 'precio desde';
+      editorField('priceLabelEn').value = rows.some((row) => row.estimated) ? 'from · estimated rate' : 'rates from';
+    }
     return rows;
   }
-
-  function recordEditorMutation(key, changes, deleted = false){
-    catalogSyncState.nextGeneration += 1;
-    const generation = catalogSyncState.nextGeneration;
-    catalogSyncState.pending[key] = {
-      generation,
-      mutationId: `${catalogSyncState.deviceId}:${generation}`,
-      baseVersion: catalogSyncState.remoteRecords[key] ? catalogSyncState.remoteRecords[key].version : 0,
-      updatedAt: new Date().toISOString(),
-      deleted: deleted === true,
-      changes: deleted === true ? {} : sanitizeOverrideChanges(changes)
-    };
-    persistCatalogSyncState();
-  }
-
-  function utf8ToBase64(value){
-    const bytes = new TextEncoder().encode(value);
-    let binary = '';
-    const chunkSize = 0x8000;
-    for(let index = 0; index < bytes.length; index += chunkSize) {
-      binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
-    }
-    return btoa(binary);
-  }
-
-  function base64ToUtf8(value){
-    const binary = atob(String(value || '').replace(/\s/g, ''));
-    return new TextDecoder().decode(Uint8Array.from(binary, (character) => character.charCodeAt(0)));
-  }
-
-  function githubApiHeaders(token){
-    return {
-      Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${token}`,
-      'X-GitHub-Api-Version': githubSyncConfig.apiVersion
-    };
-  }
-
-  function githubContentApiUrl(){
-    return `https://api.github.com/repos/${githubSyncConfig.owner}/${githubSyncConfig.repo}/contents/${githubSyncConfig.path}`;
-  }
-
-  async function githubContentRequest(token){
-    const response = await fetch(`${githubContentApiUrl()}?ref=${encodeURIComponent(githubSyncConfig.branch)}`, {
-      headers: githubApiHeaders(token),
-      cache: 'no-store'
-    });
-    if(!response.ok) {
-      const error = new Error([401, 403, 404].includes(response.status) ? 'TOKEN' : `GET_${response.status}`);
-      error.status = response.status;
-      throw error;
-    }
-    return response.json();
-  }
-
-  function sharedStateFromContentFile(file){
-    if(!file || typeof file.content !== 'string') throw new Error('REMOTE_STATE');
-    let raw;
-    try { raw = JSON.parse(base64ToUtf8(file.content)); } catch (_) { throw new Error('REMOTE_STATE'); }
-    const state = catalogSync.normalizeSharedState(raw, sanitizeOverrideChanges);
-    if(!state) throw new Error('REMOTE_STATE');
-    return state;
-  }
-
-  let githubSyncQueue = Promise.resolve();
-  let githubWritesInFlight = 0;
-  let reloadAfterGithubSync = false;
-  function editorRecordName(key){
-    const original = originalYachts.get(key) || originalAdventures.get(key);
-    return original && original.name ? original.name : key;
-  }
-
-  async function writeSharedEditorState(){
-    if(!githubSessionToken) throw new Error('TOKEN');
-    const snapshot = JSON.parse(JSON.stringify(catalogSyncState.pending));
-    if(!Object.keys(snapshot).length) return null;
-    const overwriteApprovals = new Set();
-    const useRemoteKeys = new Set();
-    githubWritesInFlight += 1;
-    try {
-      for(let attempt = 0; attempt < 4; attempt += 1) {
-        const currentFile = await githubContentRequest(githubSessionToken);
-        const remoteState = sharedStateFromContentFile(currentFile);
-        if(remoteState.revision > loadedSharedRevision) reloadAfterGithubSync = true;
-        const applicable = {};
-        Object.entries(snapshot).forEach(([key, operation]) => {
-          const remoteRecord = remoteState.records[key];
-          if(remoteRecord && remoteRecord.mutationId === operation.mutationId) return;
-          if(useRemoteKeys.has(key)) return;
-          if(catalogSync.operationConflicts(remoteRecord, operation) && !overwriteApprovals.has(key)) {
-            const keepLocal = window.confirm(ui(
-              `“${editorRecordName(key)}” tiene información más reciente en GitHub. Pulsa Aceptar para publicar el cambio de este dispositivo o Cancelar para conservar la versión de GitHub.`,
-              `“${editorRecordName(key)}” has newer information on GitHub. Press OK to publish this device’s change or Cancel to keep the GitHub version.`
-            ));
-            if(!keepLocal) {
-              useRemoteKeys.add(key);
-              return;
-            }
-            overwriteApprovals.add(key);
-          }
-          applicable[key] = operation;
-        });
-
-        let nextState = remoteState;
-        if(Object.keys(applicable).length) {
-          const revision = remoteState.revision + 1;
-          const updatedAt = new Date().toISOString();
-          const records = catalogSync.applyPendingOperations(remoteState, applicable, revision, updatedAt);
-          nextState = catalogSync.buildSharedPayload(records, revision, updatedAt);
-          const response = await fetch(githubContentApiUrl(), {
-            method: 'PUT',
-            headers: { ...githubApiHeaders(githubSessionToken), 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              message: `Update ${Object.keys(applicable).length} fleet card${Object.keys(applicable).length === 1 ? '' : 's'} from Manage`,
-              content: utf8ToBase64(`${JSON.stringify(nextState, null, 2)}\n`),
-              sha: currentFile.sha,
-              branch: githubSyncConfig.branch
-            })
-          });
-          if(response.status === 409) {
-            await new Promise((resolve) => window.setTimeout(resolve, 150 * (attempt + 1)));
-            continue;
-          }
-          if(!response.ok) {
-            const error = new Error([401, 403, 404].includes(response.status) ? 'TOKEN' : `PUT_${response.status}`);
-            error.status = response.status;
-            throw error;
-          }
-        }
-
-        catalogSyncState.remoteRecords = nextState.records;
-        catalogSyncState.lastRemoteRevision = nextState.revision;
-        catalogSyncState.lastRemoteUpdatedAt = nextState.updatedAt;
-        catalogSyncState.pending = catalogSync.rebaseNewerPending(
-          catalogSyncState.pending,
-          snapshot,
-          nextState.records,
-          [...useRemoteKeys]
-        );
-        loadedSharedRevision = nextState.revision;
-        persistCatalogSyncState();
-        if(useRemoteKeys.size) reloadAfterGithubSync = true;
-        return nextState;
-      }
-      throw new Error('CONFLICT');
-    } finally {
-      githubWritesInFlight = Math.max(0, githubWritesInFlight - 1);
-    }
-  }
-
-  function queueGithubSync(showStatus = true){
-    const status = document.getElementById('editorSaveStatus');
-    if(showStatus && status) status.textContent = ui('Guardando en GitHub…', 'Saving to GitHub…');
-    githubSyncQueue = githubSyncQueue.catch(() => {}).then(writeSharedEditorState);
-    githubSyncQueue.then(() => {
-      if(reloadAfterGithubSync && !hasPendingEditorChanges() && !document.body.classList.contains('editor-dialog-open')) {
-        reloadAfterGithubSync = false;
-        reloadCatalogPage();
-        return;
-      }
-      if(showStatus && status) status.textContent = hasPendingEditorChanges()
-        ? ui('Hay cambios pendientes de sincronizar', 'There are changes waiting to sync')
-        : ui('Guardado en GitHub', 'Saved to GitHub');
-    }).catch((error) => {
-      if(showStatus && status) {
-        if(error.message === 'TOKEN') status.textContent = ui('Token inválido o sin permiso de escritura', 'Invalid token or missing write permission');
-        else if(error.message === 'CONFLICT') status.textContent = ui('GitHub recibió cambios simultáneos. Pulsa Guardar para reintentar.', 'GitHub received simultaneous changes. Press Save to retry.');
-        else if(error.message === 'REMOTE_STATE') status.textContent = ui('El archivo compartido de GitHub no es válido', 'The shared GitHub file is invalid');
-        else status.textContent = ui('No se pudo sincronizar con GitHub; el cambio queda pendiente', 'Could not sync with GitHub; the change remains pending');
-      }
-      if(error.message === 'TOKEN') {
-        githubSessionToken = '';
-        editorAuthenticated = false;
-        closeFleetEditor();
-        setEditorMode(false);
-        openEditorLogin();
-        if(editorLoginFeedback) editorLoginFeedback.textContent = ui(
-          'El token no tiene permiso de escritura. Ingresa otro token; tus cambios siguen pendientes.',
-          'The token does not have write access. Enter another token; your changes are still pending.'
-        );
-      }
-    });
-    return githubSyncQueue;
-  }
-
-  async function validateGithubToken(token){
-    const file = await githubContentRequest(token);
-    sharedStateFromContentFile(file);
-    return true;
-  }
-
-  let lastSharedRefreshAt = 0;
-  let sharedRefreshPromise = null;
-  async function refreshSharedStateIfNeeded(){
-    if(hasPendingEditorChanges() || sharedRefreshPromise || document.body.classList.contains('editor-dialog-open')) return sharedRefreshPromise;
-    if(Date.now() - lastSharedRefreshAt < 15000) return null;
-    lastSharedRefreshAt = Date.now();
-    sharedRefreshPromise = readSharedEditorState().then((latest) => {
-      if(!latest || latest.revision <= loadedSharedRevision || document.body.classList.contains('editor-dialog-open')) return;
-      catalogSyncState.remoteRecords = latest.records;
-      catalogSyncState.lastRemoteRevision = latest.revision;
-      catalogSyncState.lastRemoteUpdatedAt = latest.updatedAt;
-      loadedSharedRevision = latest.revision;
-      persistCatalogSyncState();
-      reloadCatalogPage();
-    }).finally(() => { sharedRefreshPromise = null; });
-    return sharedRefreshPromise;
-  }
-
-  window.addEventListener('focus', refreshSharedStateIfNeeded);
-  window.addEventListener('online', () => {
-    if(githubSessionToken && hasPendingEditorChanges()) queueGithubSync(false);
-    else refreshSharedStateIfNeeded();
-  });
-  document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState === 'visible') refreshSharedStateIfNeeded();
-  });
-  window.setInterval(() => {
-    if(document.visibilityState === 'visible') refreshSharedStateIfNeeded();
-  }, 120000);
-  window.addEventListener('beforeunload', (event) => {
-    if(allowInternalReload) return;
-    if(!hasPendingEditorChanges() && githubWritesInFlight === 0) return;
-    event.preventDefault();
-    event.returnValue = '';
-  });
 
   function updateEditorAccess(){
     if(!editorAccess) return;
@@ -1401,12 +925,7 @@
   function openEditorLogin(){
     if(!editorLoginModal || !editorLoginForm) return;
     editorLoginForm.reset();
-    if(editorLoginFeedback) {
-      const pendingCount = Object.keys(catalogSyncState.pending).length;
-      editorLoginFeedback.textContent = pendingCount
-        ? `${pendingCount} ${pendingCount === 1 ? 'cambio local pendiente' : 'cambios locales pendientes'} de sincronizar.`
-        : '';
-    }
+    if(editorLoginFeedback) editorLoginFeedback.textContent = '';
     setEditorDialogState(editorLoginModal, true);
     const password = document.getElementById('editorPassword');
     if(password) window.setTimeout(() => password.focus(), 40);
@@ -1426,8 +945,7 @@
       ? `${yacht.category} · ${passengers} ${ui('pasajeros', 'passengers')}`
       : `${feet} FT · ${passengers} ${ui('pasajeros', 'passengers')}`;
     if(previewImage) {
-      const previewSource = safeMediaUrl(editorField('image').value) || imageFor(yacht, editingYachtIndex) || fallbackImage(yacht);
-      previewImage.src = previewSource;
+      previewImage.src = editorField('image').value || imageFor(yacht, editingYachtIndex) || fallbackImage(yacht);
       previewImage.alt = name;
       const draft = {
         ...yacht,
@@ -1488,36 +1006,27 @@
     setEditorDialogState(fleetEditor, false);
     editingYachtIndex = -1;
     editingVehicles = yachts;
-    if(reloadAfterGithubSync && !hasPendingEditorChanges() && githubWritesInFlight === 0) {
-      reloadAfterGithubSync = false;
-      window.setTimeout(reloadCatalogPage, 0);
-    }
   }
 
-  async function finishEditingSession(){
+  function finishEditingSession(){
     if(fleetEditor && fleetEditor.classList.contains('is-open') && editingYachtIndex >= 0) {
-      if(!saveEditorForm(true)) return;
+      if(!saveEditorForm(false)) return;
     }
-    if(hasPendingEditorChanges() && githubSessionToken) queueGithubSync(true);
-    try { await githubSyncQueue; } catch (_) { return; }
-    if(hasPendingEditorChanges()) return;
     closeFleetEditor();
     editorAuthenticated = false;
-    githubSessionToken = '';
+    try { sessionStorage.removeItem('prime-editor-session'); } catch (_) {}
     setEditorMode(false);
   }
 
   function saveEditorForm(showMessage = true){
     if(!fleetEditorForm || editingYachtIndex < 0) return false;
-    const yacht = editingVehicles[editingYachtIndex];
-    const priceTable = pricingEditorDirty ? readPricingEditorRows() : editorPriceRows(yacht);
-    const tableAmounts = priceTable.map((row) => rateValueNumber(row.value)).filter(Number.isFinite);
-    if(tableAmounts.length) editorField('price').value = formattedPrice(Math.min(...tableAmounts));
+    const priceTable = syncPricingEditorFields();
     if(!fleetEditorForm.checkValidity()) {
       fleetEditorForm.reportValidity();
       return false;
     }
-    const changes = sanitizeOverrideChanges({
+    const yacht = editingVehicles[editingYachtIndex];
+    const changes = {
       name: editorField('name').value.trim(),
       feet: yacht.category ? (yacht.feet || 0) : Number(editorField('feet').value),
       passengers: Number(editorField('passengers').value),
@@ -1538,15 +1047,18 @@
       priceTable,
       photoLink: editorField('photoLink').value.trim(),
       photoLinkEnabled: editorField('showPhotoLink').checked
-    });
-    const key = yachtStorageKey(yacht);
+    };
     Object.assign(yacht, changes);
-    recordEditorMutation(key, changes, false);
-    pricingEditorDirty = false;
+    const allChanges = readEditorChanges();
+    allChanges[yachtStorageKey(yacht)] = changes;
+    try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
     renderCatalog();
     renderAdventures();
     updateEditorPreview(yacht);
-    queueGithubSync(showMessage);
+    if(showMessage) {
+      const status = document.getElementById('editorSaveStatus');
+      if(status) status.textContent = ui('Cambios guardados', 'Changes saved');
+    }
     return true;
   }
 
@@ -1561,21 +1073,23 @@
     if(editingYachtIndex < 0 || !editingVehicles[editingYachtIndex]) return;
     const yacht = editingVehicles[editingYachtIndex];
     const confirmed = window.confirm(ui(
-      `¿Eliminar “${yacht.name}” del catálogo en todos los dispositivos?`,
-      `Delete “${yacht.name}” from the catalog on every device?`
+      `¿Eliminar “${yacht.name}” del catálogo? Esta acción ocultará la tarjeta en este dispositivo.`,
+      `Delete “${yacht.name}” from the catalog? This will hide the card on this device.`
     ));
     if(!confirmed) return;
 
     const key = yachtStorageKey(yacht);
     deletedYachtKeys.add(key);
-    recordEditorMutation(key, {}, true);
+    try { localStorage.setItem(editorDeletedStorageKey, JSON.stringify([...deletedYachtKeys])); } catch (_) {}
+    const allChanges = readEditorChanges();
+    delete allChanges[key];
+    try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
 
     editingVehicles.splice(editingYachtIndex, 1);
     if(editingVehicles === yachts && statBoats) statBoats.textContent = yachts.length;
     visibleCount = Math.min(Math.max(visibleCount, 9), Math.max(yachts.length, 9));
     renderCatalog();
     renderAdventures();
-    queueGithubSync(true);
 
     if(!editingVehicles.length) {
       closeFleetEditor();
@@ -1584,7 +1098,7 @@
     editingYachtIndex = Math.min(editingYachtIndex, editingVehicles.length - 1);
     fillEditorForm(editingVehicles[editingYachtIndex]);
     const status = document.getElementById('editorSaveStatus');
-    if(status) status.textContent = ui('Eliminando en GitHub…', 'Deleting on GitHub…');
+    if(status) status.textContent = ui('Tarjeta eliminada', 'Card deleted');
   }
 
   if(editorAccess) {
@@ -1600,49 +1114,17 @@
   if(editorExitMode) editorExitMode.addEventListener('click', finishEditingSession);
 
   if(editorLoginForm) {
-    editorLoginForm.addEventListener('submit', async (event) => {
+    editorLoginForm.addEventListener('submit', (event) => {
       event.preventDefault();
       const password = document.getElementById('editorPassword');
-      const token = document.getElementById('editorGithubToken');
-      const submit = editorLoginForm.querySelector('[type="submit"]');
-      if(!password || password.value !== '123456') {
-        if(!editorLoginFeedback) return;
-        editorLoginFeedback.textContent = 'Clave incorrecta. Inténtalo de nuevo.';
-        if(password) { password.select(); password.focus(); }
-        return;
-      }
-      if(!token || !token.value.trim()) return;
-      if(submit) submit.disabled = true;
-      if(editorLoginFeedback) editorLoginFeedback.textContent = 'Verificando acceso a GitHub…';
-      try {
-        await validateGithubToken(token.value.trim());
-        githubSessionToken = token.value.trim();
-        token.value = '';
-        if(hasPendingEditorChanges()) {
-          if(editorLoginFeedback) editorLoginFeedback.textContent = 'Sincronizando cambios pendientes…';
-          await queueGithubSync(false);
-        }
-        if(reloadAfterGithubSync && !hasPendingEditorChanges()) {
-          reloadAfterGithubSync = false;
-          setEditorDialogState(editorLoginModal, false);
-          reloadCatalogPage();
-          return;
-        }
+      if(password && password.value === '123456') {
         editorAuthenticated = true;
-        password.value = '';
+        try { sessionStorage.setItem('prime-editor-session', 'active'); } catch (_) {}
         setEditorDialogState(editorLoginModal, false);
         setEditorMode(true);
-      } catch (error) {
-        githubSessionToken = '';
-        if(editorLoginFeedback) {
-          if(error.message === 'TOKEN') editorLoginFeedback.textContent = 'Token inválido o sin acceso de escritura a este repositorio.';
-          else if(error.message === 'REMOTE_STATE') editorLoginFeedback.textContent = 'El archivo compartido de GitHub no tiene un formato válido.';
-          else editorLoginFeedback.textContent = 'No se pudo conectar con GitHub. Inténtalo de nuevo.';
-        }
-        token.select();
-        token.focus();
-      } finally {
-        if(submit) submit.disabled = false;
+      } else if(editorLoginFeedback) {
+        editorLoginFeedback.textContent = 'Clave incorrecta. Inténtalo de nuevo.';
+        if(password) { password.select(); password.focus(); }
       }
     });
     editorLoginModal.addEventListener('click', (event) => {
@@ -1655,12 +1137,9 @@
       event.preventDefault();
       saveEditorForm(true);
     });
-    fleetEditorForm.addEventListener('input', (event) => {
+    fleetEditorForm.addEventListener('input', () => {
       if(editingYachtIndex >= 0) {
-        if(event.target.closest('[data-pricing-row]')) {
-          pricingEditorDirty = true;
-          syncPricingEditorFields();
-        }
+        syncPricingEditorFields();
         updateEditorPreview(editingVehicles[editingYachtIndex]);
       }
     });
@@ -1670,13 +1149,11 @@
         if(container) {
           container.insertAdjacentHTML('beforeend', pricingRowHTML({ label: '', value: '' }));
           const newRow = container.lastElementChild;
-          pricingEditorDirty = true;
           if(newRow) newRow.querySelector('[data-rate-label]').focus();
         }
       }
       const removeRate = event.target.closest('[data-pricing-remove]');
       if(removeRate) {
-        pricingEditorDirty = true;
         const rows = document.querySelectorAll('#pricingEditorRows [data-pricing-row]');
         if(rows.length > 1) removeRate.closest('[data-pricing-row]').remove();
         else {
@@ -1698,15 +1175,17 @@
         if(!window.confirm(ui('¿Restaurar la información original de esta tarjeta?', 'Restore this card’s original information?'))) return;
         const key = yachtStorageKey(yacht);
         const original = (editingVehicles === adventures ? originalAdventures : originalYachts).get(key);
-        editableOverrideFields.forEach((field) => delete yacht[field]);
+        ['locationEn','ratesEn','notesEn','priceLabelEn','photoLinkEnabled'].forEach((field) => delete yacht[field]);
+        ['priceTable', 'coverImage', 'imageFit', 'imagePosition', 'imageBackground'].forEach((field) => delete yacht[field]);
         if(original) Object.assign(yacht, { ...original });
-        recordEditorMutation(key, {}, false);
+        const allChanges = readEditorChanges();
+        delete allChanges[key];
+        try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
         renderCatalog();
         renderAdventures();
         fillEditorForm(yacht);
         const status = document.getElementById('editorSaveStatus');
-        if(status) status.textContent = ui('Restaurando en GitHub…', 'Restoring on GitHub…');
-        queueGithubSync(true);
+        if(status) status.textContent = ui('Tarjeta restaurada', 'Card restored');
       }
     });
     fleetEditor.addEventListener('click', (event) => {
@@ -1822,13 +1301,4 @@
   renderCatalog();
   renderAdventures();
   updateEditorAccess();
-  initialSharedStatePromise.then((latest) => {
-    if(!latest || latest.revision <= loadedSharedRevision || document.body.classList.contains('editor-dialog-open')) return;
-    catalogSyncState.remoteRecords = latest.records;
-    catalogSyncState.lastRemoteRevision = latest.revision;
-    catalogSyncState.lastRemoteUpdatedAt = latest.updatedAt;
-    loadedSharedRevision = latest.revision;
-    persistCatalogSyncState();
-    reloadCatalogPage();
-  });
 })();

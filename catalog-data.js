@@ -2982,7 +2982,7 @@ window.PRIME_YACHTS = [
     "passengers": 13,
     "location": "Island Gardens Marina o Jones Boat Yard Marina",
     "rates": "6 hours : $ 8.9k | 8 hours : $ 11.5k | 12 hours : $ 14.5k",
-    "price": "$8,900",
+    "price": "$9",
     "priceLabel": "precio desde",
     "photoLink": "https://www.bing.com/images/search?q=130%20BROWARD%20TRI%20DECK%20yacht%2040ft%20yacht%20Miami",
     "image": "https://tse1.mm.bing.net/th?q=130%20broward%20tri%20deck%20yacht%20130%20broward%20tri%20deck%20yacht%20superyacht%20miami%20ocean%2040ft%20boat%20yacht%20miami%2091&w=900&h=650&c=7&rs=1&p=0&o=5&pid=1.7",
@@ -2993,15 +2993,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "6 horas",
-        "value": "$8,900"
+        "value": "$9"
       },
       {
         "label": "8 horas",
-        "value": "$11,500"
+        "value": "$12"
       },
       {
         "label": "12 horas",
-        "value": "$14,500"
+        "value": "$15"
       }
     ]
   },
