@@ -278,17 +278,15 @@
     <button class="editor-close" type="button" data-editor-login-close aria-label="Cerrar">×</button>
     <span class="editor-kicker">Prime Control</span>
     <h2 id="editorLoginTitle">Modo edición</h2>
-    <p id="editorLoginDescription">Ingresa con la cuenta administrativa para publicar cambios en todos los dispositivos.</p>
+    <p id="editorLoginDescription">Ingresa la clave de administración para publicar cambios en todos los dispositivos.</p>
     <div class="editor-login-fields">
-      <label for="editorEmail">Correo autorizado</label>
-      <input id="editorEmail" name="email" type="email" value="info@primeyachtrental.com" autocomplete="username" readonly required>
-      <label for="editorPassword">Contraseña</label>
+      <label for="editorPassword">Clave de acceso</label>
       <input id="editorPassword" name="password" type="password" minlength="8" autocomplete="current-password" required>
     </div>
     <div class="editor-login-actions">
       <button class="cta-btn" id="editorLoginSubmit" type="submit">Entrar</button>
     </div>
-    <small class="editor-login-hint" id="editorLoginHint">Acceso exclusivo para la cuenta administrativa invitada desde Supabase.</small>
+    <small class="editor-login-hint" id="editorLoginHint">La clave se valida de forma segura con Supabase.</small>
     <p class="editor-login-feedback" id="editorLoginFeedback" role="alert"></p>
   </form>
 </div>

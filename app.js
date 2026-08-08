@@ -991,7 +991,6 @@
   let editorSaveInProgress = false;
   let editorFormDirty = false;
   let editorPricingDirty = false;
-  let editorInviteSetup = false;
   let editingYachtIndex = -1;
   let editingVehicles = yachts;
 
@@ -1133,19 +1132,16 @@
   function openEditorLogin(){
     if(!editorLoginModal || !editorLoginForm) return;
     editorLoginForm.reset();
-    editorInviteSetup = Boolean(catalogStore && catalogStore.hasPendingInvite());
     const title = document.getElementById('editorLoginTitle');
     const description = document.getElementById('editorLoginDescription');
     const submit = document.getElementById('editorLoginSubmit');
     const hint = document.getElementById('editorLoginHint');
-    if(title) title.textContent = editorInviteSetup ? ui('Crear acceso administrativo', 'Create admin access') : ui('Modo edición', 'Edit mode');
-    if(description) description.textContent = editorInviteSetup
-      ? ui('La invitación fue confirmada. Crea una contraseña para activar Manage.', 'The invitation was confirmed. Create a password to activate Manage.')
-      : ui('Ingresa con la cuenta administrativa para publicar cambios en todos los dispositivos.', 'Sign in with the admin account to publish changes on every device.');
-    if(submit) submit.textContent = editorInviteSetup ? ui('Crear contraseña y entrar', 'Create password and sign in') : ui('Entrar', 'Sign in');
-    if(hint) hint.textContent = editorInviteSetup
-      ? ui('Usa una contraseña única de 8 caracteres o más.', 'Use a unique password with at least 8 characters.')
-      : ui('Acceso exclusivo para la cuenta administrativa invitada desde Supabase.', 'Access is limited to the admin account invited through Supabase.');
+    const passwordLabel = editorLoginForm.querySelector('label[for="editorPassword"]');
+    if(title) title.textContent = ui('Modo edición', 'Edit mode');
+    if(description) description.textContent = ui('Ingresa la clave de administración para publicar cambios en todos los dispositivos.', 'Enter the admin key to publish changes on every device.');
+    if(submit) submit.textContent = ui('Entrar', 'Sign in');
+    if(hint) hint.textContent = ui('La clave se valida de forma segura con Supabase.', 'The key is securely validated by Supabase.');
+    if(passwordLabel) passwordLabel.textContent = ui('Clave de acceso', 'Access key');
     setEditorLoginFeedback('');
     setEditorDialogState(editorLoginModal, true);
     const password = document.getElementById('editorPassword');
@@ -1164,11 +1160,8 @@
     if(error && error.code === 'network') return ui('No hay conexión. Revisa internet e inténtalo de nuevo.', 'No connection. Check your internet and try again.');
     if(error && error.code === 'rate_limit') return ui('Demasiados intentos. Espera un momento e inténtalo otra vez.', 'Too many attempts. Wait a moment and try again.');
     if(error && error.code === 'forbidden') return ui('Esta cuenta no está autorizada para editar.', 'This account is not authorized to edit.');
-    if(message.includes('email not confirmed')) return ui('Confirma primero el correo recibido y vuelve a entrar.', 'Confirm the email message first, then sign in again.');
-    if(error && error.code === 'invalid_invite') return ui('La invitación no está disponible o expiró. Solicita una nueva.', 'The invitation is unavailable or expired. Request a new one.');
     if(error && error.code === 'weak_password' || message.includes('password should be at least')) return ui('Usa una contraseña de al menos 8 caracteres.', 'Use a password with at least 8 characters.');
-    if(message.includes('invalid login credentials')) return ui('Correo o contraseña incorrectos.', 'Incorrect email or password.');
-    if(message.includes('user already registered')) return ui('El acceso ya existe. Usa Entrar.', 'Access already exists. Use Sign in.');
+    if(message.includes('invalid login credentials')) return ui('Clave incorrecta.', 'Incorrect key.');
     return ui('No se pudo completar la operación. Inténtalo de nuevo.', 'The operation could not be completed. Try again.');
   }
 
@@ -1504,15 +1497,12 @@
         setEditorLoginFeedback(ui('La conexión segura no está disponible. Recarga la página.', 'The secure connection is unavailable. Reload the page.'));
         return;
       }
-      const email = document.getElementById('editorEmail');
       const password = document.getElementById('editorPassword');
       editorLoginForm.querySelectorAll('button').forEach((button) => { button.disabled = true; });
       setEditorLoginFeedback(ui('Verificando acceso seguro…', 'Verifying secure access…'));
       try {
-        if(editorInviteSetup) await catalogStore.completeInvite(password ? password.value : '');
-        else await catalogStore.signIn(email ? email.value : '', password ? password.value : '');
+        await catalogStore.signIn(password ? password.value : '');
         editorAuthenticated = true;
-        editorInviteSetup = false;
         if(password) password.value = '';
         await activateEditorSession();
       } catch (error) {
@@ -1722,5 +1712,4 @@
   renderAdventures();
   updateEditorAccess();
   requestCloudRefresh(true);
-  if(catalogStore && catalogStore.hasPendingInvite()) openEditorLogin();
 })();

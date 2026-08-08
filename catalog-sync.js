@@ -23,7 +23,6 @@
 
   let session = null;
   let refreshPromise = null;
-  let pendingInvite = null;
 
   class CatalogSyncError extends Error {
     constructor(code, message, status = 0){
@@ -33,19 +32,6 @@
       this.status = status;
     }
   }
-
-  function captureInviteFromUrl(){
-    if(!global.location || typeof global.location.hash !== 'string') return;
-    const params = new URLSearchParams(global.location.hash.replace(/^#/, ''));
-    if(params.get('type') !== 'invite' || !params.get('access_token')) return;
-    pendingInvite = {
-      accessToken: String(params.get('access_token') || '').slice(0, 4096),
-      refreshToken: String(params.get('refresh_token') || '').slice(0, 4096),
-      expiresIn: Math.max(30, Number(params.get('expires_in')) || 3600)
-    };
-  }
-
-  captureInviteFromUrl();
 
   function limitedText(value, maxLength){
     if(value === null || value === undefined) return '';
@@ -260,59 +246,19 @@
     return normalizeRows(rows);
   }
 
-  async function signIn(email, password){
-    const normalizedEmail = limitedText(email, 320).toLowerCase();
-    if(normalizedEmail !== adminEmail) throw new CatalogSyncError('forbidden', 'Este correo no tiene acceso a Manage.');
+  async function signIn(password){
+    const nextPassword = String(password || '');
+    if(nextPassword.length < 8) {
+      throw new CatalogSyncError('weak_password', 'La clave debe tener al menos 8 caracteres.');
+    }
     const payload = await apiRequest('/auth/v1/token?grant_type=password', {
       method: 'POST',
-      body: { email: normalizedEmail, password: String(password || '') }
+      body: { email: adminEmail, password: nextPassword }
     });
     const publicSession = setSession(payload);
     if(!publicSession || publicSession.email !== adminEmail) {
       session = null;
       throw new CatalogSyncError('forbidden', 'Esta cuenta no tiene acceso a Manage.');
-    }
-    return publicSession;
-  }
-
-  async function completeInvite(password){
-    if(!pendingInvite || !pendingInvite.accessToken) {
-      throw new CatalogSyncError('invalid_invite', 'La invitación no está disponible o expiró.');
-    }
-    const nextPassword = String(password || '');
-    if(nextPassword.length < 8) {
-      throw new CatalogSyncError('weak_password', 'La contraseña debe tener al menos 8 caracteres.');
-    }
-
-    const invite = pendingInvite;
-    const currentPayload = await apiRequest('/auth/v1/user', { token: invite.accessToken });
-    const currentUser = currentPayload && currentPayload.user ? currentPayload.user : currentPayload;
-    const email = limitedText(currentUser && currentUser.email, 320).toLowerCase();
-    if(email !== adminEmail) {
-      pendingInvite = null;
-      throw new CatalogSyncError('forbidden', 'Esta invitación no pertenece a la cuenta administrativa.');
-    }
-
-    const updatedPayload = await apiRequest('/auth/v1/user', {
-      method: 'PUT',
-      token: invite.accessToken,
-      body: { password: nextPassword }
-    });
-    const updatedUser = updatedPayload && updatedPayload.user ? updatedPayload.user : updatedPayload;
-    const updatedEmail = limitedText(updatedUser && updatedUser.email, 320).toLowerCase();
-    if(updatedEmail !== adminEmail) {
-      throw new CatalogSyncError('forbidden', 'Supabase no confirmó la cuenta administrativa.');
-    }
-
-    const publicSession = setSession({
-      access_token: invite.accessToken,
-      refresh_token: invite.refreshToken,
-      expires_in: invite.expiresIn,
-      user: { email: updatedEmail }
-    });
-    pendingInvite = null;
-    if(global.history && typeof global.history.replaceState === 'function' && global.location) {
-      global.history.replaceState(null, '', `${global.location.pathname || ''}${global.location.search || ''}`);
     }
     return publicSession;
   }
@@ -350,8 +296,6 @@
 
   const api = Object.freeze({
     adminEmail,
-    completeInvite,
-    hasPendingInvite: () => Boolean(pendingInvite),
     load,
     normalizeRows,
     sanitizeChanges,

@@ -84,14 +84,18 @@ async function run(){
   assert.match(calls[0].url, /prime_catalog_overrides/);
   assert.ok(calls[0].options.headers.apikey.startsWith('sb_publishable_'));
   assert.equal(calls[0].options.headers.Authorization, undefined);
+  assert.equal(store.completeInvite, undefined);
+  assert.equal(store.hasPendingInvite, undefined);
 
   await assert.rejects(
-    () => store.signIn('intruder@example.com', 'password123'),
-    (error) => error.code === 'forbidden'
+    () => store.signIn('short'),
+    (error) => error.code === 'weak_password'
   );
   assert.equal(calls.length, 1);
 
-  await store.signIn(store.adminEmail, 'password123');
+  await store.signIn('password123');
+  const signInBody = JSON.parse(calls[1].options.body);
+  assert.deepEqual(signInBody, { email: store.adminEmail, password: 'password123' });
   const row = await store.save('yacht-001', { name: 'Guardado', imageFit: 'cover', injected: true });
   assert.equal(row.changes.name, 'Guardado');
   assert.equal(calls[2].options.headers.Authorization, 'Bearer user-access-token');
@@ -108,33 +112,6 @@ async function run(){
   await store.signOut();
   assert.equal(store.isAuthenticated(), false);
   assert.equal(responses.length, 0);
-
-  let cleanedInviteUrl = '';
-  global.location = {
-    hash: '#access_token=invite-access-token&refresh_token=invite-refresh-token&expires_in=3600&type=invite',
-    pathname: '/prime-yacht-rental/',
-    search: ''
-  };
-  global.history = { replaceState: (_state, _title, url) => { cleanedInviteUrl = url; } };
-  delete require.cache[require.resolve('../catalog-sync.js')];
-  const inviteStore = require('../catalog-sync.js');
-  assert.equal(inviteStore.hasPendingInvite(), true);
-  assert.match(global.location.hash, /access_token=/);
-  responses.push(
-    mockResponse({ email: inviteStore.adminEmail }),
-    mockResponse({ email: inviteStore.adminEmail }),
-    mockResponse(null, 204)
-  );
-  await inviteStore.completeInvite('strong-password-123');
-  assert.equal(inviteStore.hasPendingInvite(), false);
-  assert.equal(inviteStore.isAuthenticated(), true);
-  assert.equal(cleanedInviteUrl, '/prime-yacht-rental/');
-  assert.match(calls.at(-1).url, /\/auth\/v1\/user$/);
-  assert.equal(calls.at(-1).options.method, 'PUT');
-  await inviteStore.signOut();
-  assert.equal(responses.length, 0);
-  delete global.location;
-  delete global.history;
 
   console.log('catalog-sync tests passed');
 }
