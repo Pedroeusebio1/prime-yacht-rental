@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data: blob:; media-src 'self' https:; connect-src 'self' https://knszwrcrsljpwjkgkxfn.supabase.co; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
 <title>Prime Yacht Rental — Miami &amp; República Dominicana</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Marcellus&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="./assets/prime-logo.png">
-<link rel="stylesheet" href="styles.css?v=20260807-3">
+<link rel="stylesheet" href="styles.css?v=20260808-1">
 
 </head>
 <body>
@@ -276,12 +278,17 @@
     <button class="editor-close" type="button" data-editor-login-close aria-label="Cerrar">×</button>
     <span class="editor-kicker">Prime Control</span>
     <h2 id="editorLoginTitle">Modo edición</h2>
-    <p>Ingresa la clave para administrar la información de la flota.</p>
-    <label for="editorPassword">Clave de acceso</label>
-    <div class="editor-password-row">
-      <input id="editorPassword" name="password" type="password" inputmode="numeric" autocomplete="current-password" required>
-      <button class="cta-btn" type="submit">Entrar</button>
+    <p id="editorLoginDescription">Ingresa con la cuenta administrativa para publicar cambios en todos los dispositivos.</p>
+    <div class="editor-login-fields">
+      <label for="editorEmail">Correo autorizado</label>
+      <input id="editorEmail" name="email" type="email" value="info@primeyachtrental.com" autocomplete="username" readonly required>
+      <label for="editorPassword">Contraseña</label>
+      <input id="editorPassword" name="password" type="password" minlength="8" autocomplete="current-password" required>
     </div>
+    <div class="editor-login-actions">
+      <button class="cta-btn" id="editorLoginSubmit" type="submit">Entrar</button>
+    </div>
+    <small class="editor-login-hint" id="editorLoginHint">Acceso exclusivo para la cuenta administrativa invitada desde Supabase.</small>
     <p class="editor-login-feedback" id="editorLoginFeedback" role="alert"></p>
   </form>
 </div>
@@ -315,7 +322,7 @@
         <label>Pasajeros<input name="passengers" type="number" min="1" required></label>
       </div>
       <div class="editor-field-grid editor-field-grid-2">
-        <label>Precio principal<input name="price" type="text" placeholder="$1,500"></label>
+        <label>Precio principal (automático)<input name="price" type="text" placeholder="$1,500" readonly aria-readonly="true"></label>
         <label>Imagen de portada<input name="image" type="text" placeholder="https://... o ./assets/..."></label>
       </div>
     </div>
@@ -372,7 +379,7 @@
         <span>Tarifario</span>
         <small>El menor valor se muestra como precio principal</small>
       </div>
-      <div class="pricing-editor-head" aria-hidden="true"><span>Etiqueta (ES)</span><span>Label (EN)</span><span>Precio</span><span></span></div>
+      <div class="pricing-editor-head" aria-hidden="true"><span>Etiqueta (ES)</span><span>Label (EN)</span><span>Precio</span><span>Tipo</span><span></span></div>
       <div class="pricing-editor-rows" id="pricingEditorRows"></div>
       <button type="button" class="pricing-add-row" data-pricing-add>+ Agregar tarifa</button>
     </div>
@@ -401,6 +408,7 @@
 
 <script src="./catalog-data.js?v=20260807-1"></script>
 <script src="./catalog-media.js?v=20260804-1"></script>
-<script src="./app.js?v=20260807-5"></script>
+<script src="./catalog-sync.js?v=20260808-1"></script>
+<script src="./app.js?v=20260808-1"></script>
 </body>
 </html>

@@ -1,0 +1,145 @@
+'use strict';
+
+const assert = require('node:assert/strict');
+const store = require('../catalog-sync.js');
+
+function mockResponse(payload, status = 200){
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    text: async () => payload === null ? '' : JSON.stringify(payload)
+  };
+}
+
+async function run(){
+  const sanitized = store.sanitizeChanges({
+    name: '<script>alert(1)</script>',
+    price: '$999',
+    feet: 999,
+    passengers: '12',
+    image: 'javascript:alert(1)',
+    coverImage: './assets/boat.jpg',
+    photoLink: 'http://insecure.example.com',
+    imageFit: 'contain',
+    imagePosition: 'right center',
+    imageBackground: 'dark',
+    unknown: 'ignored',
+    __proto__: { polluted: true },
+    priceTable: [
+      { label: '4 horas', labelEn: '4 hours', value: '$650' },
+      { label: '', labelEn: '', value: '' }
+    ]
+  });
+
+  assert.equal(sanitized.name, '<script>alert(1)</script>');
+  assert.equal(sanitized.price, '$650');
+  assert.equal(sanitized.feet, 200);
+  assert.equal(sanitized.passengers, 12);
+  assert.equal(sanitized.image, '');
+  assert.equal(sanitized.coverImage, './assets/boat.jpg');
+  assert.equal(sanitized.photoLink, '');
+  assert.equal(sanitized.imageFit, 'contain');
+  assert.equal(sanitized.imagePosition, 'right center');
+  assert.equal(sanitized.imageBackground, 'dark');
+  assert.equal(Object.prototype.hasOwnProperty.call(sanitized, 'unknown'), false);
+  assert.equal({}.polluted, undefined);
+  assert.deepEqual(sanitized.priceTable, [{ label: '4 horas', labelEn: '4 hours', value: '$650' }]);
+
+  assert.equal(store.sanitizeChanges({
+    price: '$2',
+    priceTable: [{ label: '1 hora · 2 pasajeros', value: '2 riders · $145' }]
+  }).price, '$145');
+  assert.equal(store.sanitizeChanges({
+    price: '$9,999',
+    priceTable: [{ label: 'Tarifa compacta', value: '$1.5k' }]
+  }).price, '$1,500');
+
+  const calls = [];
+  const responses = [
+    mockResponse([
+      { card_key: 'yacht-001', changes: { name: 'Nuevo nombre', image: 'data:text/html,test' }, deleted: false, updated_at: '2026-08-08T00:00:00Z' },
+      { card_key: '__proto__', changes: { name: 'No' }, deleted: false }
+    ]),
+    mockResponse({
+      access_token: 'user-access-token',
+      refresh_token: 'user-refresh-token',
+      expires_in: 3600,
+      user: { email: store.adminEmail }
+    }),
+    mockResponse([
+      { card_key: 'yacht-001', changes: { name: 'Guardado', imageFit: 'cover' }, deleted: false, updated_at: '2026-08-08T00:01:00Z' }
+    ]),
+    mockResponse([]),
+    mockResponse(null, 204)
+  ];
+  global.fetch = async (url, options = {}) => {
+    calls.push({ url, options });
+    return responses.shift();
+  };
+
+  const state = await store.load();
+  assert.equal(state['yacht-001'].changes.name, 'Nuevo nombre');
+  assert.equal(state['yacht-001'].changes.image, '');
+  assert.equal(Object.prototype.hasOwnProperty.call(state, '__proto__'), false);
+  assert.match(calls[0].url, /prime_catalog_overrides/);
+  assert.ok(calls[0].options.headers.apikey.startsWith('sb_publishable_'));
+  assert.equal(calls[0].options.headers.Authorization, undefined);
+
+  await assert.rejects(
+    () => store.signIn('intruder@example.com', 'password123'),
+    (error) => error.code === 'forbidden'
+  );
+  assert.equal(calls.length, 1);
+
+  await store.signIn(store.adminEmail, 'password123');
+  const row = await store.save('yacht-001', { name: 'Guardado', imageFit: 'cover', injected: true });
+  assert.equal(row.changes.name, 'Guardado');
+  assert.equal(calls[2].options.headers.Authorization, 'Bearer user-access-token');
+  assert.match(calls[2].url, /rpc\/save_prime_catalog_override/);
+  const savedBody = JSON.parse(calls[2].options.body);
+  assert.deepEqual(savedBody.p_changes, { name: 'Guardado', imageFit: 'cover' });
+  assert.equal(savedBody.p_expected_updated_at, null);
+
+  await assert.rejects(
+    () => store.save('yacht-001', { name: 'Conflicto' }, false, row.updatedAt),
+    (error) => error.code === 'conflict' && error.status === 409
+  );
+
+  await store.signOut();
+  assert.equal(store.isAuthenticated(), false);
+  assert.equal(responses.length, 0);
+
+  let cleanedInviteUrl = '';
+  global.location = {
+    hash: '#access_token=invite-access-token&refresh_token=invite-refresh-token&expires_in=3600&type=invite',
+    pathname: '/prime-yacht-rental/',
+    search: ''
+  };
+  global.history = { replaceState: (_state, _title, url) => { cleanedInviteUrl = url; } };
+  delete require.cache[require.resolve('../catalog-sync.js')];
+  const inviteStore = require('../catalog-sync.js');
+  assert.equal(inviteStore.hasPendingInvite(), true);
+  assert.match(global.location.hash, /access_token=/);
+  responses.push(
+    mockResponse({ email: inviteStore.adminEmail }),
+    mockResponse({ email: inviteStore.adminEmail }),
+    mockResponse(null, 204)
+  );
+  await inviteStore.completeInvite('strong-password-123');
+  assert.equal(inviteStore.hasPendingInvite(), false);
+  assert.equal(inviteStore.isAuthenticated(), true);
+  assert.equal(cleanedInviteUrl, '/prime-yacht-rental/');
+  assert.match(calls.at(-1).url, /\/auth\/v1\/user$/);
+  assert.equal(calls.at(-1).options.method, 'PUT');
+  await inviteStore.signOut();
+  assert.equal(responses.length, 0);
+  delete global.location;
+  delete global.history;
+
+  console.log('catalog-sync tests passed');
+}
+
+run().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

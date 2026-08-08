@@ -140,6 +140,7 @@
   const editorLoginFeedback = document.getElementById('editorLoginFeedback');
   const fleetEditor = document.getElementById('fleetEditor');
   const fleetEditorForm = document.getElementById('fleetEditorForm');
+  const catalogStore = window.PrimeCatalogStore;
 
   if(!catalogGrid || !filterBar || !loadMoreBtn || !modal) return;
 
@@ -160,13 +161,15 @@
       .replace(/por tour/gi, 'per tour')
       .replace(/grupo privado/gi, 'private group')
       .replace(/seg[uú]n ruta/gi, 'based on route')
-      .replace(/Lun-Jue/gi, 'Mon–Thu')
+      .replace(/Lun\s*[–—-]\s*Jue/gi, 'Mon–Thu')
       .replace(/lunes a jueves/gi, 'Monday through Thursday')
       .replace(/D[ií]as laborables/gi, 'Weekdays')
       .replace(/Fin de semana/gi, 'Weekend')
       .replace(/Vie\/Dom/gi, 'Fri/Sun')
-      .replace(/S[aá]b/gi, 'Sat')
+      .replace(/S[aá]bado/gi, 'Saturday')
+      .replace(/S[aá]b(?=\b|[./\s]|$)/gi, 'Sat')
       .replace(/Dep[oó]sito requerido/gi, 'Required deposit')
+      .replace(/Tarifa base/gi, 'Base rate')
       .replace(/Tarifas de fin de semana disponibles en la ficha/gi, 'Weekend rates available in the listing')
       .replace(/Precio desde/gi, 'Rates from')
       .replace(/Tarifas sujetas a horario y disponibilidad/gi, 'Rates subject to schedule and availability')
@@ -184,24 +187,33 @@
     return copy;
   }
 
-  const editorStorageKey = 'prime-yacht-editor-v1';
-  const editorDeletedStorageKey = 'prime-yacht-deleted-v1';
+  const legacyEditorStorageKey = 'prime-yacht-editor-v1';
+  const legacyDeletedStorageKey = 'prime-yacht-deleted-v1';
   function yachtStorageKey(yacht){ return yacht.mediaKey || yacht.name; }
-  function readEditorChanges(){
-    try { return JSON.parse(localStorage.getItem(editorStorageKey) || '{}'); } catch (_) { return {}; }
-  }
-  function readDeletedYachts(){
+  function readLegacyEditorChanges(){
     try {
-      const deleted = JSON.parse(localStorage.getItem(editorDeletedStorageKey) || '[]');
+      const value = JSON.parse(localStorage.getItem(legacyEditorStorageKey) || '{}');
+      return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    } catch (_) { return {}; }
+  }
+  function readLegacyDeletedYachts(){
+    try {
+      const deleted = JSON.parse(localStorage.getItem(legacyDeletedStorageKey) || '[]');
       return Array.isArray(deleted) ? deleted : [];
     } catch (_) { return []; }
   }
-  const savedEditorChanges = readEditorChanges();
-  const deletedYachtKeys = new Set(readDeletedYachts());
-  const sourceYachts = Array.isArray(window.PRIME_YACHTS) ? window.PRIME_YACHTS.map((yacht) => ({ ...yacht })) : [];
-  const originalYachts = new Map(sourceYachts.map((yacht) => [yachtStorageKey(yacht), { ...yacht }]));
-  sourceYachts.forEach((yacht) => Object.assign(yacht, savedEditorChanges[yachtStorageKey(yacht)] || {}));
-  const yachts = sourceYachts.length ? shuffled(sourceYachts.filter((yacht) => !deletedYachtKeys.has(yachtStorageKey(yacht)))) : [];
+  function cloneVehicle(vehicle){
+    return {
+      ...vehicle,
+      ...(Array.isArray(vehicle.priceTable)
+        ? { priceTable: vehicle.priceTable.map((row) => ({ ...row })) }
+        : {})
+    };
+  }
+  const deletedYachtKeys = new Set();
+  const sourceYachts = Array.isArray(window.PRIME_YACHTS) ? window.PRIME_YACHTS.map(cloneVehicle) : [];
+  const originalYachts = new Map(sourceYachts.map((yacht) => [yachtStorageKey(yacht), cloneVehicle(yacht)]));
+  const yachts = sourceYachts.length ? shuffled(sourceYachts.map(cloneVehicle)) : [];
   const catalogMedia = window.PRIME_MEDIA || {};
 
   const filters = [
@@ -212,7 +224,7 @@
     { key: 'Premium', label: '90+ pies' }
   ];
 
-  const adventures = [
+  const sourceAdventures = [
     {
       name: 'Jet Ski Spark',
       category: 'Jet Ski',
@@ -320,11 +332,12 @@
       fallback: './assets/hero/hero-03.gif'
     }
   ];
-  const originalAdventures = new Map(adventures.map((adventure) => [yachtStorageKey(adventure), { ...adventure }]));
-  adventures.forEach((adventure) => Object.assign(adventure, savedEditorChanges[yachtStorageKey(adventure)] || {}));
-  for(let index = adventures.length - 1; index >= 0; index -= 1) {
-    if(deletedYachtKeys.has(yachtStorageKey(adventures[index]))) adventures.splice(index, 1);
-  }
+  const originalAdventures = new Map(sourceAdventures.map((adventure) => [yachtStorageKey(adventure), cloneVehicle(adventure)]));
+  const adventures = sourceAdventures.map(cloneVehicle);
+  const cloudCacheKey = 'prime-yacht-cloud-cache-v1';
+  let cloudCatalogState = {};
+  let cloudRefreshPromise = null;
+  let lastCloudRefresh = 0;
 
   let activeFilter = 'Todos';
   let searchTerm = '';
@@ -340,6 +353,167 @@
       '"': '&quot;',
       "'": '&#39;'
     }[char]));
+  }
+
+  function knownCatalogKeys(){
+    return new Set([
+      ...sourceYachts.map(yachtStorageKey),
+      ...sourceAdventures.map(yachtStorageKey)
+    ]);
+  }
+
+  function cloudStateSignature(state){
+    return JSON.stringify(Object.keys(state || {}).sort().map((key) => {
+      const row = state[key] || {};
+      return [key, row.deleted === true, row.updatedAt || '', row.changes || {}];
+    }));
+  }
+
+  function applyCloudCatalogState(nextState){
+    const knownKeys = knownCatalogKeys();
+    const safeState = {};
+    Object.entries(nextState || {}).forEach(([key, row]) => {
+      if(!knownKeys.has(key) || !row || typeof row !== 'object') return;
+      safeState[key] = {
+        changes: catalogStore ? catalogStore.sanitizeChanges(row.changes) : {},
+        deleted: row.deleted === true,
+        updatedAt: String(row.updatedAt || '')
+      };
+    });
+
+    const previousSignature = cloudStateSignature(cloudCatalogState);
+    const nextSignature = cloudStateSignature(safeState);
+    cloudCatalogState = safeState;
+    if(previousSignature === nextSignature) return false;
+
+    deletedYachtKeys.clear();
+    Object.entries(safeState).forEach(([key, row]) => {
+      if(row.deleted) deletedYachtKeys.add(key);
+    });
+
+    const currentYachtOrder = new Map(yachts.map((yacht, index) => [yachtStorageKey(yacht), index]));
+    const nextYachts = sourceYachts.map((original, sourceIndex) => {
+      const key = yachtStorageKey(original);
+      if(deletedYachtKeys.has(key)) return null;
+      return {
+        vehicle: Object.assign(cloneVehicle(original), safeState[key] ? safeState[key].changes : {}),
+        sourceIndex
+      };
+    }).filter(Boolean);
+    nextYachts.sort((a, b) => {
+      const aRank = currentYachtOrder.has(yachtStorageKey(a.vehicle)) ? currentYachtOrder.get(yachtStorageKey(a.vehicle)) : 10000 + a.sourceIndex;
+      const bRank = currentYachtOrder.has(yachtStorageKey(b.vehicle)) ? currentYachtOrder.get(yachtStorageKey(b.vehicle)) : 10000 + b.sourceIndex;
+      return aRank - bRank;
+    });
+    yachts.splice(0, yachts.length, ...nextYachts.map((item) => item.vehicle));
+
+    const nextAdventures = sourceAdventures.map((original) => {
+      const key = yachtStorageKey(original);
+      if(deletedYachtKeys.has(key)) return null;
+      return Object.assign(cloneVehicle(original), safeState[key] ? safeState[key].changes : {});
+    }).filter(Boolean);
+    adventures.splice(0, adventures.length, ...nextAdventures);
+
+    visibleCount = Math.min(Math.max(visibleCount, 9), Math.max(yachts.length, 9));
+    if(statBoats) statBoats.textContent = yachts.length;
+    renderCatalog();
+    renderAdventures();
+    if(modal.classList.contains('is-open')) closeModal();
+    return true;
+  }
+
+  async function refreshCatalogFromCloud(options = {}){
+    if(!catalogStore) throw new Error('Supabase catalog store is unavailable.');
+    if(document.body.classList.contains('fleet-editing')) return cloudCatalogState;
+    if(cloudRefreshPromise) return cloudRefreshPromise;
+
+    cloudRefreshPromise = catalogStore.load()
+      .then((state) => {
+        lastCloudRefresh = Date.now();
+        applyCloudCatalogState(state);
+        writeCloudCatalogCache(state);
+        return state;
+      })
+      .finally(() => { cloudRefreshPromise = null; });
+    return cloudRefreshPromise;
+  }
+
+  function cloudStateRows(state){
+    return Object.entries(state || {}).map(([key, row]) => ({
+      card_key: key,
+      changes: row && row.changes ? row.changes : {},
+      deleted: Boolean(row && row.deleted),
+      updated_at: row && row.updatedAt ? row.updatedAt : ''
+    }));
+  }
+
+  function readCloudCatalogCache(){
+    if(!catalogStore) return null;
+    try {
+      const cached = JSON.parse(localStorage.getItem(cloudCacheKey) || 'null');
+      if(!cached || !Array.isArray(cached.rows)) return null;
+      return catalogStore.normalizeRows(cached.rows);
+    } catch (_) { return null; }
+  }
+
+  function writeCloudCatalogCache(state){
+    try {
+      localStorage.setItem(cloudCacheKey, JSON.stringify({
+        savedAt: new Date().toISOString(),
+        rows: cloudStateRows(state)
+      }));
+    } catch (_) {}
+  }
+
+  function writeRemainingLegacyState(changes, deleted){
+    try {
+      if(Object.keys(changes).length) localStorage.setItem(legacyEditorStorageKey, JSON.stringify(changes));
+      else localStorage.removeItem(legacyEditorStorageKey);
+      if(deleted.length) localStorage.setItem(legacyDeletedStorageKey, JSON.stringify(deleted));
+      else localStorage.removeItem(legacyDeletedStorageKey);
+    } catch (_) {}
+  }
+
+  async function migrateLegacyCatalogState(options = {}){
+    const legacyChanges = readLegacyEditorChanges();
+    const legacyDeleted = new Set(readLegacyDeletedYachts());
+    const knownKeys = knownCatalogKeys();
+    const keys = new Set([...Object.keys(legacyChanges), ...legacyDeleted]);
+    const remainingChanges = Object.create(null);
+    const remainingDeleted = [];
+    let migrated = 0;
+    let conflicts = 0;
+    let failed = 0;
+    let unknown = 0;
+
+    for(const key of keys) {
+      if(!knownKeys.has(key)) {
+        if(Object.prototype.hasOwnProperty.call(legacyChanges, key)) remainingChanges[key] = legacyChanges[key];
+        if(legacyDeleted.has(key)) remainingDeleted.push(key);
+        unknown += 1;
+        continue;
+      }
+      const remoteRow = cloudCatalogState[key];
+      if(remoteRow && !options.overwriteConflicts) {
+        if(Object.prototype.hasOwnProperty.call(legacyChanges, key)) remainingChanges[key] = legacyChanges[key];
+        if(legacyDeleted.has(key)) remainingDeleted.push(key);
+        conflicts += 1;
+        continue;
+      }
+      try {
+        const hasLegacyChanges = Object.prototype.hasOwnProperty.call(legacyChanges, key);
+        const changes = hasLegacyChanges ? legacyChanges[key] : (remoteRow ? remoteRow.changes : {});
+        await catalogStore.save(key, changes, legacyDeleted.has(key), remoteRow ? remoteRow.updatedAt : null);
+        migrated += 1;
+      } catch (_) {
+        if(Object.prototype.hasOwnProperty.call(legacyChanges, key)) remainingChanges[key] = legacyChanges[key];
+        if(legacyDeleted.has(key)) remainingDeleted.push(key);
+        failed += 1;
+      }
+    }
+
+    writeRemainingLegacyState(remainingChanges, remainingDeleted);
+    return { migrated, conflicts, failed, unknown };
   }
 
   function compactText(value, maxLength = 180){
@@ -603,7 +777,7 @@
       const poster = media.poster ? ` poster="${escapeHTML(media.poster)}"` : '';
       return `<video${classAttr} src="${escapeHTML(media.src)}"${poster} muted playsinline controls preload="metadata"></video>`;
     }
-    return `<img${classAttr} src="${escapeHTML(media.src)}" alt="${escapeHTML(alt)}" loading="lazy" style="${escapeHTML(mediaImageStyle(vehicle))}" onerror="this.style.display='none'">`;
+    return `<img${classAttr} data-hide-on-error src="${escapeHTML(media.src)}" alt="${escapeHTML(alt)}" loading="lazy" style="${escapeHTML(mediaImageStyle(vehicle))}">`;
   }
 
   function hasDirectImage(url){
@@ -613,14 +787,14 @@
   function isUsablePhotoLink(yacht){
     if(yacht.photoLinkEnabled === false) return false;
     const url = String(yacht.photoLink || '');
-    if(!/^https?:\/\//i.test(url)) return false;
+    if(!/^https:\/\//i.test(url)) return false;
     return !/(?:bing\.com\/images|tse\d*\.mm\.bing\.net)/i.test(url);
   }
 
   function yachtMediaHTML(yacht, index){
     const image = imageFor(yacht, index);
     if(image) {
-      return `<img src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(yacht))}" onerror="this.style.display='none'">`;
+      return `<img data-hide-on-error src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(yacht))}">`;
     }
 
     return `
@@ -728,7 +902,7 @@
     modalMedia.classList.toggle('no-photo', !image);
     modalMedia.dataset.placeholder = `${yacht.feet || ''}' ${yacht.name}`;
     modalMedia.innerHTML = image
-      ? `<img class="modal-active-media" src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" style="${escapeHTML(mediaImageStyle(yacht))}" onerror="this.style.display='none'">`
+      ? `<img class="modal-active-media" data-hide-on-error src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" style="${escapeHTML(mediaImageStyle(yacht))}">`
       : '';
     modal.querySelector('[data-modal-kicker]').textContent = isEnglish() ? `${yacht.feet || ''} ft | ${yacht.category || 'Yacht'}` : `${yacht.size} | ${yacht.sizeLabel}`;
     modal.querySelector('[data-modal-title]').textContent = yacht.name;
@@ -761,20 +935,22 @@
     adventuresGrid.innerHTML = adventures.map((adventure) => `
       <article class="adv-card" data-adventure-index="${adventures.indexOf(adventure)}">
         <button class="card-edit-btn" type="button" data-edit-adventure="${adventures.indexOf(adventure)}"><span aria-hidden="true">✎</span> ${ui('Editar tarjeta', 'Edit card')}</button>
-        <button class="adv-open" type="button" aria-label="${ui('Ver detalles de', 'View details for')} ${adventure.name}">
+        <button class="adv-open" type="button" aria-label="${ui('Ver detalles de', 'View details for')} ${escapeHTML(adventure.name)}">
           <span class="adv-media ${mediaContainerClass(adventure)}" style="${escapeHTML(mediaContainerStyle(adventure, imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure)))}">
-            <img src="${escapeHTML(imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure))}" alt="${escapeHTML(adventure.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(adventure))}" onerror="this.style.display='none'">
-            <span class="cat-badge">${adventure.sizeLabel}</span>
-            <span class="cat-pax">${adventure.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${adventure.passengers} ${ui('pasajeros', 'passengers')}`}</span>
+            <img data-hide-on-error src="${escapeHTML(imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure))}" alt="${escapeHTML(adventure.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(adventure))}">
+            <span class="cat-badge">${escapeHTML(adventure.sizeLabel)}</span>
+            <span class="cat-pax">${escapeHTML(adventure.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${adventure.passengers} ${ui('pasajeros', 'passengers')}`)}</span>
           </span>
           <span class="adv-body">
-            <span class="tag">${adventure.category}</span>
-            <h3>${adventure.name}</h3>
-            <span class="meta">${localizedLocation(adventure.location)}</span>
+            <span class="tag">${escapeHTML(adventure.category)}</span>
+            <h3>${escapeHTML(adventure.name)}</h3>
+            <span class="meta">${escapeHTML(yachtLocationText(adventure))}</span>
             ${priceTableHTML(adventure)}
             <span class="adv-prices">
               <span class="adv-price">
-                <span class="d">${escapeHTML(localizedRate(adventure.priceLabel || ui('por hora', 'per hour')))}</span>
+                <span class="d">${escapeHTML(isEnglish()
+                  ? (adventure.priceLabelEn || localizedRate(adventure.priceLabel || 'per hour'))
+                  : (adventure.priceLabel || 'por hora'))}</span>
                 <span class="v">${escapeHTML(localizedRate(adventure.price || `${ui('Desde', 'From')} $${baseHourlyPrice(adventure)}`))}</span>
               </span>
               <span class="adv-link">${ui('Ver detalles', 'View details')}</span>
@@ -812,19 +988,32 @@
   }
 
   let editorAuthenticated = false;
+  let editorSaveInProgress = false;
+  let editorFormDirty = false;
+  let editorPricingDirty = false;
+  let editorInviteSetup = false;
   let editingYachtIndex = -1;
   let editingVehicles = yachts;
-  try { editorAuthenticated = sessionStorage.getItem('prime-editor-session') === 'active'; } catch (_) {}
 
   function editorField(name){
     return fleetEditorForm ? fleetEditorForm.elements.namedItem(name) : null;
   }
 
   function editorPriceRows(yacht){
-    const rows = Array.isArray(yacht.priceTable) && yacht.priceTable.length
-      ? yacht.priceTable
-      : parsePriceRows(yacht.rates);
-    if(rows.length) return rows.map((row) => ({ ...row, labelEn: row.labelEn || englishRate(row.label || '') }));
+    if(Array.isArray(yacht.priceTable) && yacht.priceTable.length) {
+      return yacht.priceTable.map((row) => ({ ...row, labelEn: row.labelEn || englishRate(row.label || '') }));
+    }
+    const spanishRows = parsePriceRows(yacht.rates);
+    const englishRows = parsePriceRows(yacht.ratesEn);
+    if(spanishRows.length) {
+      return spanishRows.map((row, index) => ({
+        ...row,
+        labelEn: englishRows[index]?.label || englishRate(row.label || '')
+      }));
+    }
+    if(englishRows.length) {
+      return englishRows.map((row) => ({ ...row, labelEn: row.label || '' }));
+    }
     return [{ label: 'Tarifa base', labelEn: 'Base rate', value: yacht.price || '' }];
   }
 
@@ -833,6 +1022,7 @@
       <input type="text" data-rate-label value="${escapeHTML(row.label || '')}" placeholder="${ui('Ej. 4 horas', 'E.g. 4 hours')}" aria-label="${ui('Duración o condición', 'Duration or condition')}" required>
       <input type="text" data-rate-label-en value="${escapeHTML(row.labelEn || englishRate(row.label || ''))}" placeholder="E.g. 4 hours" aria-label="English rate label" required>
       <input type="text" data-rate-value value="${escapeHTML(row.value || '')}" placeholder="$650" aria-label="${ui('Precio o rango', 'Price or range')}" required>
+      <label class="pricing-estimated-toggle"><input type="checkbox" data-rate-estimated${row.estimated ? ' checked' : ''}><span>${ui('Estimada', 'Estimated')}</span></label>
       <button class="pricing-remove-row" type="button" data-pricing-remove aria-label="${ui('Eliminar tarifa', 'Remove rate')}">×</button>
     </div>`;
   }
@@ -858,24 +1048,37 @@
       label: row.querySelector('[data-rate-label]').value.trim(),
       labelEn: row.querySelector('[data-rate-label-en]').value.trim(),
       value: normalizeRateValue(row.querySelector('[data-rate-value]').value),
-      ...(row.dataset.estimated === 'true' ? { estimated: true } : {})
+      ...(row.querySelector('[data-rate-estimated]').checked ? { estimated: true } : {})
     })).filter((row) => row.label || row.value);
   }
 
   function rateValueNumber(value){
-    const compact = String(value || '');
-    const thousands = compact.match(/\$?\s*(\d+(?:\.\d+)?)\s*k\b/i);
-    if(thousands) return Math.round(Number(thousands[1]) * 1000);
-    const match = compact.match(/\$?\s*([\d,.]+)/);
-    if(!match) return null;
-    return Number(match[1].replace(/,/g, ''));
+    const compact = String(value || '').trim();
+    const currencyMatches = [...compact.matchAll(/\$\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(k)?\b/gi)];
+    const matches = currencyMatches.length
+      ? currencyMatches
+      : [...compact.matchAll(/^\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(k)?(?:\s*[–-]\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(k)?)?\s*$/gi)];
+    const amounts = matches.flatMap((match) => {
+      const values = [Number(match[1].replace(/,/g, '')) * (match[2] ? 1000 : 1)];
+      if(match[3]) values.push(Number(match[3].replace(/,/g, '')) * (match[4] ? 1000 : 1));
+      return values;
+    }).filter(Number.isFinite);
+    return amounts.length ? Math.min(...amounts) : null;
   }
 
   function formattedPrice(value){
     return `$${Math.round(value).toLocaleString('en-US')}`;
   }
 
-  function syncPricingEditorFields(){
+  function syncPricingEditorFields(updateLabels = true){
+    const pricingContainer = document.getElementById('pricingEditorRows');
+    if(pricingContainer) {
+      pricingContainer.querySelectorAll('[data-rate-value]').forEach((field) => {
+        field.setCustomValidity(rateValueNumber(field.value) === null
+          ? ui('Escribe un precio válido, por ejemplo $650 o $350 – $400.', 'Enter a valid price, for example $650 or $350 – $400.')
+          : '');
+      });
+    }
     const rows = readPricingEditorRows();
     if(!rows.length) return rows;
     const rates = rows.map((row) => `${row.label}: ${row.value}`).join(' | ');
@@ -883,11 +1086,16 @@
     const ratesEnField = editorField('ratesEn');
     if(ratesField) ratesField.value = rates;
     if(ratesEnField) ratesEnField.value = rows.map((row) => `${row.labelEn || englishRate(row.label)}: ${row.value}`).join(' | ');
-    const amounts = rows.map((row) => rateValueNumber(row.value)).filter(Number.isFinite);
-    if(amounts.length) {
-      editorField('price').value = formattedPrice(Math.min(...amounts));
-      editorField('priceLabel').value = rows.some((row) => row.estimated) ? 'desde · tarifa estimada' : 'precio desde';
-      editorField('priceLabelEn').value = rows.some((row) => row.estimated) ? 'from · estimated rate' : 'rates from';
+    const pricedRows = rows.map((row) => ({ row, amount: rateValueNumber(row.value) })).filter((item) => Number.isFinite(item.amount));
+    if(pricedRows.length) {
+      const minimum = Math.min(...pricedRows.map((item) => item.amount));
+      editorField('price').value = formattedPrice(minimum);
+      if(updateLabels) {
+        const minimumRows = pricedRows.filter((item) => item.amount === minimum);
+        const minimumIsEstimated = minimumRows.length > 0 && minimumRows.every((item) => item.row.estimated);
+        editorField('priceLabel').value = minimumIsEstimated ? 'desde · tarifa estimada' : 'precio desde';
+        editorField('priceLabelEn').value = minimumIsEstimated ? 'from · estimated rate' : 'rates from';
+      }
     }
     return rows;
   }
@@ -925,10 +1133,73 @@
   function openEditorLogin(){
     if(!editorLoginModal || !editorLoginForm) return;
     editorLoginForm.reset();
-    if(editorLoginFeedback) editorLoginFeedback.textContent = '';
+    editorInviteSetup = Boolean(catalogStore && catalogStore.hasPendingInvite());
+    const title = document.getElementById('editorLoginTitle');
+    const description = document.getElementById('editorLoginDescription');
+    const submit = document.getElementById('editorLoginSubmit');
+    const hint = document.getElementById('editorLoginHint');
+    if(title) title.textContent = editorInviteSetup ? ui('Crear acceso administrativo', 'Create admin access') : ui('Modo edición', 'Edit mode');
+    if(description) description.textContent = editorInviteSetup
+      ? ui('La invitación fue confirmada. Crea una contraseña para activar Manage.', 'The invitation was confirmed. Create a password to activate Manage.')
+      : ui('Ingresa con la cuenta administrativa para publicar cambios en todos los dispositivos.', 'Sign in with the admin account to publish changes on every device.');
+    if(submit) submit.textContent = editorInviteSetup ? ui('Crear contraseña y entrar', 'Create password and sign in') : ui('Entrar', 'Sign in');
+    if(hint) hint.textContent = editorInviteSetup
+      ? ui('Usa una contraseña única de 8 caracteres o más.', 'Use a unique password with at least 8 characters.')
+      : ui('Acceso exclusivo para la cuenta administrativa invitada desde Supabase.', 'Access is limited to the admin account invited through Supabase.');
+    setEditorLoginFeedback('');
     setEditorDialogState(editorLoginModal, true);
     const password = document.getElementById('editorPassword');
     if(password) window.setTimeout(() => password.focus(), 40);
+  }
+
+  function setEditorLoginFeedback(message, success = false){
+    if(!editorLoginFeedback) return;
+    editorLoginFeedback.textContent = message;
+    editorLoginFeedback.classList.toggle('is-success', Boolean(success));
+  }
+
+  function editorErrorText(error){
+    const message = String(error && error.message || '').toLowerCase();
+    if(error && error.code === 'conflict') return ui('Otro dispositivo cambió esta tarjeta. Revisa el formulario y pulsa Guardar otra vez si deseas reemplazar la versión compartida.', 'Another device changed this card. Review the form and press Save again if you want to replace the shared version.');
+    if(error && error.code === 'network') return ui('No hay conexión. Revisa internet e inténtalo de nuevo.', 'No connection. Check your internet and try again.');
+    if(error && error.code === 'rate_limit') return ui('Demasiados intentos. Espera un momento e inténtalo otra vez.', 'Too many attempts. Wait a moment and try again.');
+    if(error && error.code === 'forbidden') return ui('Esta cuenta no está autorizada para editar.', 'This account is not authorized to edit.');
+    if(message.includes('email not confirmed')) return ui('Confirma primero el correo recibido y vuelve a entrar.', 'Confirm the email message first, then sign in again.');
+    if(error && error.code === 'invalid_invite') return ui('La invitación no está disponible o expiró. Solicita una nueva.', 'The invitation is unavailable or expired. Request a new one.');
+    if(error && error.code === 'weak_password' || message.includes('password should be at least')) return ui('Usa una contraseña de al menos 8 caracteres.', 'Use a password with at least 8 characters.');
+    if(message.includes('invalid login credentials')) return ui('Correo o contraseña incorrectos.', 'Incorrect email or password.');
+    if(message.includes('user already registered')) return ui('El acceso ya existe. Usa Entrar.', 'Access already exists. Use Sign in.');
+    return ui('No se pudo completar la operación. Inténtalo de nuevo.', 'The operation could not be completed. Try again.');
+  }
+
+  async function refreshConflictVersion(key){
+    try {
+      const latest = await catalogStore.load();
+      if(latest[key]) cloudCatalogState[key] = latest[key];
+      else delete cloudCatalogState[key];
+      writeCloudCatalogCache(cloudCatalogState);
+    } catch (_) {}
+  }
+
+  function setEditorBusy(busy){
+    editorSaveInProgress = Boolean(busy);
+    if(!fleetEditorForm) return;
+    fleetEditorForm.querySelectorAll('button, input, select, textarea').forEach((control) => {
+      if(editorSaveInProgress) {
+        control.dataset.editorWasDisabled = control.disabled ? 'true' : 'false';
+        control.disabled = true;
+      } else {
+        control.disabled = control.dataset.editorWasDisabled === 'true';
+        delete control.dataset.editorWasDisabled;
+      }
+    });
+  }
+
+  function setEditorStatus(message, isError = false){
+    const status = document.getElementById('editorSaveStatus');
+    if(!status) return;
+    status.textContent = message;
+    status.classList.toggle('is-error', Boolean(isError));
   }
 
   function updateEditorPreview(yacht){
@@ -945,7 +1216,10 @@
       ? `${yacht.category} · ${passengers} ${ui('pasajeros', 'passengers')}`
       : `${feet} FT · ${passengers} ${ui('pasajeros', 'passengers')}`;
     if(previewImage) {
-      previewImage.src = editorField('image').value || imageFor(yacht, editingYachtIndex) || fallbackImage(yacht);
+      const draftImage = catalogStore
+        ? catalogStore.sanitizeChanges({ image: editorField('image').value }).image
+        : editorField('image').value;
+      previewImage.src = draftImage || imageFor(yacht, editingYachtIndex) || fallbackImage(yacht);
       previewImage.alt = name;
       const draft = {
         ...yacht,
@@ -987,8 +1261,9 @@
     if(title) title.textContent = yacht.category ? ui('Editar aventura', 'Edit adventure') : ui('Editar embarcación', 'Edit vessel');
     if(position) position.textContent = `${ui('Tarjeta', 'Card')} ${editingYachtIndex + 1} ${ui('de', 'of')} ${editingVehicles.length}`;
     renderPricingEditor(yacht);
-    const status = document.getElementById('editorSaveStatus');
-    if(status) status.textContent = '';
+    setEditorStatus('');
+    editorFormDirty = false;
+    editorPricingDirty = false;
     updateEditorPreview(yacht);
     fleetEditorForm.scrollTop = 0;
   }
@@ -1003,30 +1278,40 @@
   }
 
   function closeFleetEditor(){
+    if(editorFormDirty && !window.confirm(ui('Hay cambios sin guardar. ¿Cerrar y descartarlos?', 'There are unsaved changes. Close and discard them?'))) return false;
     setEditorDialogState(fleetEditor, false);
     editingYachtIndex = -1;
     editingVehicles = yachts;
+    editorFormDirty = false;
+    return true;
   }
 
-  function finishEditingSession(){
+  async function finishEditingSession(){
+    if(editorSaveInProgress) return;
     if(fleetEditor && fleetEditor.classList.contains('is-open') && editingYachtIndex >= 0) {
-      if(!saveEditorForm(false)) return;
+      if(!await saveEditorForm(false)) return;
     }
     closeFleetEditor();
     editorAuthenticated = false;
-    try { sessionStorage.removeItem('prime-editor-session'); } catch (_) {}
+    if(catalogStore) await catalogStore.signOut();
     setEditorMode(false);
+    void refreshCatalogFromCloud({ force: true }).catch(() => {});
   }
 
-  function saveEditorForm(showMessage = true){
-    if(!fleetEditorForm || editingYachtIndex < 0) return false;
-    const priceTable = syncPricingEditorFields();
+  async function saveEditorForm(showMessage = true){
+    if(!fleetEditorForm || editingYachtIndex < 0 || editorSaveInProgress) return false;
+    if(!editorFormDirty) {
+      if(showMessage) setEditorStatus(ui('No hay cambios pendientes', 'No pending changes'));
+      return true;
+    }
+    const priceTable = syncPricingEditorFields(editorPricingDirty);
     if(!fleetEditorForm.checkValidity()) {
       fleetEditorForm.reportValidity();
       return false;
     }
     const yacht = editingVehicles[editingYachtIndex];
-    const changes = {
+    const key = yachtStorageKey(yacht);
+    const draftChanges = {
       name: editorField('name').value.trim(),
       feet: yacht.category ? (yacht.feet || 0) : Number(editorField('feet').value),
       passengers: Number(editorField('passengers').value),
@@ -1048,57 +1333,152 @@
       photoLink: editorField('photoLink').value.trim(),
       photoLinkEnabled: editorField('showPhotoLink').checked
     };
-    Object.assign(yacht, changes);
-    const allChanges = readEditorChanges();
-    allChanges[yachtStorageKey(yacht)] = changes;
-    try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
-    renderCatalog();
-    renderAdventures();
-    updateEditorPreview(yacht);
-    if(showMessage) {
-      const status = document.getElementById('editorSaveStatus');
-      if(status) status.textContent = ui('Cambios guardados', 'Changes saved');
+    const changes = catalogStore ? catalogStore.sanitizeChanges(draftChanges) : draftChanges;
+
+    setEditorBusy(true);
+    setEditorStatus(ui('Guardando en todos los dispositivos…', 'Saving on every device…'));
+    try {
+      const expectedUpdatedAt = cloudCatalogState[key] ? cloudCatalogState[key].updatedAt : null;
+      const row = await catalogStore.save(key, changes, false, expectedUpdatedAt);
+      cloudCatalogState[key] = row;
+      deletedYachtKeys.delete(key);
+      Object.assign(yacht, row.changes);
+      writeCloudCatalogCache(cloudCatalogState);
+      editorFormDirty = false;
+      editorPricingDirty = false;
+      renderCatalog();
+      renderAdventures();
+      updateEditorPreview(yacht);
+      setEditorStatus(showMessage
+        ? ui('Guardado en todos los dispositivos', 'Saved on every device')
+        : ui('Sincronizado', 'Synced'));
+      return true;
+    } catch (error) {
+      if(error && error.code === 'conflict') await refreshConflictVersion(key);
+      setEditorStatus(editorErrorText(error), true);
+      return false;
+    } finally {
+      setEditorBusy(false);
     }
-    return true;
   }
 
-  function moveEditor(direction){
+  async function moveEditor(direction){
     if(!editingVehicles.length) return;
-    if(!saveEditorForm(false)) return;
+    if(!await saveEditorForm(false)) return;
     editingYachtIndex = (editingYachtIndex + direction + editingVehicles.length) % editingVehicles.length;
     fillEditorForm(editingVehicles[editingYachtIndex]);
   }
 
-  function deleteEditorYacht(){
-    if(editingYachtIndex < 0 || !editingVehicles[editingYachtIndex]) return;
+  async function deleteEditorYacht(){
+    if(editingYachtIndex < 0 || !editingVehicles[editingYachtIndex] || editorSaveInProgress) return;
+    const collection = editingVehicles;
+    const collectionIndex = editingYachtIndex;
     const yacht = editingVehicles[editingYachtIndex];
     const confirmed = window.confirm(ui(
-      `¿Eliminar “${yacht.name}” del catálogo? Esta acción ocultará la tarjeta en este dispositivo.`,
-      `Delete “${yacht.name}” from the catalog? This will hide the card on this device.`
+      `¿Eliminar “${yacht.name}” del catálogo? La tarjeta se ocultará en todos los dispositivos.`,
+      `Delete “${yacht.name}” from the catalog? The card will be hidden on every device.`
     ));
     if(!confirmed) return;
 
     const key = yachtStorageKey(yacht);
-    deletedYachtKeys.add(key);
-    try { localStorage.setItem(editorDeletedStorageKey, JSON.stringify([...deletedYachtKeys])); } catch (_) {}
-    const allChanges = readEditorChanges();
-    delete allChanges[key];
-    try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
+    setEditorBusy(true);
+    setEditorStatus(ui('Eliminando en todos los dispositivos…', 'Removing on every device…'));
+    try {
+      const existing = cloudCatalogState[key];
+      const row = await catalogStore.save(key, existing ? existing.changes : {}, true, existing ? existing.updatedAt : null);
+      cloudCatalogState[key] = row;
+      deletedYachtKeys.add(key);
+      writeCloudCatalogCache(cloudCatalogState);
+      editorFormDirty = false;
+      collection.splice(collectionIndex, 1);
+      if(collection === yachts && statBoats) statBoats.textContent = yachts.length;
+      visibleCount = Math.min(Math.max(visibleCount, 9), Math.max(yachts.length, 9));
+      renderCatalog();
+      renderAdventures();
 
-    editingVehicles.splice(editingYachtIndex, 1);
-    if(editingVehicles === yachts && statBoats) statBoats.textContent = yachts.length;
-    visibleCount = Math.min(Math.max(visibleCount, 9), Math.max(yachts.length, 9));
-    renderCatalog();
-    renderAdventures();
-
-    if(!editingVehicles.length) {
-      closeFleetEditor();
-      return;
+      if(!collection.length) {
+        closeFleetEditor();
+        return;
+      }
+      editingVehicles = collection;
+      editingYachtIndex = Math.min(collectionIndex, collection.length - 1);
+      fillEditorForm(collection[editingYachtIndex]);
+      setEditorStatus(ui('Tarjeta eliminada en todos los dispositivos', 'Card removed on every device'));
+    } catch (error) {
+      if(error && error.code === 'conflict') {
+        await refreshConflictVersion(key);
+        setEditorStatus(ui(
+          'Otro dispositivo cambió esta tarjeta. Pulsa Eliminar otra vez si aún deseas ocultarla.',
+          'Another device changed this card. Press Delete again if you still want to hide it.'
+        ), true);
+      } else {
+        setEditorStatus(editorErrorText(error), true);
+      }
+    } finally {
+      setEditorBusy(false);
     }
-    editingYachtIndex = Math.min(editingYachtIndex, editingVehicles.length - 1);
-    fillEditorForm(editingVehicles[editingYachtIndex]);
-    const status = document.getElementById('editorSaveStatus');
-    if(status) status.textContent = ui('Tarjeta eliminada', 'Card deleted');
+  }
+
+  async function restoreEditorYacht(){
+    if(editingYachtIndex < 0 || !editingVehicles[editingYachtIndex] || editorSaveInProgress) return;
+    const yacht = editingVehicles[editingYachtIndex];
+    if(!window.confirm(ui('¿Restaurar la información original de esta tarjeta en todos los dispositivos?', 'Restore this card’s original information on every device?'))) return;
+    const key = yachtStorageKey(yacht);
+    const original = (editingVehicles === adventures ? originalAdventures : originalYachts).get(key);
+    if(!original) return;
+
+    setEditorBusy(true);
+    setEditorStatus(ui('Restaurando tarjeta…', 'Restoring card…'));
+    try {
+      const existing = cloudCatalogState[key];
+      const row = await catalogStore.save(key, {}, false, existing ? existing.updatedAt : null);
+      cloudCatalogState[key] = row;
+      Object.keys(yacht).forEach((field) => { delete yacht[field]; });
+      Object.assign(yacht, cloneVehicle(original));
+      deletedYachtKeys.delete(key);
+      writeCloudCatalogCache(cloudCatalogState);
+      renderCatalog();
+      renderAdventures();
+      fillEditorForm(yacht);
+      setEditorStatus(ui('Tarjeta restaurada en todos los dispositivos', 'Card restored on every device'));
+    } catch (error) {
+      if(error && error.code === 'conflict') {
+        await refreshConflictVersion(key);
+        setEditorStatus(ui(
+          'Otro dispositivo cambió esta tarjeta. Pulsa Restaurar tarjeta otra vez si aún deseas recuperar la versión original.',
+          'Another device changed this card. Press Restore card again if you still want the original version.'
+        ), true);
+      } else {
+        setEditorStatus(editorErrorText(error), true);
+      }
+    } finally {
+      setEditorBusy(false);
+    }
+  }
+
+  async function activateEditorSession(){
+    await refreshCatalogFromCloud({ force: true });
+    let migration = await migrateLegacyCatalogState();
+    let migrated = migration.migrated;
+    if(migration.conflicts) {
+      const overwrite = window.confirm(ui(
+        `Hay ${migration.conflicts} cambio(s) antiguo(s) guardado(s) en este dispositivo y ya existe una versión compartida. ¿Publicar los cambios de este dispositivo y reemplazar la versión compartida?`,
+        `There are ${migration.conflicts} older local change(s) and a shared version already exists. Publish this device’s changes and replace the shared version?`
+      ));
+      if(overwrite) {
+        migration = await migrateLegacyCatalogState({ overwriteConflicts: true });
+        migrated += migration.migrated;
+      }
+    }
+    if(migrated) await refreshCatalogFromCloud({ force: true });
+    if(migration.failed) {
+      window.alert(ui(
+        `${migration.failed} cambio(s) local(es) no pudieron publicarse y permanecen guardados en este dispositivo.`,
+        `${migration.failed} local change(s) could not be published and remain saved on this device.`
+      ));
+    }
+    setEditorDialogState(editorLoginModal, false);
+    setEditorMode(true);
   }
 
   if(editorAccess) {
@@ -1111,20 +1491,37 @@
     });
   }
 
-  if(editorExitMode) editorExitMode.addEventListener('click', finishEditingSession);
+  if(editorExitMode) editorExitMode.addEventListener('click', () => { void finishEditingSession(); });
 
   if(editorLoginForm) {
-    editorLoginForm.addEventListener('submit', (event) => {
+    editorLoginForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+      if(!editorLoginForm.checkValidity()) {
+        editorLoginForm.reportValidity();
+        return;
+      }
+      if(!catalogStore) {
+        setEditorLoginFeedback(ui('La conexión segura no está disponible. Recarga la página.', 'The secure connection is unavailable. Reload the page.'));
+        return;
+      }
+      const email = document.getElementById('editorEmail');
       const password = document.getElementById('editorPassword');
-      if(password && password.value === '123456') {
+      editorLoginForm.querySelectorAll('button').forEach((button) => { button.disabled = true; });
+      setEditorLoginFeedback(ui('Verificando acceso seguro…', 'Verifying secure access…'));
+      try {
+        if(editorInviteSetup) await catalogStore.completeInvite(password ? password.value : '');
+        else await catalogStore.signIn(email ? email.value : '', password ? password.value : '');
         editorAuthenticated = true;
-        try { sessionStorage.setItem('prime-editor-session', 'active'); } catch (_) {}
-        setEditorDialogState(editorLoginModal, false);
-        setEditorMode(true);
-      } else if(editorLoginFeedback) {
-        editorLoginFeedback.textContent = 'Clave incorrecta. Inténtalo de nuevo.';
+        editorInviteSetup = false;
+        if(password) password.value = '';
+        await activateEditorSession();
+      } catch (error) {
+        editorAuthenticated = false;
+        await catalogStore.signOut();
+        setEditorLoginFeedback(editorErrorText(error));
         if(password) { password.select(); password.focus(); }
+      } finally {
+        editorLoginForm.querySelectorAll('button').forEach((button) => { button.disabled = false; });
       }
     });
     editorLoginModal.addEventListener('click', (event) => {
@@ -1133,13 +1530,17 @@
   }
 
   if(fleetEditorForm) {
-    fleetEditorForm.addEventListener('submit', (event) => {
+    fleetEditorForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-      saveEditorForm(true);
+      await saveEditorForm(true);
     });
-    fleetEditorForm.addEventListener('input', () => {
+    fleetEditorForm.addEventListener('input', (event) => {
       if(editingYachtIndex >= 0) {
-        syncPricingEditorFields();
+        editorFormDirty = true;
+        if(event.target.matches('[data-rate-label], [data-rate-label-en], [data-rate-value], [data-rate-estimated]')) {
+          editorPricingDirty = true;
+          syncPricingEditorFields(true);
+        }
         updateEditorPreview(editingVehicles[editingYachtIndex]);
       }
     });
@@ -1147,9 +1548,16 @@
       if(event.target.closest('[data-pricing-add]')) {
         const container = document.getElementById('pricingEditorRows');
         if(container) {
+          if(container.querySelectorAll('[data-pricing-row]').length >= 20) {
+            setEditorStatus(ui('El tarifario admite hasta 20 filas.', 'The price table supports up to 20 rows.'), true);
+            return;
+          }
           container.insertAdjacentHTML('beforeend', pricingRowHTML({ label: '', value: '' }));
           const newRow = container.lastElementChild;
           if(newRow) newRow.querySelector('[data-rate-label]').focus();
+          setEditorStatus('');
+          editorFormDirty = true;
+          editorPricingDirty = true;
         }
       }
       const removeRate = event.target.closest('[data-pricing-remove]');
@@ -1159,37 +1567,26 @@
         else {
           const row = removeRate.closest('[data-pricing-row]');
           row.querySelector('[data-rate-label]').value = '';
+          row.querySelector('[data-rate-label-en]').value = '';
           row.querySelector('[data-rate-value]').value = '';
         }
         syncPricingEditorFields();
+        editorFormDirty = true;
+        editorPricingDirty = true;
       }
       if(event.target.closest('[data-fleet-editor-close]')) closeFleetEditor();
-      if(event.target.closest('[data-editor-previous]')) moveEditor(-1);
-      if(event.target.closest('[data-editor-next]')) moveEditor(1);
-      if(event.target.closest('[data-editor-delete]')) deleteEditorYacht();
+      if(event.target.closest('[data-editor-previous]')) void moveEditor(-1);
+      if(event.target.closest('[data-editor-next]')) void moveEditor(1);
+      if(event.target.closest('[data-editor-delete]')) void deleteEditorYacht();
       if(event.target.closest('[data-editor-logout]')) {
-        finishEditingSession();
+        void finishEditingSession();
       }
       if(event.target.closest('[data-editor-reset]') && editingYachtIndex >= 0) {
-        const yacht = editingVehicles[editingYachtIndex];
-        if(!window.confirm(ui('¿Restaurar la información original de esta tarjeta?', 'Restore this card’s original information?'))) return;
-        const key = yachtStorageKey(yacht);
-        const original = (editingVehicles === adventures ? originalAdventures : originalYachts).get(key);
-        ['locationEn','ratesEn','notesEn','priceLabelEn','photoLinkEnabled'].forEach((field) => delete yacht[field]);
-        ['priceTable', 'coverImage', 'imageFit', 'imagePosition', 'imageBackground'].forEach((field) => delete yacht[field]);
-        if(original) Object.assign(yacht, { ...original });
-        const allChanges = readEditorChanges();
-        delete allChanges[key];
-        try { localStorage.setItem(editorStorageKey, JSON.stringify(allChanges)); } catch (_) {}
-        renderCatalog();
-        renderAdventures();
-        fillEditorForm(yacht);
-        const status = document.getElementById('editorSaveStatus');
-        if(status) status.textContent = ui('Tarjeta restaurada', 'Card restored');
+        void restoreEditorYacht();
       }
     });
     fleetEditor.addEventListener('click', (event) => {
-      if(event.target === fleetEditor) closeFleetEditor();
+      if(event.target === fleetEditor && !editorSaveInProgress) closeFleetEditor();
     });
   }
 
@@ -1284,6 +1681,7 @@
 
   document.addEventListener('keydown', (event) => {
     if(event.key !== 'Escape') return;
+    if(editorSaveInProgress) return;
     if(fleetEditor && fleetEditor.classList.contains('is-open')) closeFleetEditor();
     else if(editorLoginModal && editorLoginModal.classList.contains('is-open')) setEditorDialogState(editorLoginModal, false);
     else if(modal.classList.contains('is-open')) closeModal();
@@ -1297,8 +1695,32 @@
     if(modal.classList.contains('is-open')) closeModal();
   });
 
+  document.addEventListener('error', (event) => {
+    const target = event.target;
+    if(target && target.matches && target.matches('img[data-hide-on-error]')) target.style.display = 'none';
+  }, true);
+
+  function requestCloudRefresh(force = false){
+    if(!catalogStore) return;
+    if(!force && Date.now() - lastCloudRefresh < 15000) return;
+    void refreshCatalogFromCloud({ force }).catch(() => {});
+  }
+
+  window.addEventListener('focus', () => requestCloudRefresh());
+  window.addEventListener('online', () => requestCloudRefresh(true));
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible') requestCloudRefresh();
+  });
+  window.setInterval(() => {
+    if(document.visibilityState === 'visible') requestCloudRefresh();
+  }, 120000);
+
+  const cachedCloudCatalog = readCloudCatalogCache();
+  if(cachedCloudCatalog) applyCloudCatalogState(cachedCloudCatalog);
   renderFilters();
   renderCatalog();
   renderAdventures();
   updateEditorAccess();
+  requestCloudRefresh(true);
+  if(catalogStore && catalogStore.hasPendingInvite()) openEditorLogin();
 })();

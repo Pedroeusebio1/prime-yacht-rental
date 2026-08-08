@@ -2376,9 +2376,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami River (THE GAMBLER) 2215 NW 14th St",
-    "rates": "4 horas: $400 – $650 | 6 horas: $450 – $1,050 | 8 horas: $850 – $1,550",
-    "price": "$400",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $8,000 | 6 horas: $10,000 | 8 horas: $12,000",
+    "price": "$8,000",
+    "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/m8qwbwdpn5xk3dolmz7yl/AKLqoiqV-O0_dU_Kpgit0vI?rlkey=2vf7yd5ym421svcrfhar8rndk&st=fnrdfyrz&dl=0",
     "image": "https://tse1.mm.bing.net/th?q=82ft%20sunseeker%20predator%2082ft%20sunseeker%20predator%20yacht%20miami%2082ft%20boat%20yacht%20miami%2072&w=900&h=650&c=7&rs=1&p=0&o=5&pid=1.7",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
@@ -2388,18 +2388,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$400 – $650",
-        "estimated": true
+        "value": "$8,000"
       },
       {
         "label": "6 horas",
-        "value": "$450 – $1,050",
-        "estimated": true
+        "value": "$10,000"
       },
       {
         "label": "8 horas",
-        "value": "$850 – $1,550",
-        "estimated": true
+        "value": "$12,000"
       }
     ]
   },
@@ -2981,8 +2978,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "Island Gardens Marina o Jones Boat Yard Marina",
-    "rates": "6 hours : $ 8.9k | 8 hours : $ 11.5k | 12 hours : $ 14.5k",
-    "price": "$9",
+    "rates": "6 horas: $8,900 | 8 horas: $11,500 | 12 horas: $14,500",
+    "price": "$8,900",
     "priceLabel": "precio desde",
     "photoLink": "https://www.bing.com/images/search?q=130%20BROWARD%20TRI%20DECK%20yacht%2040ft%20yacht%20Miami",
     "image": "https://tse1.mm.bing.net/th?q=130%20broward%20tri%20deck%20yacht%20130%20broward%20tri%20deck%20yacht%20superyacht%20miami%20ocean%2040ft%20boat%20yacht%20miami%2091&w=900&h=650&c=7&rs=1&p=0&o=5&pid=1.7",
@@ -2993,15 +2990,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "6 horas",
-        "value": "$9"
+        "value": "$8,900"
       },
       {
         "label": "8 horas",
-        "value": "$12"
+        "value": "$11,500"
       },
       {
         "label": "12 horas",
-        "value": "$15"
+        "value": "$14,500"
       }
     ]
   },
