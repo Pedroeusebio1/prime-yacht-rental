@@ -178,6 +178,12 @@
   function localizedRate(value){ return isEnglish() ? englishRate(value) : value; }
 
   const imageBase = 'https://loremflickr.com/900/650/';
+  const yachtFallbackImages = {
+    Pequeno: './assets/catalog-fallbacks/small-boat.png',
+    Mediano: './assets/catalog-fallbacks/motor-yacht.png',
+    Grande: './assets/catalog-fallbacks/superyacht.png',
+    Premium: './assets/catalog-fallbacks/superyacht.png'
+  };
   function shuffled(items){
     const copy = [...items];
     for(let index = copy.length - 1; index > 0; index -= 1) {
@@ -683,16 +689,7 @@
 
   function yachtImage(yacht){
     if(hasDirectImage(yacht.image)) return yacht.image;
-
-    const index = yachts.indexOf(yacht) + 1;
-    const tags = {
-      Pequeno: 'boat,yacht',
-      Mediano: 'motor-yacht,boat',
-      Grande: 'luxury-yacht,miami',
-      Premium: 'superyacht,luxury-yacht'
-    };
-
-    return `${imageBase}${tags[yacht.size] || 'yacht,boat'}?lock=${index}`;
+    return yachtFallbackImages[yacht.size] || yachtFallbackImages.Mediano;
   }
 
   function slugify(value){
@@ -732,7 +729,7 @@
   function galleryFor(vehicle, index, prefix = ''){
     const key = mediaKeyFor(vehicle, index, prefix);
     const localItems = Array.isArray(catalogMedia[key])
-      ? catalogMedia[key].map(normalizeMedia).filter((item) => item.src)
+      ? catalogMedia[key].map(normalizeMedia).filter((item) => item.src && !isBingImageUrl(item.src))
       : [];
     if(localItems.length) return localItems;
 
@@ -741,7 +738,7 @@
   }
 
   function imageFor(vehicle, index, prefix = ''){
-    if(vehicle.coverImage) return vehicle.coverImage;
+    if(hasDirectImage(vehicle.coverImage)) return vehicle.coverImage;
     const gallery = galleryFor(vehicle, index, prefix);
     const localImage = gallery.find((item) => normalizeMedia(item).type === 'image');
     if(localImage) return normalizeMedia(localImage).src;
@@ -793,8 +790,17 @@
     return `<img${classAttr} data-hide-on-error src="${escapeHTML(media.src)}" alt="${escapeHTML(alt)}" loading="lazy" style="${escapeHTML(mediaImageStyle(vehicle, view))}">`;
   }
 
+  function isBingImageUrl(url){
+    try {
+      const hostname = new URL(String(url || ''), document.baseURI).hostname.toLowerCase();
+      return hostname === 'bing.com' || hostname.endsWith('.bing.com') || hostname === 'bing.net' || hostname.endsWith('.bing.net');
+    } catch (_) {
+      return false;
+    }
+  }
+
   function hasDirectImage(url){
-    return Boolean(url && (/^https?:\/\//i.test(url) || /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(url)));
+    return Boolean(url && !isBingImageUrl(url) && (/^https?:\/\//i.test(url) || /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(url)));
   }
 
   function isUsablePhotoLink(yacht){
@@ -824,7 +830,7 @@
   }
 
   function adventureImage(adventure){
-    if(adventure.image) return adventure.image;
+    if(hasDirectImage(adventure.image)) return adventure.image;
     const index = adventures.indexOf(adventure) + 101;
     return `${imageBase}${adventure.imageTags}?lock=${index}`;
   }

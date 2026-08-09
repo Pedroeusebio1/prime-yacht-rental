@@ -7,18 +7,19 @@ const catalogPath = path.join(__dirname, '..', 'catalog-data.js');
 
 require(catalogPath);
 
-const imageBySize = {
-  Pequeno: './assets/catalog-fallbacks/small-boat.png',
-  Mediano: './assets/catalog-fallbacks/motor-yacht.png',
-  Grande: './assets/catalog-fallbacks/superyacht.png',
-  Premium: './assets/catalog-fallbacks/superyacht.png'
-};
-
+const bingUrl = /(?:^|\/\/)(?:[^/]+\.)?bing\.(?:com|net)(?:[/:?#]|$)/i;
+let cleaned = 0;
 window.PRIME_YACHTS.forEach((yacht) => {
-  yacht.image = imageBySize[yacht.size] || imageBySize.Mediano;
+  ['image', 'coverImage'].forEach((field) => {
+    if(!bingUrl.test(String(yacht[field] || ''))) return;
+    delete yacht[field];
+    cleaned += 1;
+  });
 });
 
 fs.writeFileSync(
   catalogPath,
   `window.PRIME_YACHTS = ${JSON.stringify(window.PRIME_YACHTS, null, 2)};\n`
 );
+
+console.log(`Removed ${cleaned} Bing cover URL${cleaned === 1 ? '' : 's'}.`);

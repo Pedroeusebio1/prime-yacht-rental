@@ -56,6 +56,24 @@
     return '';
   }
 
+  function isBingUrl(value){
+    if(!value) return false;
+    try {
+      const base = global.document && global.document.baseURI
+        ? global.document.baseURI
+        : 'https://primeyachtrental.com/';
+      const hostname = new URL(String(value), base).hostname.toLowerCase();
+      return hostname === 'bing.com' || hostname.endsWith('.bing.com') || hostname === 'bing.net' || hostname.endsWith('.bing.net');
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function safeCatalogImage(value){
+    const url = safeUrl(value, true);
+    return isBingUrl(url) ? '' : url;
+  }
+
   function finiteInteger(value, min, max){
     const number = Number(value);
     if(!Number.isFinite(number)) return null;
@@ -113,8 +131,8 @@
       const passengers = finiteInteger(source.passengers, 1, 100);
       if(passengers !== null) clean.passengers = passengers;
     }
-    if(Object.prototype.hasOwnProperty.call(source, 'image')) clean.image = safeUrl(source.image, true);
-    if(Object.prototype.hasOwnProperty.call(source, 'coverImage')) clean.coverImage = safeUrl(source.coverImage, true);
+    if(Object.prototype.hasOwnProperty.call(source, 'image')) clean.image = safeCatalogImage(source.image);
+    if(Object.prototype.hasOwnProperty.call(source, 'coverImage')) clean.coverImage = safeCatalogImage(source.coverImage);
     if(Object.prototype.hasOwnProperty.call(source, 'photoLink')) clean.photoLink = safeUrl(source.photoLink, false);
     if(Object.prototype.hasOwnProperty.call(source, 'photoLinkEnabled')) clean.photoLinkEnabled = source.photoLinkEnabled === true;
     if(validImageFits.has(source.imageFit)) clean.imageFit = source.imageFit;

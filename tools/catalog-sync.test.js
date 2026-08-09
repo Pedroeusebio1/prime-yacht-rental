@@ -59,6 +59,17 @@ async function run(){
     price: '$9,999',
     priceTable: [{ label: 'Tarifa compacta', value: '$1.5k' }]
   }).price, '$1,500');
+  assert.deepEqual(store.sanitizeChanges({
+    image: 'https://tse1.mm.bing.net/th?q=yacht',
+    coverImage: 'https://www.bing.com/images/search?q=yacht'
+  }), { image: '', coverImage: '' });
+  assert.deepEqual(store.sanitizeChanges({
+    image: 'https://images.example.com/yacht.jpg',
+    coverImage: './assets/covers/yacht.jpg'
+  }), {
+    image: 'https://images.example.com/yacht.jpg',
+    coverImage: './assets/covers/yacht.jpg'
+  });
 
   const calls = [];
   const responses = [
