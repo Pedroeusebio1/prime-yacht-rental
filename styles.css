@@ -284,10 +284,8 @@ nav.links a:hover {
   position: relative;
   isolation: isolate;
   display: inline-grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    "label value"
-    "note value";
+  grid-template-columns: auto auto;
+  grid-template-areas: "label value";
   align-items: center;
   column-gap: 22px;
   max-width: 100%;
@@ -346,13 +344,6 @@ nav.links a:hover {
   line-height: 0.92;
   letter-spacing: 0.01em;
   text-shadow: 0 2px 18px rgba(201, 158, 59, 0.28);
-}
-.hero-price-note {
-  grid-area: note;
-  margin-top: 6px;
-  color: rgba(255, 253, 248, 0.68);
-  font-size: 11px;
-  line-height: 1.35;
 }
 .hero-price-callout + .hero-actions {
   margin-top: 26px;

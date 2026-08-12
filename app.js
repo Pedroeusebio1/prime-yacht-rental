@@ -8,7 +8,7 @@
       'hero.eyebrow': 'Miami, FL & Dominican Republic',
       'hero.title': 'Experience luxury on the <em>sea</em>, without borders',
       'hero.lead': 'Prime Yacht Rental offers an exclusive fleet of yachts, boats, jet skis and ATVs in Miami and the Dominican Republic. Private charters, captain included, and five-star service for every occasion.',
-      'hero.priceFrom': 'Starting at', 'hero.priceNote': 'the lowest rate across our fleet',
+      'hero.priceFrom': 'Starting at',
       'hero.viewFleet': 'View Yachts & Boats', 'hero.quote': 'Personalized Quote',
       'stats.vessels': 'Vessels', 'stats.countries': 'Countries', 'stats.days': 'Days a week', 'stats.largest': 'Largest yacht',
       'locations.eyebrow': 'Two coasts, one exceptional brand',
