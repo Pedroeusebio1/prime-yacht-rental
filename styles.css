@@ -280,6 +280,83 @@ nav.links a:hover {
   color: rgba(255, 253, 248, 0.82);
   max-width: 560px;
 }
+.hero-price-callout {
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "label value"
+    "note value";
+  align-items: center;
+  column-gap: 22px;
+  max-width: 100%;
+  margin-top: 28px;
+  padding: 14px 22px 14px 19px;
+  overflow: hidden;
+  border: 1px solid rgba(201, 158, 59, 0.72);
+  border-left: 3px solid var(--gold-light);
+  border-radius: 2px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(201, 158, 59, 0.28), transparent 48%),
+    linear-gradient(135deg, rgba(13, 10, 4, 0.88), rgba(92, 67, 18, 0.56));
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.34),
+    inset 0 0 0 1px rgba(255, 253, 248, 0.06);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.hero-price-callout[hidden] {
+  display: none;
+}
+.hero-price-callout::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 120px;
+  height: 120px;
+  top: -78px;
+  right: -40px;
+  border: 1px solid rgba(255, 253, 248, 0.16);
+  border-radius: 50%;
+}
+.hero-price-label {
+  grid-area: label;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--gold-light);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.hero-price-label::before {
+  content: "✦";
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.hero-price-callout strong {
+  grid-area: value;
+  color: #fffdf8;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 18px rgba(201, 158, 59, 0.28);
+}
+.hero-price-note {
+  grid-area: note;
+  margin-top: 6px;
+  color: rgba(255, 253, 248, 0.68);
+  font-size: 11px;
+  line-height: 1.35;
+}
+.hero-price-callout + .hero-actions {
+  margin-top: 26px;
+}
 .hero-actions {
   display: flex;
   gap: 16px;
@@ -1652,6 +1729,20 @@ body.fleet-editing .cat-card { outline: 1px dashed rgba(201, 158, 59, .5); outli
   }
   .stat-strip {
     gap: 34px;
+    margin-top: 44px;
+  }
+  .hero-price-callout {
+    width: 100%;
+    max-width: 380px;
+    margin-top: 24px;
+    padding: 12px 15px;
+    column-gap: 12px;
+  }
+  .hero-price-callout strong {
+    font-size: 34px;
+  }
+  .hero-price-callout + .hero-actions {
+    margin-top: 20px;
   }
   .foot-grid {
     grid-template-columns: 1fr;

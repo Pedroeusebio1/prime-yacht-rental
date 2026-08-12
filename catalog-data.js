@@ -6,7 +6,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 12,
     "location": "Boca Chica, República Dominicana",
-    "rates": "5 horas: $1,050 USD",
+    "rates": "5 horas: $1,050",
     "price": "$1,050",
     "priceLabel": "precio desde",
     "photoLink": "",
@@ -29,7 +29,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 10,
     "location": "Boca Chica, República Dominicana",
-    "rates": "5 horas: $800 USD",
+    "rates": "5 horas: $800",
     "price": "$800",
     "priceLabel": "precio desde",
     "photoLink": "",
@@ -52,7 +52,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 8,
     "location": "Boca Chica, República Dominicana",
-    "rates": "5 horas: $600 USD",
+    "rates": "5 horas: $600",
     "price": "$600",
     "priceLabel": "precio desde",
     "photoLink": "",
@@ -75,7 +75,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 12,
     "location": "Boca Chica, República Dominicana",
-    "rates": "5 horas: $750 USD",
+    "rates": "5 horas: $750",
     "price": "$750",
     "priceLabel": "precio desde",
     "photoLink": "",
@@ -98,8 +98,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "MIAMI RIVER",
-    "rates": "4 hours $1200",
-    "price": "$1,200",
+    "rates": "4 horas: $1,500",
+    "price": "$1,500",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/vhmsr3ihh9wnxaru1z2og/AKSUZf8bb-ZyPDb6UPFS7Ng?rlkey=r6wyiczer8smi1wwii9okk8zk&st=gk7xiggr&dl=",
     "notes": "Fotos disponibles en el boton Ver mas fotos.",
@@ -109,7 +109,7 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$1,200"
+        "value": "$1,500"
       }
     ]
   },
@@ -120,7 +120,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "MIAMI RIVER",
-    "rates": "4HRS: $1500 | 5 HRS: $1,650",
+    "rates": "4 horas: $1,500 | 5 horas: $1,650",
     "price": "$1,500",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/zoldjzyzd6scqj86waegr/ADuFfYoAuxCbmAIa3Td42do?rlkey=trbmlxn2r32meodsi3oeh06hw&st=lzgf21mk&dl=0",
@@ -146,9 +146,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "555 NW South River DR, Miami, FL 33136, United States",
-    "rates": "4 horas: $200 – $300 | 6 horas: $300 – $450 | 8 horas: $450 – $1,050",
-    "price": "$200",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $300 | 6 horas: $450 | 8 horas: $1,050",
+    "price": "$300",
+    "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/hxje52i6kxzfbtacskcwp/ALlCSWrLYH5wkXLOIzleXnI?rlkey=nskpdqfswhsvzu7ghjwhhlgzf&st=h8lge773&dl=0",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "(CHIQUIMU) 52ft Sea Ray Sedan Bridge - 13 People\nPick up location: 555 NW South River DR, Miami, FL 33136, United States\nPictures :  \nBroker Pricing\n4hr: $1,500+ gratuity\n5hr: $1,700 + gratuity\nALLWEEKEND FREE! DM US",
@@ -157,18 +157,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$200 – $300",
-        "estimated": true
+        "value": "$300"
       },
       {
         "label": "6 horas",
-        "value": "$300 – $450",
-        "estimated": true
+        "value": "$450"
       },
       {
         "label": "8 horas",
-        "value": "$450 – $1,050",
-        "estimated": true
+        "value": "$1,050"
       }
     ]
   },
@@ -179,8 +176,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 13,
     "location": "Miami River 22nd avenue (next to regal)",
-    "rates": "3 hours - $400 | 4 hours - $510 | 5 hours - $655 | 6 hours - $768 | 7 hours - $896 | 8 hours - $1,025 | 3 hours - $413 | 4 hours - $535 | 5 hours - $670 | 6 hours - $780 | 7 hours - $903 | 8 hours - $1,025",
-    "price": "$400",
+    "rates": "3 horas: $413 | 4 horas: $535 | 5 horas: $670 | 6 horas: $780 | 7 horas: $903 | 8 horas: $1,025",
+    "price": "$413",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/59131lardb2pwhigvkoqq/AAp07-THCGwnnw2EnQ6xIM0?rlkey=gwao4gygh6lepvmd25kosshji&st=n0vsbrua&dl=0",
     "notes": "Fotos disponibles en el boton Ver mas fotos.",
@@ -188,30 +185,6 @@ window.PRIME_YACHTS = [
     "mediaKey": "004-28ft-pink-rinker",
     "photoLinkOk": true,
     "priceTable": [
-      {
-        "label": "3 horas",
-        "value": "$400"
-      },
-      {
-        "label": "4 horas",
-        "value": "$510"
-      },
-      {
-        "label": "5 horas",
-        "value": "$655"
-      },
-      {
-        "label": "6 horas",
-        "value": "$768"
-      },
-      {
-        "label": "7 horas",
-        "value": "$896"
-      },
-      {
-        "label": "8 horas",
-        "value": "$1,025"
-      },
       {
         "label": "3 horas",
         "value": "$413"
@@ -231,6 +204,10 @@ window.PRIME_YACHTS = [
       {
         "label": "7 horas",
         "value": "$903"
+      },
+      {
+        "label": "8 horas",
+        "value": "$1,025"
       }
     ]
   },
@@ -241,8 +218,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "MIAMI RIVER",
-    "rates": "2HRS: $440 | 3HRS: $565 | 4HRS: $740 | 5HRS: $890 | 6HRS: $1040 | 8HRS: $1340 | 2HRS: $470 | 3HRS: $675 | 4HRS: $765 | 5HRS: $925 | 6HRS: $1075 | 8HRS: $1400",
-    "price": "$440",
+    "rates": "2 horas: $470 | 3 horas: $675 | 4 horas: $765 | 5 horas: $925 | 6 horas: $1,075 | 8 horas: $1,400",
+    "price": "$470",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/44qykbvvp6atwkgn7tqv3/ACrOTWSOhXGuwg67LvscQmY?rlkey=zutwksorz10jdem2nckz4nmpf&st=q3uyjvtt&dl=0",
     "notes": "Fotos disponibles en el boton Ver mas fotos.",
@@ -250,30 +227,6 @@ window.PRIME_YACHTS = [
     "mediaKey": "005-44ft-sea-ray-sundancer-2",
     "photoLinkOk": true,
     "priceTable": [
-      {
-        "label": "2 horas",
-        "value": "$440"
-      },
-      {
-        "label": "3 horas",
-        "value": "$565"
-      },
-      {
-        "label": "4 horas",
-        "value": "$740"
-      },
-      {
-        "label": "5 horas",
-        "value": "$890"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,040"
-      },
-      {
-        "label": "8 horas",
-        "value": "$1,340"
-      },
       {
         "label": "2 horas",
         "value": "$470"
@@ -307,7 +260,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4 Hours: $1,600 | 5 Hours: $1,800 | 6 Hours: $2,150 | 8 Hours: $4,300",
+    "rates": "4 horas: $1,600 | 5 horas: $1,800 | 6 horas: $2,150 | 8 horas: $4,300",
     "price": "$1,600",
     "priceLabel": "precio desde",
     "photoLink": "https://clientyachtlink.com/l/d11c30f712ffb0f3",
@@ -341,7 +294,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "MIAMI RIVER",
-    "rates": "4 hours: $1,700 | 5 hours: $1,900 | 6 hours: $2,300 | 8 hours: $3,200",
+    "rates": "4 horas: $1,700 | 5 horas: $1,900 | 6 horas: $2,300 | 8 horas: $3,200",
     "price": "$1,700",
     "priceLabel": "precio desde",
     "photoLink": "https://www.bing.com/images/search?q=40FT%20FORMULA%2040ft%20yacht%20Miami",
@@ -375,7 +328,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4 hrs: $2,120 | 5 hrs: $2,380 | 6 hrs: $2,680",
+    "rates": "4 horas: $2,120 | 5 horas: $2,380 | 6 horas: $2,680",
     "price": "$2,120",
     "priceLabel": "precio desde",
     "photoLink": "https://www.bing.com/images/search?q=42FT%20REGAL%2042ft%20yacht%20Miami",
@@ -405,7 +358,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "MIAMI RIVER",
-    "rates": "4 hrs: $1,730 | 5 hrs: $2,100 | 6 hrs: $2,450 | 8 hrs: $3,050 | 8 hrs: $3,100",
+    "rates": "4 horas: $1,730 | 5 horas: $2,100 | 6 horas: $2,450 | 8 horas: $3,100",
     "price": "$1,730",
     "priceLabel": "precio desde",
     "photoLink": "https://clientyachtlink.com/l/b6685d52d44c187b",
@@ -425,10 +378,6 @@ window.PRIME_YACHTS = [
       {
         "label": "6 horas",
         "value": "$2,450"
-      },
-      {
-        "label": "8 horas",
-        "value": "$3,050"
       },
       {
         "label": "8 horas",
@@ -498,7 +447,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 12,
     "location": "2060 NW 13 ST Miami FL",
-    "rates": "4 Hours - $650 | 6 Hours - $900 | 8 Hours - $1100",
+    "rates": "4 horas: $650 | 6 horas: $900 | 8 horas: $1,100",
     "price": "$650",
     "priceLabel": "precio desde",
     "photoLink": "https://miasuarez1125.smugmug.com/Barletta-Tritoon-25",
@@ -528,9 +477,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 12,
     "location": "Miami Beach Marina",
-    "rates": "4 horas: $150 – $200 | 6 horas: $200 – $300 | 8 horas: $300 – $450",
-    "price": "$150",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $1,000 | 6 horas: $1,300 | 8 horas: $1,500",
+    "price": "$1,000",
+    "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/EnDEbvd2xtHZMVNa8",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "36ft 2024 NX - 12 people (Miami Beach Marina)\nPictures: \n4hr: $1,000 plus gratuity\n6hr: $1,300 plus gratuity\n8hr: $1,500 plus gratuity\nAvailable ✅",
@@ -539,18 +488,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$150 – $200",
-        "estimated": true
+        "value": "$1,000"
       },
       {
         "label": "6 horas",
-        "value": "$200 – $300",
-        "estimated": true
+        "value": "$1,300"
       },
       {
         "label": "8 horas",
-        "value": "$300 – $450",
-        "estimated": true
+        "value": "$1,500"
       }
     ]
   },
@@ -561,7 +507,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 13,
     "location": "961 NW S River Dr, Miami, FL 33136",
-    "rates": "2 horas $400 | 3 horas $550 | 4 horas $650 | 5 horas $750 | 6 horas $850 | 8 horas $1150",
+    "rates": "2 horas: $400 | 3 horas: $550 | 4 horas: $650 | 5 horas: $750 | 6 horas: $850 | 8 horas: $1,150",
     "price": "$400",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/9tyffz322e0olw2ledxd9/AHvkIaxgBZ3a39R8Gvfl6_A?rlkey=831kgs763z3wca0y6foah1bvf&st=oq3pqn9b&dl=0",
@@ -603,7 +549,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 13,
     "location": "2215 NW 14th St, Miami, FL 33125",
-    "rates": "2 horas $460 | 3 horas $560 | 4 horas $660 | 5 horas $760 | 6 horas $860 | 8 horas $1125",
+    "rates": "2 horas: $460 | 3 horas: $560 | 4 horas: $660 | 5 horas: $760 | 6 horas: $860 | 8 horas: $1,125",
     "price": "$460",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/7isyp6zuey7mwd5xc86w4/AAfXtnCTJzH4CM3HqlpA-mE?rlkey=jc5j682pet8v6oeisuy7ihwr8&st=bl4yuevt&dl=0",
@@ -645,7 +591,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 13,
     "location": "201 NW South River Dr Miami Fl 33128",
-    "rates": "4 Hours - $600 | 6 Hours - $750",
+    "rates": "4 horas: $600 | 6 horas: $750",
     "price": "$600",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/qrgiparmlg6d8lzcswmir/AETDDDwZAYkwfPJhf4nUuLc?rlkey=1wcpv7urzae6kj805wgv07bzp&st=03j711z1&dl=0",
@@ -673,7 +619,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 13,
     "location": "Miami Beach Marina",
-    "rates": "4 hrs $1,500 | 6 hrs $2,300 | 8 hrs $2,800",
+    "rates": "4 horas: $1,500 | 6 horas: $2,300 | 8 horas: $2,800",
     "price": "$1,500",
     "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/EDFK2nB7KV49SppL6",
@@ -703,8 +649,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "2215 NW 14th St, Miami, FL 33125",
-    "rates": "3 hours: $1050 | 4 hours: $ 1200 | 5 hours: $1350 | 6 hours: $1500 | 3 hours: $ 1100 | 4 hours: $1250 | 5 hours: $1400 | 6 hours: $1,550 | 3 hours: $1150 | 4 hours: $1300 | 5 hours: $1450 | 6 hours: $1,600",
-    "price": "$1,050",
+    "rates": "3 horas: $1,150 | 4 horas: $1,300 | 5 horas: $1,450 | 6 horas: $1,600",
+    "price": "$1,150",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/zb9cypo22xq9rnchaogbt/AAqa2FJcp3hEY6Ivr9X8wDQ?rlkey=h25yapafw1hvcmt52u8ufaepy&st=xndfjfxk&dl=0",
     "notes": "Fotos disponibles en el boton Ver mas fotos.",
@@ -712,38 +658,6 @@ window.PRIME_YACHTS = [
     "mediaKey": "018-40ft-axopar",
     "photoLinkOk": true,
     "priceTable": [
-      {
-        "label": "3 horas",
-        "value": "$1,050"
-      },
-      {
-        "label": "4 horas",
-        "value": "$1,200"
-      },
-      {
-        "label": "5 horas",
-        "value": "$1,350"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,500"
-      },
-      {
-        "label": "3 horas",
-        "value": "$1,100"
-      },
-      {
-        "label": "4 horas",
-        "value": "$1,250"
-      },
-      {
-        "label": "5 horas",
-        "value": "$1,400"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,550"
-      },
       {
         "label": "3 horas",
         "value": "$1,150"
@@ -769,7 +683,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "2060 NW 13 ST Miami FL",
-    "rates": "4 hours $1300 | 6 hours $1700 | 8 hours $2100",
+    "rates": "4 horas: $1,300 | 6 horas: $1,700 | 8 horas: $2,100",
     "price": "$1,300",
     "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/oW6HuPRLRsYKCVN57",
@@ -799,9 +713,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Venetian Marina",
-    "rates": "4 horas: $150 – $200 | 6 horas: $200 – $300 | 8 horas: $300 – $450",
-    "price": "$150",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $200 | 6 horas: $300 | 8 horas: $450",
+    "price": "$200",
+    "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/86FKfz1xCAZYsnqt9",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "40ft 2023 Schaefer - 13 people (Venetian Marina)\nPictures: \n4hr: $1,000 plus gratuity\n6hr: $1,300 plus gratuity\n8hr: $1,700 plus gratuity",
@@ -810,18 +724,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$150 – $200",
-        "estimated": true
+        "value": "$200"
       },
       {
         "label": "6 horas",
-        "value": "$200 – $300",
-        "estimated": true
+        "value": "$300"
       },
       {
         "label": "8 horas",
-        "value": "$300 – $450",
-        "estimated": true
+        "value": "$450"
       }
     ]
   },
@@ -832,7 +743,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4hr: $800 | 5hr: $900 | 6hr: $1000",
+    "rates": "4 horas: $800 | 5 horas: $900 | 6 horas: $1,000",
     "price": "$800",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/giz6swzzco51utdb1wca0/AKpyM6XeApw7FHt50tw70j4?rlkey=aad9ruwaf2k8p3sig3wxqkz46&st=h5nren7g&dl=0",
@@ -862,7 +773,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4 Hours – $4,000 | 6 Hours – $5,000 | 8 Hours – $6,000 | Extra Hour – $1,200",
+    "rates": "4 horas: $4,000 | 6 horas: $5,000 | 8 horas: $6,000",
     "price": "$4,000",
     "priceLabel": "precio desde",
     "photoLink": "https://bit.ly/94Azimut",
@@ -892,7 +803,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Venetian Marina",
-    "rates": "3 hrs $1,300 | 4 hrs $1,500 | 6 hrs $2,300 | 8 hrs $3,000",
+    "rates": "3 horas: $1,300 | 4 horas: $1,500 | 6 horas: $2,300 | 8 horas: $3,000",
     "price": "$1,300",
     "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/15tr5MC2QLrj7jTTA",
@@ -926,7 +837,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Breezo Marine - 129 NW S River Dr, Miami, FL 33128",
-    "rates": "-$100 Mon–Thurs | 3H $600 | 4H $750 | 6H $1150",
+    "rates": "3 horas: $600 | 4 horas: $750 | 6 horas: $1,150",
     "price": "$600",
     "priceLabel": "precio desde",
     "photoLink": "",
@@ -956,9 +867,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "2215 NW 14th St",
-    "rates": "4 horas: $150 – $200 | 6 horas: $200 – $300 | 8 horas: $300 – $450",
-    "price": "$150",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $200 | 6 horas: $300 | 8 horas: $450",
+    "price": "$200",
+    "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/dsly75emvudnjrou7kyod/AMpeDB_33G1-gipwO_uE4rA?rlkey=u99yl6n3yzxbj8284vourmmmj&st=3o7oijr5&dl=0",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "42ft Marquis Sport Coupe - 13 People\nPick up location 2215 NW 14th St\nMiami, FL  33125, United States\nPictures : \nBroker Pricing\nWeekday (Mon-Thru)\n4hr: $900 + gratuity\n6hr: $1,200+ gratuity\n8hr: $1,450 + gratuity\nWeekend\n4hr: $1,000 + gratuity\n6hr: $1,300 + gratuity\n8hr: $1,500 + gratuity\nIncluded:",
@@ -967,18 +878,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$150 – $200",
-        "estimated": true
+        "value": "$200"
       },
       {
         "label": "6 horas",
-        "value": "$200 – $300",
-        "estimated": true
+        "value": "$300"
       },
       {
         "label": "8 horas",
-        "value": "$300 – $450",
-        "estimated": true
+        "value": "$450"
       }
     ]
   },
@@ -989,9 +897,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "North Miami",
-    "rates": "4 horas: $150 – $200 | 6 horas: $200 – $300 | 8 horas: $300 – $450",
-    "price": "$150",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $1,800 | 6 horas: $2,300 | 8 horas: $2,800",
+    "price": "$1,800",
+    "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/NDwbfAe92BmDFG2y5",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "42ft Luxury Azimut Verve - 13 people (North Miami)\nPictures: \n4hr: $1,800 plus gratuity\n6hr: $2,300 plus gratuity\n8hr: $2,800 plus gratuity",
@@ -1000,18 +908,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$150 – $200",
-        "estimated": true
+        "value": "$1,800"
       },
       {
         "label": "6 horas",
-        "value": "$200 – $300",
-        "estimated": true
+        "value": "$2,300"
       },
       {
         "label": "8 horas",
-        "value": "$300 – $450",
-        "estimated": true
+        "value": "$2,800"
       }
     ]
   },
@@ -1022,8 +927,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "2 horas - $700 | 3 horas - $800 | 4 horas - $900 | 5 horas - $1000 | 6 horas - $1100 | 7 horas - $1200 | 8 horas - $1300 | 2 horas - $800 | 3 horas - $900 | 4 horas - $1000 | 5 horas - $1100 | 6 horas - $1200",
-    "price": "$700",
+    "rates": "2 horas: $800 | 3 horas: $900 | 4 horas: $1,000 | 5 horas: $1,100 | 6 horas: $1,200 | 7 horas: $1,300 | 8 horas: $1,400",
+    "price": "$800",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/vh92ekpojg0rsxlclarc8/h?rlkey=msr7un7vuepitu2cnm5qqizmx&st=he3sbh9z&dl=0",
     "notes": "Fotos disponibles en el boton Ver mas fotos.",
@@ -1033,51 +938,31 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "2 horas",
-        "value": "$700"
-      },
-      {
-        "label": "3 horas",
         "value": "$800"
       },
       {
-        "label": "4 horas",
+        "label": "3 horas",
         "value": "$900"
       },
       {
-        "label": "5 horas",
+        "label": "4 horas",
         "value": "$1,000"
       },
       {
-        "label": "6 horas",
+        "label": "5 horas",
         "value": "$1,100"
+      },
+      {
+        "label": "6 horas",
+        "value": "$1,200"
       },
       {
         "label": "7 horas",
-        "value": "$1,200"
-      },
-      {
-        "label": "8 horas",
         "value": "$1,300"
       },
       {
-        "label": "2 horas",
-        "value": "$800"
-      },
-      {
-        "label": "3 horas",
-        "value": "$900"
-      },
-      {
-        "label": "4 horas",
-        "value": "$1,000"
-      },
-      {
-        "label": "5 horas",
-        "value": "$1,100"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,200"
+        "label": "8 horas",
+        "value": "$1,400"
       }
     ]
   },
@@ -1088,7 +973,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "961 NW 7th St, Miami, FL 33136",
-    "rates": "Lun-Jue: 3h $610 | 4h $780 | 5h $925 | 6h $1070 | 8h $1360. Tarifas de fin de semana disponibles en la ficha.",
+    "rates": "3 horas: $610 | 4 horas: $780 | 5 horas: $925 | 6 horas: $1,070 | 8 horas: $1,360",
     "price": "$610",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/aa8ixkbayqys42xbdqbg0/AN9worfTxwDx83Vg60nERyg?rlkey=t1ozy9fwxw99wmrjucdhwxv89&st=4y4g50h5&dl=0",
@@ -1114,7 +999,7 @@ window.PRIME_YACHTS = [
         "value": "$1,070"
       },
       {
-        "label": "8 horas · Fin de semana",
+        "label": "8 horas",
         "value": "$1,360"
       }
     ]
@@ -1126,7 +1011,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "2060 NW 13 St, Miami, FL 33125",
-    "rates": "4 horas $1200 | 6 horas $1600 | 8 horas $2300 | Depósito requerido: $300",
+    "rates": "4 horas: $1,200 | 6 horas: $1,600 | 8 horas: $2,300",
     "price": "$1,200",
     "priceLabel": "precio desde",
     "photoLink": "https://www.bing.com/images/search?q=45%20Regal%202022%20w%2F%20Flybridge%2040ft%20yacht%20Miami",
@@ -1156,7 +1041,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4 hour $1,700 | 6 hour $2,200",
+    "rates": "4 horas: $1,700 | 6 horas: $2,200",
     "price": "$1,700",
     "priceLabel": "precio desde",
     "photoLink": "https://yachtfleet.smugmug.com/45-Galeon",
@@ -1182,7 +1067,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "2215 NW 14th St, Miami, FL 33125",
-    "rates": "Lun-Jue: 3h $550 | 4h $720 | 5h $865 | 6h $1010 | 8h $1300. Tarifas de fin de semana disponibles en la ficha.",
+    "rates": "3 horas: $550 | 4 horas: $720 | 5 horas: $865 | 6 horas: $1,010 | 8 horas: $1,300",
     "price": "$550",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/yclcukcpxz07obr8hk79p/AEA2ExJejp8IEYucum1MsD4?rlkey=yggz5s41q8hwk1w2wgs7bhgzh&st=qqkvrydi&dl=0",
@@ -1208,7 +1093,7 @@ window.PRIME_YACHTS = [
         "value": "$1,010"
       },
       {
-        "label": "8 horas · Fin de semana",
+        "label": "8 horas",
         "value": "$1,300"
       }
     ]
@@ -1220,9 +1105,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Regal Marina",
-    "rates": "4 horas: $150 – $200 | 6 horas: $200 – $300 | 8 horas: $300 – $450",
-    "price": "$150",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $200 | 6 horas: $300 | 8 horas: $450",
+    "price": "$200",
+    "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/obtJ3SoUcrC5VxBX6",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "48ft Sea Ray Fly Bridge - 13 people (Regal Marina)\nPictures: \n4hr: $1,000 plus gratuity\n6hr: $1,350 plus gratuity\n8hr: $1,700 plus gratuity",
@@ -1231,18 +1116,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$150 – $200",
-        "estimated": true
+        "value": "$200"
       },
       {
         "label": "6 horas",
-        "value": "$200 – $300",
-        "estimated": true
+        "value": "$300"
       },
       {
         "label": "8 horas",
-        "value": "$300 – $450",
-        "estimated": true
+        "value": "$450"
       }
     ]
   },
@@ -1253,9 +1135,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Miami River",
-    "rates": "4 horas: $150 – $200 | 6 horas: $200 – $300 | 8 horas: $300 – $450",
-    "price": "$150",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $200 | 6 horas: $300 | 8 horas: $450",
+    "price": "$200",
+    "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/1VWmTf8eNawx0fv9yvdMIj2-jd6u9ycLs",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "48ft Princess Fly Bridge - 13 People\nPick up location: Miami River\nPictures : \n4hr: $900+ gratuity\n6hr: $1,200 + gratuity\n8hr: $1,500 + gratuity",
@@ -1264,18 +1146,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$150 – $200",
-        "estimated": true
+        "value": "$200"
       },
       {
         "label": "6 horas",
-        "value": "$200 – $300",
-        "estimated": true
+        "value": "$300"
       },
       {
         "label": "8 horas",
-        "value": "$300 – $450",
-        "estimated": true
+        "value": "$450"
       }
     ]
   },
@@ -1286,47 +1165,15 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "2215 NW 14th St, Miami, FL 33125",
-    "rates": "3 hours: $655 | 4 hours: $775 | 5 hours: $950 | 6 hours: $1,125 | 3 hours: $755 | 4 hours: $875 | 5 hours: $1,050 | 6 hours: $1,200 | 3 hours: $830 | 4 hours: $950 | 5 hours: $1,125 | 6 hours: $1,300",
-    "price": "$655",
+    "rates": "3 horas: $830 | 4 horas: $950 | 5 horas: $1,125 | 6 horas: $1,300",
+    "price": "$830",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/u0lngiscceb987bsar6ma/ANAFkjdRuHrumsbu-zYoBnU?rlkey=xr15967zrrzbzpyotbuaw9cwr&st=9wc7oo7u&dl=0",
-    "notes": "Fotos disponibles en el boton Ver mas fotos.",
+    "notes": "Tarifas variables segun el dia. Fotos disponibles en el boton Ver mas fotos.",
     "description": "48FT CRANCHI\n13 MAX\nDEPARTURE: 2215 NW 14th St, Miami, FL 33125\n>>>>> MON–THURS <<<<<\n3 hours: $655\n4 hours: $775\n5 hours: $950\n6 hours: $1,125\n>>>>> FRIDAY <<<<<\n3 hours: $755\n4 hours: $875\n5 hours: $1,050\n6 hours: $1,200\n>>>>> SATURDAY <<<<<\n3 hours: $830\n4 hours: $950\n5 hours: $1,125\n6 hours: $1,300\n>>>>> SUNDAY <<<<<\n3 hours: $755\n4 hours: $875\n5 hours: $1,050\n6 hours: $1,200\n",
     "mediaKey": "034-48ft-cranchi",
     "photoLinkOk": true,
     "priceTable": [
-      {
-        "label": "3 horas",
-        "value": "$655"
-      },
-      {
-        "label": "4 horas",
-        "value": "$775"
-      },
-      {
-        "label": "5 horas",
-        "value": "$950"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,125"
-      },
-      {
-        "label": "3 horas",
-        "value": "$755"
-      },
-      {
-        "label": "4 horas",
-        "value": "$875"
-      },
-      {
-        "label": "5 horas",
-        "value": "$1,050"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,200"
-      },
       {
         "label": "3 horas",
         "value": "$830"
@@ -1352,7 +1199,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "$1500 4 hours | $1800 5 hours",
+    "rates": "4 horas: $1,500 | 5 horas: $1,800",
     "price": "$1,500",
     "priceLabel": "precio desde",
     "photoLink": "https://www.bing.com/images/search?q=WARRIOR%2050FT%2050ft%20yacht%20Miami",
@@ -1378,7 +1225,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "243 NW S River Dr, Miami, FL 33128",
-    "rates": "-$100 Mon–Thurs | 4H $1000 | 6H $1400",
+    "rates": "4 horas: $1,000 | 6 horas: $1,400",
     "price": "$1,000",
     "priceLabel": "precio desde",
     "photoLink": "",
@@ -1404,7 +1251,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Bayside (Downtown Miami)",
-    "rates": "4Hours - $1200 | 6Hours - $1800 | 8Hours - $2400",
+    "rates": "4 horas: $1,200 | 6 horas: $1,800 | 8 horas: $2,400",
     "price": "$1,200",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/up8t7qu1afcpnz8qkqeyl/AIAsha4HHKSZMynQcKFM4as?rlkey=sx44fupf3o9zpxyjqy84b6o8a&dl=0",
@@ -1434,7 +1281,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "1675 Northwest South River Drive",
-    "rates": "4 Hours - $900 | 6 Hours - $1200",
+    "rates": "4 horas: $900 | 6 horas: $1,200",
     "price": "$900",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/6l11km7w5ezid6vvdcm7p/ADJoQej2_WYwIg1_H5CwNkI?rlkey=fvgz4vpr4r58l3wrgrxsm36rg&st=om77vmaw&dl=0",
@@ -1460,7 +1307,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Regal Marine",
-    "rates": "4 hours $1300 | 6 hours $1800 | 8 hours $2100",
+    "rates": "4 horas: $1,300 | 6 horas: $1,800 | 8 horas: $2,100",
     "price": "$1,300",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/rltkzm8bfbl78u237czl0/AKuz7FTxSMWqQGWe5PsteHU?rlkey=8a01abjbuc5guoswr2ymbcnqk&st=bjm4ac6f&dl=0",
@@ -1490,7 +1337,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "2215 NW 14th St, Miami, FL",
-    "rates": "4H $1,500 | 6H $2,000 | 8H $2,500 | -$100 Mon–Thurs",
+    "rates": "4 horas: $1,500 | 6 horas: $2,000 | 8 horas: $2,500",
     "price": "$1,500",
     "priceLabel": "precio desde",
     "photoLink": "https://www.bing.com/images/search?q=Julia%20Valentine%20%E2%80%93%2052%E2%80%B2%20Azimut%202020%2040ft%20yacht%20Miami",
@@ -1520,9 +1367,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "River Landing",
-    "rates": "4 horas: $200 – $300 | 6 horas: $300 – $450 | 8 horas: $450 – $1,050",
-    "price": "$200",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $300 | 6 horas: $450 | 8 horas: $1,050",
+    "price": "$300",
+    "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/C6npEUQKQddviCxC9",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "53ft 2022 Galeon - 13 people (River Landing)\nPictures: \n4hr: $2,000 plus gratuity\n6hr: $3,000 plus gratuity\n8hr: $4,000 plus gratuity",
@@ -1531,18 +1378,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$200 – $300",
-        "estimated": true
+        "value": "$300"
       },
       {
         "label": "6 horas",
-        "value": "$300 – $450",
-        "estimated": true
+        "value": "$450"
       },
       {
         "label": "8 horas",
-        "value": "$450 – $1,050",
-        "estimated": true
+        "value": "$1,050"
       }
     ]
   },
@@ -1553,7 +1397,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "2215 NW 14th St, Miami, FL 33125",
-    "rates": "3 hours $1250 | 4 hour $1400 | 6 hours $1750 | 4H $2700 | 6H $4050 | 8H $5400",
+    "rates": "3 horas: $1,250 | 4 horas: $2,700 | 6 horas: $4,050 | 8 horas: $5,400",
     "price": "$1,250",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/znvy2nincz7v6i8kf4cux/AA0m9m8c5fL5Nz5m18pcOL8?rlkey=5b84zjj8obqhy3f9srhb1xw6c&st=nrrf0lg9&dl=0",
@@ -1565,14 +1409,6 @@ window.PRIME_YACHTS = [
       {
         "label": "3 horas",
         "value": "$1,250"
-      },
-      {
-        "label": "4 horas",
-        "value": "$1,400"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,750"
       },
       {
         "label": "4 horas",
@@ -1595,7 +1431,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4hrs: $1700 | 5hrs: $2100 | 6hrs: $2300 | *Security deposit: $300",
+    "rates": "4 horas: $1,700 | 5 horas: $2,100 | 6 horas: $2,300",
     "price": "$1,700",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/u/0/mobile/folders/1QbV9vWzhTw05wWvy1ga_MGY525WpqH-5?usp=share_link",
@@ -1625,8 +1461,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "From BaysideDowntown Miami",
-    "rates": "4 hours - $1,500 | 6 hours - $2,100 | 8 hours - $2,700 | 4 hours - $1300 | 6 hours - $1800 | 8 hours - $2400 | 4 hours $1500 | 6 hours $2000 | 8 hours $2500 | Take $100 off weekdays",
-    "price": "$1,300",
+    "rates": "4 horas: $1,500 | 6 horas: $2,100 | 8 horas: $2,700",
+    "price": "$1,500",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/11Kq9TgfIyhf0SxgRX3Lo4nc-QkWluKWa",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
@@ -1645,26 +1481,6 @@ window.PRIME_YACHTS = [
       {
         "label": "8 horas",
         "value": "$2,700"
-      },
-      {
-        "label": "4 horas",
-        "value": "$1,300"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,800"
-      },
-      {
-        "label": "8 horas",
-        "value": "$2,400"
-      },
-      {
-        "label": "6 horas",
-        "value": "$2,000"
-      },
-      {
-        "label": "8 horas",
-        "value": "$2,500"
       }
     ]
   },
@@ -1675,7 +1491,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "Lun-Jue: 4h $1500 | 6h $1800 | 8h $2600. Fin de semana: 4h $2000 | 6h $2500 | 8h $3500",
+    "rates": "4 horas: $1,500 | 6 horas: $2,500 | 8 horas: $3,500",
     "price": "$1,500",
     "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/ByqWw2MhVnUN5n8Z8",
@@ -1687,14 +1503,6 @@ window.PRIME_YACHTS = [
       {
         "label": "4 horas",
         "value": "$1,500"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,800"
-      },
-      {
-        "label": "8 horas · Fin de semana",
-        "value": "$2,600"
       },
       {
         "label": "6 horas",
@@ -1713,7 +1521,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "1800 NW 24th Ave, Miami, FL 33125",
-    "rates": "3H: $900 (Weekdays Only) | 4H: $1200 | 6H: $1800 | 8H: $2300 | $100 off Monday-Thursday",
+    "rates": "3 horas: $900 | 4 horas: $1,200 | 6 horas: $1,800 | 8 horas: $2,300",
     "price": "$900",
     "priceLabel": "precio desde",
     "photoLink": "https://vcyacht.club/monacophoto",
@@ -1723,7 +1531,7 @@ window.PRIME_YACHTS = [
     "photoLinkOk": true,
     "priceTable": [
       {
-        "label": "3 horas · Lun–Jue",
+        "label": "3 horas",
         "value": "$900"
       },
       {
@@ -1747,7 +1555,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "2550 S Bayshore Dr, Miami, FL 33133, United States",
-    "rates": "-$100 Mon–Thurs | 3H $1200 | 4H $1600 | 6H $2000 | 8H $2350",
+    "rates": "3 horas: $1,200 | 4 horas: $1,600 | 6 horas: $2,000 | 8 horas: $2,350",
     "price": "$1,200",
     "priceLabel": "precio desde",
     "photoLink": "",
@@ -1781,7 +1589,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4h $1,800 | 6h $2,600 | 8h $3,400",
+    "rates": "4 horas: $1,800 | 6 horas: $2,600 | 8 horas: $3,400",
     "price": "$1,800",
     "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/K3fPevBGXazHHLE7A",
@@ -1811,8 +1619,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4 hours-$2200 | 6-hours $2700 | 8-hours $3200 | 4 hours $2000 | 6 hours $2500 | 8 hours $3000 | Slide $700 | Pool $400 | Trampoline $400 | Jungle Gym $350",
-    "price": "$2,000",
+    "rates": "4 horas: $2,200 | 6 horas: $2,500 | 8 horas: $3,000",
+    "price": "$2,200",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/8580y46s392rlgs3yw1e4/h?rlkey=hjt8h4j8nuqylrw9epjhtox75&dl=0",
     "notes": "Extras indicados en la ficha original disponibles segun reserva. Fotos disponibles en el boton Ver mas fotos.",
@@ -1823,10 +1631,6 @@ window.PRIME_YACHTS = [
       {
         "label": "4 horas",
         "value": "$2,200"
-      },
-      {
-        "label": "4 horas",
-        "value": "$2,000"
       },
       {
         "label": "6 horas",
@@ -1845,7 +1649,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Chamonix Marina",
-    "rates": "4H- $1,300 | 6H- $1,700 | 8H- $2,800",
+    "rates": "4 horas: $1,300 | 6 horas: $1,700 | 8 horas: $2,800",
     "price": "$1,300",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/1LilJaIuVXdKQt8wrer64_3CtyfcDLEhf",
@@ -1875,7 +1679,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "$1100 4 hrs | $1500 6 hrs",
+    "rates": "4 horas: $1,100 | 6 horas: $1,500",
     "price": "$1,100",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/sh/modwphc5i7vhyj3/AABTQjx2Cz7vUezkzqVP8Bhga?dl=0",
@@ -1901,7 +1705,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Venetian Marina",
-    "rates": "4 Hours - $2300 | 6 Hours - $3000 | 8 Hours - $3700",
+    "rates": "4 horas: $2,300 | 6 horas: $3,000 | 8 horas: $3,700",
     "price": "$2,300",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/1pbbdXFLxJacbZnnwDom06Zmdh4S5V1xn?usp=drive_link",
@@ -1931,9 +1735,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Captain Joes",
-    "rates": "4 horas: $200 – $300 | 6 horas: $300 – $450 | 8 horas: $450 – $1,050",
-    "price": "$200",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $300 | 6 horas: $450 | 8 horas: $1,050",
+    "price": "$300",
+    "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/1-uQpUdHDYyROQPB-8vKr6gxlJWnKCGEa",
     "notes": "Gratuidad/tip segun nota del operador. Incluye capitan cuando se indica en el catalogo. Fotos disponibles en el boton Ver mas fotos.",
     "description": "️ 62’ Catamaran\n$2500 + tip - 4hrs\nLocation: Captain Joes\n",
@@ -1942,18 +1746,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$200 – $300",
-        "estimated": true
+        "value": "$300"
       },
       {
         "label": "6 horas",
-        "value": "$300 – $450",
-        "estimated": true
+        "value": "$450"
       },
       {
         "label": "8 horas",
-        "value": "$450 – $1,050",
-        "estimated": true
+        "value": "$1,050"
       }
     ]
   },
@@ -1964,7 +1765,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "2215 NW 14th St, Miami, FL 33125",
-    "rates": "Lun-Jue: 4h $1290 | 6h $1700. Vie/Dom: 4h $1390 | 6h $1800. Sáb: 4h $1440 | 5h $1645 | 6h $1850",
+    "rates": "4 horas: $1,290 | 5 horas: $1,645 | 6 horas: $1,850",
     "price": "$1,290",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/abzce06uqdm7ao0lbfy8j/AENtmJ1Rg-JyLxYfp3o61zU?rlkey=kln78khkfi6gzj7ax09qfewtx&st=tn1ak5yy&dl=0",
@@ -1976,14 +1777,6 @@ window.PRIME_YACHTS = [
       {
         "label": "4 horas",
         "value": "$1,290"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,700"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,800"
       },
       {
         "label": "5 horas",
@@ -2002,7 +1795,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami Beach Marina",
-    "rates": "4 horas $3500 | 6 horas $4500 | 8 horas $5500 | Tie-up $300",
+    "rates": "4 horas: $3,500 | 6 horas: $4,500 | 8 horas: $5,500",
     "price": "$3,500",
     "priceLabel": "precio desde",
     "photoLink": "https://floridalistingmedia.smugmug.com/YachtPhotographyGallery/n-dWL8QL/2022-Sunseeker-65-Predator",
@@ -2032,7 +1825,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "$2000 4 hours | $2800 6 hours",
+    "rates": "4 horas: $2,000 | 6 horas: $2,800",
     "price": "$2,000",
     "priceLabel": "precio desde",
     "photoLink": "https://www.bing.com/images/search?q=WARRIOR%20II%2066ft.%2066ft%20yacht%20Miami",
@@ -2058,7 +1851,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "Días laborables: 4h $1500 | 6h $1800 | 8h $2600. Fin de semana: 4h $2000 | 6h $2500 | 8h $3500",
+    "rates": "4 horas: $1,500 | 6 horas: $2,500 | 8 horas: $3,500",
     "price": "$1,500",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/1-6BZ1X1QFcbYLqvkJMBZRMBBSxjhVDZX",
@@ -2068,16 +1861,8 @@ window.PRIME_YACHTS = [
     "photoLinkOk": true,
     "priceTable": [
       {
-        "label": "4 horas · Lun–Jue",
+        "label": "4 horas",
         "value": "$1,500"
-      },
-      {
-        "label": "6 horas",
-        "value": "$1,800"
-      },
-      {
-        "label": "8 horas · Fin de semana",
-        "value": "$2,600"
       },
       {
         "label": "6 horas",
@@ -2096,7 +1881,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "$1600 4 hrs | $2300 6 hrs | $3000 8 hrs",
+    "rates": "4 horas: $1,600 | 6 horas: $2,300 | 8 horas: $3,000",
     "price": "$1,600",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/tk30jpopb5370xjg5wvgj/h?rlkey=odbypb3odcwocmpscejsucovt&e=1&dl=0",
@@ -2126,7 +1911,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "3218 NW North River Dr Miami, FL  33142 United States",
-    "rates": "4 HOURS - $1400 | 6 HOURS - $2000 | 8 HOURS - $2800",
+    "rates": "4 horas: $1,400 | 6 horas: $2,000 | 8 horas: $2,800",
     "price": "$1,400",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/i7cq9iltueg4p5crf08lc/AM5l1jKvevHm3Ef2tEFKzRA?rlkey=7oq1ljtzsie8th6e2a63d7o79&e=1&st=m6n555um&dl=0",
@@ -2156,9 +1941,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Regal Marina",
-    "rates": "4 horas: $200 – $300 | 6 horas: $300 – $450 | 8 horas: $450 – $1,050",
-    "price": "$200",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $300 | 6 horas: $450 | 8 horas: $1,050",
+    "price": "$300",
+    "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/DmVkdAr81kkaheRb9",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "68ft Luxury Azimut - 13 People (Regal Marina)\nPictures: \n4hr: $2,500 plus gratuity\n6hr: $3,500 plus gratuity\n8hr: $4,500 plus gratuity",
@@ -2167,18 +1952,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$200 – $300",
-        "estimated": true
+        "value": "$300"
       },
       {
         "label": "6 horas",
-        "value": "$300 – $450",
-        "estimated": true
+        "value": "$450"
       },
       {
         "label": "8 horas",
-        "value": "$450 – $1,050",
-        "estimated": true
+        "value": "$1,050"
       }
     ]
   },
@@ -2211,7 +1993,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "North Bay Village",
-    "rates": "4 hrs - $3,500 | 6 hrs - $4,425 | 8 hrs - $5,310",
+    "rates": "4 horas: $3,500 | 6 horas: $4,425 | 8 horas: $5,310",
     "price": "$3,500",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/10H-AiizLSLgs8WfsRyOEyQiP4ErjMLkv",
@@ -2241,7 +2023,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Bayside, Downtown Miami",
-    "rates": "4hr $3,500 | 6hrs $4,500 | 8 hrs $5,500",
+    "rates": "4 horas: $3,500 | 6 horas: $4,500 | 8 horas: $5,500",
     "price": "$3,500",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/u/0/mobile/folders/1OMB6yykTtTZQLO49_G-s9tWdapPDxHuI",
@@ -2271,8 +2053,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "$2100 4hr | $2600 6hr | $3200 8hr | $1900 4hr | $2400 6h | $3000 8hr",
-    "price": "$1,900",
+    "rates": "4 horas: $2,100 | 6 horas: $2,600 | 8 horas: $3,200",
+    "price": "$2,100",
     "priceLabel": "precio desde",
     "photoLink": "https://photos.google.com/share/AF1QipOm2id6VoZfBnqFNzERmR2d0fEdU4q9gqIR2y4H99TMAK2j2fjhto8DEEjtHNHCXQ?key=TXcwLWJpWWtQOXF4R3kybHg2bl82b0pKYkl5NEtR",
     "notes": "Fotos disponibles en el boton Ver mas fotos.",
@@ -2291,18 +2073,6 @@ window.PRIME_YACHTS = [
       {
         "label": "8 horas",
         "value": "$3,200"
-      },
-      {
-        "label": "4 horas",
-        "value": "$1,900"
-      },
-      {
-        "label": "6 horas",
-        "value": "$2,400"
-      },
-      {
-        "label": "8 horas",
-        "value": "$3,000"
       }
     ]
   },
@@ -2343,7 +2113,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4 hours $3200 | 6 hours $4000 | 8 hours $4700 | - Trampoline $200 (Flat Rate) | - Slide $400 (flat rate) | - Party-Bana $300 (flat rate) | - Mandatory Deposit ($1000) | Extra hour $500 per hour. *NO HIDDEN FEES *",
+    "rates": "4 horas: $3,200 | 6 horas: $4,000 | 8 horas: $4,700",
     "price": "$3,200",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/mfdrvp00g67hloyopw9gp/ANLp1Ue5-2UxKxUcE8ahrhc?rlkey=gb7hplojneh8z222kltoxpjjb&st=lm43ls56&dl=0",
@@ -2373,7 +2143,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "$2500 4 hrs | $3500 6 hrs | $4500 8 hrs",
+    "rates": "4 horas: $2,500 | 6 horas: $3,500 | 8 horas: $4,500",
     "price": "$2,500",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/3vl31p87881lm3a8eh8ds/h?rlkey=gqxm32t95owzc9b2c6lr41888&e=2&dl=0",
@@ -2403,7 +2173,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miamarina at Bayside",
-    "rates": "4 hours - $7,490 | 6 hours - $9,560 | 8 hours - $11,770",
+    "rates": "4 horas: $7,490 | 6 horas: $9,560 | 8 horas: $11,770",
     "price": "$7,490",
     "priceLabel": "precio desde",
     "photoLink": "https://yachtfleet.smugmug.com/85-Wally",
@@ -2433,7 +2203,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4 hours: $7,550 | 6 hours: $9,450 | 8 hours: $11,300",
+    "rates": "4 horas: $7,550 | 6 horas: $9,450 | 8 horas: $11,300",
     "price": "$7,550",
     "priceLabel": "precio desde",
     "photoLink": "https://bit.ly/88Azimut",
@@ -2463,9 +2233,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Regal Marina / River Landing / Aston Martin Miami",
-    "rates": "4 horas: $400 – $650 | 6 horas: $450 – $1,050 | 8 horas: $850 – $1,550",
-    "price": "$400",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $650 | 6 horas: $1,050 | 8 horas: $1,550",
+    "price": "$650",
+    "priceLabel": "precio desde",
     "photoLink": "https://photos.app.goo.gl/Ms3xHaWSRcHpArgc6",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "88ft Azimut “Satisfaction”- 13 people (Regal Marina/ Riverlanding/ Aston MartinMiami)\nPictures: \n4hr: $4,000 plus gratuity\n6hr: $5,000 plus gratuity\n8hr: $6,000 plus gratuity",
@@ -2474,18 +2244,15 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$400 – $650",
-        "estimated": true
+        "value": "$650"
       },
       {
         "label": "6 horas",
-        "value": "$450 – $1,050",
-        "estimated": true
+        "value": "$1,050"
       },
       {
         "label": "8 horas",
-        "value": "$850 – $1,550",
-        "estimated": true
+        "value": "$1,550"
       }
     ]
   },
@@ -2496,7 +2263,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Venetian Marina Pier 5",
-    "rates": "4 Hours - $2500 | 6 Hours - $3500 | 8 Hours - $4500 | 6H- $5,000 | 8H- $6,500",
+    "rates": "4 horas: $2,500 | 6 horas: $5,000 | 8 horas: $6,500",
     "price": "$2,500",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/1-FI60IpoLeD2bckwnV6F-EYhwXmXqoLT",
@@ -2508,14 +2275,6 @@ window.PRIME_YACHTS = [
       {
         "label": "4 horas",
         "value": "$2,500"
-      },
-      {
-        "label": "6 horas",
-        "value": "$3,500"
-      },
-      {
-        "label": "8 horas",
-        "value": "$4,500"
       },
       {
         "label": "6 horas",
@@ -2534,7 +2293,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "60 a 88 pies",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4 hours - $7,000 | 6 hours - $9,500 | 8 hours - $11,000",
+    "rates": "4 horas: $7,000 | 6 horas: $9,500 | 8 horas: $11,000",
     "price": "$7,000",
     "priceLabel": "precio desde",
     "photoLink": "https://www.sirena88charters.com/",
@@ -2564,7 +2323,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "3218 NW North River Dr, Miami, FL 33142",
-    "rates": "4 HOURS - $4000 | 6 HOURS - $5500 | 8 HOURS - $6500",
+    "rates": "4 horas: $4,000 | 6 horas: $5,500 | 8 horas: $6,500",
     "price": "$4,000",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/1VUqUIML-UE_sixD3hrzWmnZHQEaurL6C?usp=share_link",
@@ -2594,7 +2353,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "$2500 4 hrs | $3500 6 hrs | $4500 8 hrs",
+    "rates": "4 horas: $2,500 | 6 horas: $3,500 | 8 horas: $4,500",
     "price": "$2,500",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/uls26sjqsiaz6wjgb3pwm/ABb-7n44VFdu6pClk3oOVlM?rlkey=k9f583q5cctw6om5fm1jpkt4v&e=2&dl=0",
@@ -2624,7 +2383,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "3218 NW North River Dr Miami, FL  33142 United States",
-    "rates": "4 HOURS - $2500 | 6 HOURS - $3500 | 8 HOURS - $4500",
+    "rates": "4 horas: $2,500 | 6 horas: $3,500 | 8 horas: $4,500",
     "price": "$2,500",
     "priceLabel": "precio desde",
     "photoLink": "https://timetr.ee/s/HscCD8mXql9Y3RCrwyPS7rmVExcNzPxI",
@@ -2654,7 +2413,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4 Hours – $8,000 | 6 Hours – $9,500 | 8 Hours – $11,000 | Extra Hour – $1,500",
+    "rates": "4 horas: $8,000 | 6 horas: $9,500 | 8 horas: $11,000",
     "price": "$8,000",
     "priceLabel": "precio desde",
     "photoLink": "https://bit.ly/94Azimut",
@@ -2684,7 +2443,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "Waterways Marina Aventura",
-    "rates": "4 hrs $4850 | 6 hrs $5850 | 8 hrs $7000 | Daily Rate $10,000 +35% APA + Taxes when going to bahamas",
+    "rates": "4 horas: $4,850 | 6 horas: $5,850 | 8 horas: $7,000",
     "price": "$4,850",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/u/1/folders/1-MB9ZxAIP7PQ1oMGK3Lk-MRKnXeC9XE-",
@@ -2714,7 +2473,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "Island Gardens Marina, Miami, FL",
-    "rates": "4 hours - $5,500 - All Included | 6 hours - $6,750 - All Included | 8 hours - $8,500 - All Included",
+    "rates": "4 horas: $5,500 | 6 horas: $6,750 | 8 horas: $8,500",
     "price": "$5,500",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/file/d/1RbuNJOVFd_wALuaQLsER9Ku9dC5SpP7K/view?usp=sharing",
@@ -2744,7 +2503,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "Miami River",
-    "rates": "4 hours - $7,000 | 6 hours - $8,000 | 8 hours - $9,800",
+    "rates": "4 horas: $7,000 | 6 horas: $8,000 | 8 horas: $9,800",
     "price": "$7,000",
     "priceLabel": "precio desde",
     "photoLink": "https://yachtfleet.smugmug.com/100-Dominator",
@@ -2774,7 +2533,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4H- $4,000 | 6H- $5,000 | 8H- $6,500",
+    "rates": "4 horas: $4,000 | 6 horas: $5,000 | 8 horas: $6,500",
     "price": "$4,000",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/1xEvHORD_PfJxUzQkr4oMu8KWlBztCFIs",
@@ -2804,9 +2563,9 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "Miami River 2215 NW 14th St",
-    "rates": "4 horas: $400 – $650 | 6 horas: $450 – $1,050 | 8 horas: $850 – $1,550",
-    "price": "$400",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $3,300 | 6 horas: $4,250 | 7 horas: $5,050 | 8 horas: $5,980",
+    "price": "$3,300",
+    "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/ulcbcg2qhil8zyfvzzk64/AGA0E48RidX2fKeslSzAGiY?rlkey=8zrucmz8m77yuejhxsjsbss6y&dl=0",
     "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
     "description": "110ft Maiora - 13 People (STAMOS BIEN)\nPick up location: Miami River 2215 NW 14th St\nMiami, FL  33125, United States\nPictures : \nBroker Pricing\nWeekdays Mon-Thru\n4hr: $3,000+ gratuity\n6hr: $3,937 + gratuity\n7hrs: $4,724+ gratuity\n8hr: $5,511+ gratuity\nWeekend\n4hr: $3,300+ gratuity\n6hr: $4,250 + gratuity\n7hr: $5,050+ gratuity\n8hr: $5,980+ gratuity",
@@ -2815,18 +2574,19 @@ window.PRIME_YACHTS = [
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$400 – $650",
-        "estimated": true
+        "value": "$3,300"
       },
       {
         "label": "6 horas",
-        "value": "$450 – $1,050",
-        "estimated": true
+        "value": "$4,250"
+      },
+      {
+        "label": "7 horas",
+        "value": "$5,050"
       },
       {
         "label": "8 horas",
-        "value": "$850 – $1,550",
-        "estimated": true
+        "value": "$5,980"
       }
     ]
   },
@@ -2837,29 +2597,26 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "4 horas: $400 – $650 | 6 horas: $450 – $1,050 | 8 horas: $850 – $1,550",
-    "price": "$400",
-    "priceLabel": "desde · tarifa estimada",
+    "rates": "4 horas: $8,000 | 6 horas: $10,000 | 8 horas: $12,000",
+    "price": "$8,000",
+    "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/ypywveh09dgcnmxekim72/AB2ru47IylPf-S_h801T_6Y?rlkey=6f2ewnx6yfw8nvkl8yal6newd&e=1&dl=0",
-    "notes": "Gratuidad/tip segun nota del operador. Fotos disponibles en el boton Ver mas fotos.",
+    "notes": "Propina no incluida. Propina minima: 10%. Fotos disponibles en el boton Ver mas fotos.",
     "description": "116 “Infinity”\n4 hrs 8k no tip\n6 hrs 10k no tip\n8 hrs 12k no tip\n10% minimal on tip\n",
     "mediaKey": "089-116-infinity",
     "photoLinkOk": true,
     "priceTable": [
       {
         "label": "4 horas",
-        "value": "$400 – $650",
-        "estimated": true
+        "value": "$8,000"
       },
       {
         "label": "6 horas",
-        "value": "$450 – $1,050",
-        "estimated": true
+        "value": "$10,000"
       },
       {
         "label": "8 horas",
-        "value": "$850 – $1,550",
-        "estimated": true
+        "value": "$12,000"
       }
     ]
   },
@@ -2870,8 +2627,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "90 pies o mas",
     "passengers": 13,
     "location": "Miami, FL",
-    "rates": "Weekday Charter (8 hours): $23,500 all-inclusive | Weekend Charter (8 hours): $29,000 all-inclusive | Weekly Term Charter (7 days): $184,000",
-    "price": "$23,500",
+    "rates": "8 horas: $29,000",
+    "price": "$29,000",
     "priceLabel": "precio desde",
     "photoLink": "https://drive.google.com/drive/folders/1Ryre4RN2eGXAlh9sHdElscPYoFqFRnXg",
     "notes": "Incluye capitan cuando se indica en el catalogo. Extras indicados en la ficha original disponibles segun reserva. Fotos disponibles en el boton Ver mas fotos.",
@@ -2880,11 +2637,7 @@ window.PRIME_YACHTS = [
     "photoLinkOk": true,
     "priceTable": [
       {
-        "label": "8 horas · Lun–Jue",
-        "value": "$23,500"
-      },
-      {
-        "label": "8 horas · Fin de semana",
+        "label": "8 horas",
         "value": "$29,000"
       }
     ]
@@ -2926,7 +2679,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 12,
     "location": "2215 NW 14th St, Miami, FL 33125",
-    "rates": "6 horas $960",
+    "rates": "6 horas: $960",
     "price": "$960",
     "priceLabel": "precio desde",
     "photoLink": "https://www.dropbox.com/scl/fo/iw9g5natlr2cxm1fvlkhr/AOg_rtsyHaWWaY8bCiv4s9k?rlkey=deqenzzdo107a8yqmy1k94r1x&st=us7v8sm6&dl=0",
@@ -2948,8 +2701,8 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 13,
     "location": "MIAMI RIVER",
-    "rates": "4 hours: $640 | 5 hours: $740 | 6 hours: $900 | 8 hours: $1,035 | 4 hours: $660 | 5 hours: $770 | 6 hours: $920 | 8 hours: $1,055 | 4 hours: $710 | 5 hours: $840 | 6 hours: $970 | 8 hours: $1,180",
-    "price": "$640",
+    "rates": "4 horas: $710 | 5 horas: $840 | 6 horas: $970 | 8 horas: $1,180",
+    "price": "$710",
     "priceLabel": "precio desde",
     "photoLink": "https://clientyachtlink.com/l/a79ac4f4166840d2",
     "notes": "Fotos disponibles en el boton Ver mas fotos.",
@@ -2957,38 +2710,6 @@ window.PRIME_YACHTS = [
     "mediaKey": "093-36ft-regal",
     "photoLinkOk": true,
     "priceTable": [
-      {
-        "label": "4 horas",
-        "value": "$640"
-      },
-      {
-        "label": "5 horas",
-        "value": "$740"
-      },
-      {
-        "label": "6 horas",
-        "value": "$900"
-      },
-      {
-        "label": "8 horas",
-        "value": "$1,035"
-      },
-      {
-        "label": "4 horas",
-        "value": "$660"
-      },
-      {
-        "label": "5 horas",
-        "value": "$770"
-      },
-      {
-        "label": "6 horas",
-        "value": "$920"
-      },
-      {
-        "label": "8 horas",
-        "value": "$1,055"
-      },
       {
         "label": "4 horas",
         "value": "$710"
@@ -3014,12 +2735,12 @@ window.PRIME_YACHTS = [
     "sizeLabel": "40 a 58 pies",
     "passengers": 13,
     "location": "MIAMI RIVER",
-    "rates": "4 hrs: $2,500usd",
+    "rates": "4 horas: $2,500",
     "price": "$2,500",
     "priceLabel": "precio desde",
     "photoLink": "https://clientyachtlink.com/l/7fdd0f600b681a1b",
-    "notes": "Fotos disponibles en el boton Ver mas fotos.",
-    "description": "46FT MAXUM\nMax Capacity: 13 Guests\nDeparture: MIAMI RIVER\nNew Pictures \nNight time  ( 6PM TO 10PM OR 10PM-2AM )\n4 hrs: $2,500usd",
+    "notes": "Horario nocturno: 6PM–10PM o 10PM–2AM. Fotos disponibles en el boton Ver mas fotos.",
+    "description": "46FT MAXUM\nMax Capacity: 13 Guests\nDeparture: MIAMI RIVER\nNew Pictures: https://clientyachtlink.com/l/7fdd0f600b681a1b\nNight time (6PM TO 10PM OR 10PM-2AM)\n4 hrs: $2,500 USD",
     "mediaKey": "094-46ft-maxum",
     "photoLinkOk": true,
     "priceTable": [
@@ -3102,7 +2823,7 @@ window.PRIME_YACHTS = [
     "sizeLabel": "26 a 38 pies",
     "passengers": 11,
     "location": "201 NW South River Dr Miami Fl 33128",
-    "rates": "105usd PER HOUR ALL WEEK (EXCEPT SATURDAY‼️) | SATURDAY PRICE: $110 usd per hour | 2 hours $100 | 3 hours $150 | 4 hours $200 | 5 hours $250 | 6 hours $300 | 7 hours $350 | 8 hours $400",
+    "rates": "2 horas: $100 | 3 horas: $150 | 4 horas: $200 | 5 horas: $250 | 6 horas: $300 | 7 horas: $350 | 8 horas: $400",
     "price": "$100",
     "priceLabel": "precio desde",
     "photoLink": "https://clientyachtlink.com/l/5efeee369106edf1",
@@ -3111,10 +2832,6 @@ window.PRIME_YACHTS = [
     "mediaKey": "098-26-sea-ray-sundeck",
     "photoLinkOk": true,
     "priceTable": [
-      {
-        "label": "Por hora · Sábado",
-        "value": "$110"
-      },
       {
         "label": "2 horas",
         "value": "$100"

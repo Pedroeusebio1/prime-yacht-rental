@@ -8,5 +8,15 @@ assets/catalog/
 download-error.txt
 download-warning.txt
 node_modules/
+__pycache__/
+*.pyc
 .DS_Store
 Thumbs.db
+
+# Generated catalog upload artifacts
+tools/.miniaturas-upload/
+tools/.thumbnail-upload/
+tools/catalog-thumbnails-manifest.json
+tools/miniaturas-manifest.json
+tools/miniaturas-upload-results.json
+assets/covers/48ft-cranchi.png

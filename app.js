@@ -8,6 +8,7 @@
       'hero.eyebrow': 'Miami, FL & Dominican Republic',
       'hero.title': 'Experience luxury on the <em>sea</em>, without borders',
       'hero.lead': 'Prime Yacht Rental offers an exclusive fleet of yachts, boats, jet skis and ATVs in Miami and the Dominican Republic. Private charters, captain included, and five-star service for every occasion.',
+      'hero.priceFrom': 'Starting at', 'hero.priceNote': 'the lowest rate across our fleet',
       'hero.viewFleet': 'View Yachts & Boats', 'hero.quote': 'Personalized Quote',
       'stats.vessels': 'Vessels', 'stats.countries': 'Countries', 'stats.days': 'Days a week', 'stats.largest': 'Largest yacht',
       'locations.eyebrow': 'Two coasts, one exceptional brand',
@@ -132,6 +133,7 @@
   const loadMoreBtn = document.getElementById('loadMoreBtn');
   const adventuresGrid = document.getElementById('adventuresGrid');
   const statBoats = document.getElementById('statBoats');
+  const heroStartingPrice = document.getElementById('heroStartingPrice');
   const modal = document.getElementById('yachtModal');
   const editorAccess = document.getElementById('editorAccess');
   const editorExitMode = document.getElementById('editorExitMode');
@@ -177,20 +179,32 @@
   }
   function localizedRate(value){ return isEnglish() ? englishRate(value) : value; }
 
-  const imageBase = 'https://loremflickr.com/900/650/';
+  const catalogThumbnails = window.PRIME_THUMBNAILS || {};
   const yachtFallbackImages = {
     Pequeno: './assets/catalog-fallbacks/small-boat.png',
     Mediano: './assets/catalog-fallbacks/motor-yacht.png',
     Grande: './assets/catalog-fallbacks/superyacht.png',
     Premium: './assets/catalog-fallbacks/superyacht.png'
   };
-  function shuffled(items){
-    const copy = [...items];
-    for(let index = copy.length - 1; index > 0; index -= 1) {
-      const swapIndex = Math.floor(Math.random() * (index + 1));
-      [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
-    }
-    return copy;
+  function yachtStartingPrice(yacht){
+    const tableAmounts = Array.isArray(yacht && yacht.priceTable)
+      ? yacht.priceTable.map((row) => rateValueNumber(row && row.value)).filter(Number.isFinite)
+      : [];
+    if(tableAmounts.length) return Math.min(...tableAmounts);
+    const listedPrice = rateValueNumber(yacht && yacht.price);
+    return Number.isFinite(listedPrice) ? listedPrice : Number.POSITIVE_INFINITY;
+  }
+  function compareYachtPrices(a, b){
+    const aPrice = yachtStartingPrice(a);
+    const bPrice = yachtStartingPrice(b);
+    if(aPrice === bPrice) return 0;
+    return aPrice < bPrice ? -1 : 1;
+  }
+  function yachtsByStartingPrice(items){
+    return items
+      .map((yacht, sourceIndex) => ({ yacht, sourceIndex }))
+      .sort((a, b) => compareYachtPrices(a.yacht, b.yacht) || a.sourceIndex - b.sourceIndex)
+      .map((item) => item.yacht);
   }
 
   const legacyEditorStorageKey = 'prime-yacht-editor-v1';
@@ -216,10 +230,18 @@
         : {})
     };
   }
+  function withStaticThumbnail(vehicle){
+    const staticImage = catalogThumbnails[yachtStorageKey(vehicle)];
+    return staticImage
+      ? { ...vehicle, image: staticImage, coverImage: staticImage }
+      : vehicle;
+  }
   const deletedYachtKeys = new Set();
-  const sourceYachts = Array.isArray(window.PRIME_YACHTS) ? window.PRIME_YACHTS.map(cloneVehicle) : [];
+  const sourceYachts = Array.isArray(window.PRIME_YACHTS)
+    ? window.PRIME_YACHTS.map(cloneVehicle).map(withStaticThumbnail)
+    : [];
   const originalYachts = new Map(sourceYachts.map((yacht) => [yachtStorageKey(yacht), cloneVehicle(yacht)]));
-  const yachts = sourceYachts.length ? shuffled(sourceYachts.map(cloneVehicle)) : [];
+  const yachts = sourceYachts.length ? yachtsByStartingPrice(sourceYachts.map(cloneVehicle)) : [];
   const catalogMedia = window.PRIME_MEDIA || {};
 
   const filters = [
@@ -337,10 +359,10 @@
       imageTags: 'jet-car,miami,water',
       fallback: './assets/hero/hero-03.gif'
     }
-  ];
+  ].map(withStaticThumbnail);
   const originalAdventures = new Map(sourceAdventures.map((adventure) => [yachtStorageKey(adventure), cloneVehicle(adventure)]));
   const adventures = sourceAdventures.map(cloneVehicle);
-  const cloudCacheKey = 'prime-yacht-cloud-cache-v1';
+  const cloudCacheKey = 'prime-yacht-cloud-cache-v3';
   let cloudCatalogState = {};
   let cloudRefreshPromise = null;
   let lastCloudRefresh = 0;
@@ -397,7 +419,6 @@
       if(row.deleted) deletedYachtKeys.add(key);
     });
 
-    const currentYachtOrder = new Map(yachts.map((yacht, index) => [yachtStorageKey(yacht), index]));
     const nextYachts = sourceYachts.map((original, sourceIndex) => {
       const key = yachtStorageKey(original);
       if(deletedYachtKeys.has(key)) return null;
@@ -407,9 +428,7 @@
       };
     }).filter(Boolean);
     nextYachts.sort((a, b) => {
-      const aRank = currentYachtOrder.has(yachtStorageKey(a.vehicle)) ? currentYachtOrder.get(yachtStorageKey(a.vehicle)) : 10000 + a.sourceIndex;
-      const bRank = currentYachtOrder.has(yachtStorageKey(b.vehicle)) ? currentYachtOrder.get(yachtStorageKey(b.vehicle)) : 10000 + b.sourceIndex;
-      return aRank - bRank;
+      return compareYachtPrices(a.vehicle, b.vehicle) || a.sourceIndex - b.sourceIndex;
     });
     yachts.splice(0, yachts.length, ...nextYachts.map((item) => item.vehicle));
 
@@ -674,8 +693,9 @@
         if(/photos?|pictures?|calendar|galer[ií]a|https?:|www\.|\.club\//i.test(line)) return false;
         if(/(?:guest|people|pasajer|max|capacity)/i.test(line)) return false;
         if(/(?:location|departure|pickup|pick up|marina).*:/i.test(line)) return false;
-        if(/(?:hours?|horas?|hrs?|\b\d+h\b).*\$|\$.*(?:hours?|horas?|hrs?|\b\d+h\b)/i.test(line)) return false;
-        if(/^(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekday|weekend|mon|tue|wed|thu|fri|sat|sun)/i.test(line)) return false;
+        if(/\$|\b(?:usd|price|pricing|rates?|precios?|tarifas?)\b/i.test(line)) return false;
+        if(/(?:hours?|horas?|hrs?|\b\d+h\b).*\b\d{3,}\b|\b\d{3,}\b.*(?:hours?|horas?|hrs?|\b\d+h\b)/i.test(line)) return false;
+        if(/^(?:de\s+)?(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekday|weekend|mon|tue|wed|thu|fri|sat|sun|lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo|entre semana|fin de semana)/i.test(line)) return false;
         if(seen.has(normalized)) return false;
         seen.add(normalized);
         return true;
@@ -831,8 +851,7 @@
 
   function adventureImage(adventure){
     if(hasDirectImage(adventure.image)) return adventure.image;
-    const index = adventures.indexOf(adventure) + 101;
-    return `${imageBase}${adventure.imageTags}?lock=${index}`;
+    return fallbackImage(adventure);
   }
 
   function fallbackImage(yacht){
@@ -848,9 +867,7 @@
       ? yachts
       : yachts.filter((yacht) => yacht.size === activeFilter);
 
-    if(!searchTerm) return sizeFiltered;
-
-    return sizeFiltered.filter((yacht) => {
+    const searchFiltered = !searchTerm ? sizeFiltered : sizeFiltered.filter((yacht) => {
       const searchable = [
         yacht.name,
         yacht.feet,
@@ -869,6 +886,7 @@
         .toLowerCase();
       return searchable.includes(searchTerm);
     });
+    return yachtsByStartingPrice(searchFiltered);
   }
 
   function renderFilters(){
@@ -878,6 +896,7 @@
   }
 
   function renderCatalog(){
+    renderHeroStartingPrice();
     const filteredYachts = getFilteredYachts();
     const visibleYachts = filteredYachts.slice(0, visibleCount);
 
@@ -1086,6 +1105,17 @@
 
   function formattedPrice(value){
     return `$${Math.round(value).toLocaleString('en-US')}`;
+  }
+
+  function renderHeroStartingPrice(){
+    if(!heroStartingPrice) return;
+    const minimum = yachts.reduce((lowest, yacht) => (
+      Math.min(lowest, yachtStartingPrice(yacht))
+    ), Number.POSITIVE_INFINITY);
+    const callout = heroStartingPrice.closest('.hero-price-callout');
+    const hasPrice = Number.isFinite(minimum);
+    if(callout) callout.hidden = !hasPrice;
+    if(hasPrice) heroStartingPrice.textContent = formattedPrice(minimum);
   }
 
   function syncPricingEditorFields(updateLabels = true){
