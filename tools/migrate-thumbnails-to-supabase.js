@@ -28,12 +28,13 @@ const fallbackBySize = {
 };
 
 const sourceAdventures = [
-  { mediaKey: 'adventure-001-jet-ski-spark', image: './assets/catalog-fallbacks/jetski.png' },
+  { mediaKey: 'adventure-001-jet-ski', image: './assets/catalog-fallbacks/jetski.png' },
   { mediaKey: 'adventure-002-jet-ski-premium', image: './assets/catalog-fallbacks/jetski.png' },
   { mediaKey: 'adventure-003-atv-honda-rancher', image: 'https://loremflickr.com/900/650/atv,beach,adventure?lock=103' },
   { mediaKey: 'adventure-004-utv-honda-pioneer', image: './assets/adventures/utv-honda-pioneer.png' },
   { mediaKey: 'adventure-005-atv-group-experience', image: 'https://resmark-production.s3.amazonaws.com/images/QeygN9/aa998b9b8f6e73b603e3a243d805461f5c0229db/original' },
-  { mediaKey: 'adventure-006-jet-car-miami', image: 'https://loremflickr.com/900/650/jet-car,miami,water?lock=106' }
+  { mediaKey: 'adventure-006-jet-car-miami', image: 'https://loremflickr.com/900/650/jet-car,miami,water?lock=106' },
+  { mediaKey: 'adventure-007-horseback-riding', image: './assets/adventures/beach-horseback-riding.png' }
 ];
 
 // Fresh, downloadable sources recovered from the owners' shared Google Drive

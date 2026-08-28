@@ -148,6 +148,9 @@
 
   const isEnglish = () => document.documentElement.lang === 'en';
   const ui = (es, en) => isEnglish() ? en : es;
+  const vehicleName = (vehicle) => isEnglish() ? (vehicle.nameEn || vehicle.name) : vehicle.name;
+  const vehicleCategory = (vehicle) => isEnglish() ? (vehicle.categoryEn || vehicle.category) : vehicle.category;
+  const vehicleSizeLabel = (vehicle) => isEnglish() ? (vehicle.sizeLabelEn || vehicle.sizeLabel) : vehicle.sizeLabel;
   function englishLocation(value){
     return String(value || '')
       .replace(/Rep[uú]blica Dominicana/gi, 'Dominican Republic')
@@ -254,19 +257,19 @@
 
   const sourceAdventures = [
     {
-      name: 'Jet Ski Spark',
+      name: 'Jet Ski',
       category: 'Jet Ski',
       size: 'Acuatico',
       sizeLabel: 'Jet Ski',
       passengers: 2,
       location: 'Miami, FL',
-      rates: '1 hora · 1 pasajero: $135 | 1 hora · 2 pasajeros: $145 | 1 hora · Paquete deluxe con video y fotos: $175',
-      ratesEn: '1 hour · Single rider: $135 | 1 hour · Double rider: $145 | 1 hour · Deluxe video and photo package: $175',
-      price: '$135',
+      rates: '1 hora · 1 pasajero: $140 | 1 hora · 2 pasajeros: $160',
+      ratesEn: '1 hour · Single rider: $140 | 1 hour · Double rider: $160',
+      price: '$140',
       priceLabel: 'por hora',
-      notes: 'Máximo 2 horas por reservación. El paquete deluxe incluye videos y fotografías.',
-      notesEn: 'Maximum 2 hours per booking. The deluxe package includes videos and photos.',
-      mediaKey: 'adventure-001-jet-ski-spark',
+      notes: 'Máximo 2 horas por reservación. Incluye un paseo en bote de 35 a 40 minutos sin costo adicional.',
+      notesEn: 'Maximum 2 hours per booking. Includes a complimentary 35–40 minute boat ride.',
+      mediaKey: 'adventure-001-jet-ski',
       image: './assets/catalog-fallbacks/jetski.png',
       imageTags: 'jet-ski,miami,water',
       fallback: './assets/hero/hero-02.gif'
@@ -278,12 +281,12 @@
       sizeLabel: 'Jet Ski Premium',
       passengers: 2,
       location: 'Miami, FL',
-      rates: '1 hora · 1 pasajero: $135 | 1 hora · 2 pasajeros: $145 | 1 hora · Paquete deluxe con video y fotos: $175',
-      ratesEn: '1 hour · Single rider: $135 | 1 hour · Double rider: $145 | 1 hour · Deluxe video and photo package: $175',
-      price: '$135',
+      rates: '1 hora · 1 pasajero: $140 | 1 hora · 2 pasajeros: $160',
+      ratesEn: '1 hour · Single rider: $140 | 1 hour · Double rider: $160',
+      price: '$140',
       priceLabel: 'por hora',
-      notes: 'Máximo 2 horas por reservación. El paquete deluxe incluye videos y fotografías.',
-      notesEn: 'Maximum 2 hours per booking. The deluxe package includes videos and photos.',
+      notes: 'Máximo 2 horas por reservación.',
+      notesEn: 'Maximum 2 hours per booking.',
       mediaKey: 'adventure-002-jet-ski-premium',
       image: './assets/catalog-fallbacks/jetski.png',
       imageTags: 'luxury-jet-ski,miami,water',
@@ -358,6 +361,28 @@
       mediaKey: 'adventure-006-jet-car-miami',
       imageTags: 'jet-car,miami,water',
       fallback: './assets/hero/hero-03.gif'
+    },
+    {
+      name: 'Caballos',
+      nameEn: 'Horseback Riding',
+      category: 'Caballos',
+      categoryEn: 'Horseback Riding',
+      size: 'Terrestre',
+      sizeLabel: 'Paseo a caballo',
+      sizeLabelEn: 'Horseback riding',
+      passengers: 1,
+      location: 'Miami, FL',
+      rates: '1 hora: $120',
+      ratesEn: '1 hour: $120',
+      price: '$120',
+      priceLabel: '1 hora',
+      priceLabelEn: '1 hour',
+      notes: 'Paseo a caballo disponible por reservación.',
+      notesEn: 'Horseback riding experience available by reservation.',
+      mediaKey: 'adventure-007-horseback-riding',
+      image: './assets/adventures/beach-horseback-riding.png',
+      imageTags: 'horseback-riding,beach,adventure',
+      fallback: './assets/hero/hero-05.jpg'
     }
   ].map(withStaticThumbnail);
   const originalAdventures = new Map(sourceAdventures.map((adventure) => [yachtStorageKey(adventure), cloneVehicle(adventure)]));
@@ -833,7 +858,7 @@
   function yachtMediaHTML(yacht, index){
     const image = imageFor(yacht, index);
     if(image) {
-      return `<img data-hide-on-error src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(yacht))}">`;
+      return `<img data-hide-on-error src="${escapeHTML(image)}" alt="${escapeHTML(vehicleName(yacht))}" loading="lazy" style="${escapeHTML(mediaImageStyle(yacht))}">`;
     }
 
     return `
@@ -846,7 +871,7 @@
 
   function photoLinkHTML(yacht, className = 'photo-link'){
     if(!isUsablePhotoLink(yacht)) return '';
-    return `<a class="${className}" href="${escapeHTML(yacht.photoLink)}" target="_blank" rel="noopener noreferrer" aria-label="${ui('Ver más fotos de', 'View more photos of')} ${escapeHTML(yacht.name)}">${ui('Ver más fotos', 'View more photos')}</a>`;
+    return `<a class="${className}" href="${escapeHTML(yacht.photoLink)}" target="_blank" rel="noopener noreferrer" aria-label="${ui('Ver más fotos de', 'View more photos of')} ${escapeHTML(vehicleName(yacht))}">${ui('Ver más fotos', 'View more photos')}</a>`;
   }
 
   function adventureImage(adventure){
@@ -870,9 +895,13 @@
     const searchFiltered = !searchTerm ? sizeFiltered : sizeFiltered.filter((yacht) => {
       const searchable = [
         yacht.name,
+        yacht.nameEn,
+        yacht.category,
+        yacht.categoryEn,
         yacht.feet,
         yacht.size,
         yacht.sizeLabel,
+        yacht.sizeLabelEn,
         yacht.location,
         yacht.locationEn,
         yacht.passengers,
@@ -911,7 +940,7 @@
           </span>
           <span class="cat-body">
             <span class="cat-kicker">${escapeHTML(yacht.size)} · ${escapeHTML(yacht.feet || '')}FT</span>
-            <h3>${escapeHTML(yacht.name)}</h3>
+            <h3>${escapeHTML(vehicleName(yacht))}</h3>
             <span class="marina">${escapeHTML(yachtLocationText(yacht))}</span>
             ${yachtCardDetailsHTML(yacht)}
             <span class="cat-foot">
@@ -938,12 +967,14 @@
     modalMedia.style.backgroundImage = '';
     applyMediaPresentation(modalMedia, image, yacht, 'detail');
     modalMedia.classList.toggle('no-photo', !image);
-    modalMedia.dataset.placeholder = `${yacht.feet || ''}' ${yacht.name}`;
+    modalMedia.dataset.placeholder = `${yacht.feet || ''}' ${vehicleName(yacht)}`;
     modalMedia.innerHTML = image
-      ? `<img class="modal-active-media" data-hide-on-error src="${escapeHTML(image)}" alt="${escapeHTML(yacht.name)}" style="${escapeHTML(mediaImageStyle(yacht, 'detail'))}">`
+      ? `<img class="modal-active-media" data-hide-on-error src="${escapeHTML(image)}" alt="${escapeHTML(vehicleName(yacht))}" style="${escapeHTML(mediaImageStyle(yacht, 'detail'))}">`
       : '';
-    modal.querySelector('[data-modal-kicker]').textContent = isEnglish() ? `${yacht.feet || ''} ft | ${yacht.category || 'Yacht'}` : `${yacht.size} | ${yacht.sizeLabel}`;
-    modal.querySelector('[data-modal-title]').textContent = yacht.name;
+    modal.querySelector('[data-modal-kicker]').textContent = yacht.category
+      ? (isEnglish() ? vehicleSizeLabel(yacht) : `${yacht.size} | ${vehicleSizeLabel(yacht)}`)
+      : (isEnglish() ? `${yacht.feet || ''} ft | Yacht` : `${yacht.size} | ${yacht.sizeLabel}`);
+    modal.querySelector('[data-modal-title]').textContent = vehicleName(yacht);
     modal.querySelector('[data-modal-passengers]').textContent = yacht.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${yacht.passengers} ${ui('pasajeros', 'passengers')}`;
     modal.querySelector('[data-modal-location]').textContent = yachtLocationText(yacht);
     const modalRates = modal.querySelector('[data-modal-rates]');
@@ -973,15 +1004,15 @@
     adventuresGrid.innerHTML = adventures.map((adventure) => `
       <article class="adv-card" data-adventure-index="${adventures.indexOf(adventure)}">
         <button class="card-edit-btn" type="button" data-edit-adventure="${adventures.indexOf(adventure)}"><span aria-hidden="true">✎</span> ${ui('Editar tarjeta', 'Edit card')}</button>
-        <button class="adv-open" type="button" aria-label="${ui('Ver detalles de', 'View details for')} ${escapeHTML(adventure.name)}">
+        <button class="adv-open" type="button" aria-label="${ui('Ver detalles de', 'View details for')} ${escapeHTML(vehicleName(adventure))}">
           <span class="adv-media ${mediaContainerClass(adventure)}" style="${escapeHTML(mediaContainerStyle(adventure, imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure)))}">
-            <img data-hide-on-error src="${escapeHTML(imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure))}" alt="${escapeHTML(adventure.name)}" loading="lazy" style="${escapeHTML(mediaImageStyle(adventure))}">
-            <span class="cat-badge">${escapeHTML(adventure.sizeLabel)}</span>
+            <img data-hide-on-error src="${escapeHTML(imageFor(adventure, adventures.indexOf(adventure), 'adventure-') || fallbackImage(adventure))}" alt="${escapeHTML(vehicleName(adventure))}" loading="lazy" style="${escapeHTML(mediaImageStyle(adventure))}">
+            <span class="cat-badge">${escapeHTML(vehicleSizeLabel(adventure))}</span>
             <span class="cat-pax">${escapeHTML(adventure.passengers === 1 ? ui('1 pasajero', '1 passenger') : `${adventure.passengers} ${ui('pasajeros', 'passengers')}`)}</span>
           </span>
           <span class="adv-body">
-            <span class="tag">${escapeHTML(adventure.category)}</span>
-            <h3>${escapeHTML(adventure.name)}</h3>
+            <span class="tag">${escapeHTML(vehicleCategory(adventure))}</span>
+            <h3>${escapeHTML(vehicleName(adventure))}</h3>
             <span class="meta">${escapeHTML(yachtLocationText(adventure))}</span>
             ${priceTableHTML(adventure)}
             <span class="adv-prices">
