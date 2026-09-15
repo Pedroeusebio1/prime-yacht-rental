@@ -12,6 +12,7 @@ __pycache__/
 *.pyc
 .DS_Store
 Thumbs.db
+supabase/.temp/
 
 # Generated catalog upload artifacts
 tools/.miniaturas-upload/

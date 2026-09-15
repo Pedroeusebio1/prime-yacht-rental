@@ -9,7 +9,7 @@ as $$
     select 1
     from auth.users
     where id = (select auth.uid())
-      and lower(email) = 'info@primeyachtrental.com'
+      and lower(email) = 'primeyachtrent@gmail.com'
       and email_confirmed_at is not null
   );
 $$;

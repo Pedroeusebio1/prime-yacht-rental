@@ -27,8 +27,15 @@
       'deals.weekdayTitle': 'Weekdays', 'deals.weekday': 'Book 3 hours and enjoy the 4th on us.', 'deals.weekendTitle': 'Weekends', 'deals.weekend': 'Book 4 hours and enjoy the 5th on us.',
       'deals.sunday': 'Book 5 hours and pay for only 4.', 'deals.combos': 'Combine a yacht, jet ski, ATV or UTV in a private experience tailored to you.',
       'cta.title': 'Ready to set sail with <span class="accent">Prime</span>?', 'cta.text': 'Message us to create your ideal experience in Miami or the Dominican Republic. Fast response, no obligation.',
+      'visit.eyebrow': 'Find us in Miami', 'visit.title': 'Our <span class="accent">location</span>',
+      'visit.text': 'Visit us in the heart of Miami and let us help you plan an unforgettable experience on the water.',
+      'visit.office': 'Prime Yacht Rental · Miami', 'visit.button': 'View on Google Maps',
+      'reviews.eyebrow': 'Your experience matters', 'reviews.title': 'Share your <span class="accent">Prime</span> experience',
+      'reviews.text': 'Prime Yacht Rental would love your feedback. Share a review on our Google profile.',
+      'reviews.button': '⭐ Leave us a Google review', 'reviews.scan': 'Scan to leave us a review',
       'footer.about': 'Yacht, boat, jet ski and ATV rentals in Miami, FL and the Dominican Republic (Boca Chica, La Romana and Punta Cana). Live the Prime experience.',
-      'footer.navigation': 'Navigation', 'footer.open': 'Open 7 days a week', 'footer.rights': '© 2026 Prime Yacht Rental. All rights reserved.'
+      'footer.navigation': 'Navigation', 'footer.miamiTitle': 'Miami, United States', 'footer.drTitle': 'Dominican Republic',
+      'footer.open': 'Open 7 days a week', 'footer.rights': '© 2026 Prime Yacht Rental. All rights reserved.'
     }
   };
 
@@ -66,6 +73,37 @@
   let saved = 'es';
   try { saved = localStorage.getItem('prime-language') || (navigator.language.toLowerCase().startsWith('en') ? 'en' : 'es'); } catch (_) {}
   applyLanguage(saved, false);
+})();
+
+(function(){
+  const widget = document.querySelector('[data-whatsapp-widget]');
+  if(!widget) return;
+
+  const toggle = widget.querySelector('.whatsapp-float');
+  const options = widget.querySelector('.whatsapp-options');
+  if(!toggle || !options) return;
+
+  function setOpen(open){
+    widget.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+
+  toggle.addEventListener('click', () => setOpen(!widget.classList.contains('is-open')));
+  options.addEventListener('click', (event) => {
+    if(event.target.closest('a')) setOpen(false);
+  });
+  widget.addEventListener('focusout', (event) => {
+    if(!widget.contains(event.relatedTarget)) setOpen(false);
+  });
+  document.addEventListener('click', (event) => {
+    if(!widget.contains(event.target)) setOpen(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if(event.key === 'Escape') {
+      setOpen(false);
+      if(widget.contains(document.activeElement)) toggle.focus();
+    }
+  });
 })();
 
 (function(){

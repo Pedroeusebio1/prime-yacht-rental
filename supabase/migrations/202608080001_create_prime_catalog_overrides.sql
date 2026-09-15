@@ -53,7 +53,7 @@ as $$
     select 1
     from auth.users
     where id = (select auth.uid())
-      and lower(email) = 'info@primeyachtrental.com'
+      and lower(email) = 'primeyachtrent@gmail.com'
       and invited_at is not null
       and email_confirmed_at is not null
   );

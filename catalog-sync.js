@@ -4,7 +4,7 @@
   const projectUrl = 'https://knszwrcrsljpwjkgkxfn.supabase.co';
   const publishableKey = 'sb_publishable_kmFr40MwFGqX4mfoprBK2g_oe1xvbP7';
   const tableName = 'prime_catalog_overrides';
-  const adminEmail = 'info@primeyachtrental.com';
+  const adminEmail = 'primeyachtrent@gmail.com';
   const validImageFits = new Set(['cover', 'contain']);
   const validImagePositions = new Set(['center center', 'center top', 'center bottom', 'left center', 'right center']);
   const validImageBackgrounds = new Set(['blur', 'cream', 'dark', 'white']);
