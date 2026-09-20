@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "prime-yacht-rental.vercel.app"
+        }
+      ],
+      "destination": "https://primeyachtrental.com/$1",
+      "permanent": true
+    }
+  ]
+}
