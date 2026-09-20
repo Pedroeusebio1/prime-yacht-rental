@@ -47,7 +47,7 @@
     try {
       const base = global.document && global.document.baseURI
         ? global.document.baseURI
-        : 'https://primeyachtrental.com/';
+        : 'https://www.primeyachtrents.com/';
       const url = new URL(raw, base);
       if(url.username || url.password) return '';
       if(url.protocol === 'https:') return raw;
@@ -61,7 +61,7 @@
     try {
       const base = global.document && global.document.baseURI
         ? global.document.baseURI
-        : 'https://primeyachtrental.com/';
+        : 'https://www.primeyachtrents.com/';
       const hostname = new URL(String(value), base).hostname.toLowerCase();
       return hostname === 'bing.com' || hostname.endsWith('.bing.com') || hostname === 'bing.net' || hostname.endsWith('.bing.net');
     } catch (_) {

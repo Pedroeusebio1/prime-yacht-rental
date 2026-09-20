@@ -9,7 +9,7 @@
           "value": "prime-yacht-rental.vercel.app"
         }
       ],
-      "destination": "https://primeyachtrental.com/$1",
+      "destination": "https://www.primeyachtrents.com/$1",
       "permanent": true
     }
   ]
